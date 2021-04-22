@@ -1,60 +1,29 @@
 package ua.com.foxminded.university.domain;
 
-import java.util.Objects;
+import java.util.Arrays;
 
-public class ScienceDegree {
+public enum ScienceDegree {
 
-    private final String name;
 
-    private ScienceDegree(Builder builder) {
-        this.name = builder.name;
+    GRADUATE(1),
+    MASTER(2),
+    PH_D_CANDIDATE(3),
+    PH_D(4);
+
+    private int id;
+
+    ScienceDegree(int id) {
+        this.id = id;
     }
 
-    public static Builder builder() {
-        return new Builder();
+    public static ScienceDegree getById(int id) {
+        return Arrays.stream(values())
+                .filter(legNo -> legNo.id == id)
+                .findFirst().orElse(null);
     }
 
-    public String getName() {
-        return name;
+    public int getId(){
+        return id;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        ScienceDegree that = (ScienceDegree) o;
-        return Objects.equals(name, that.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name);
-    }
-
-    @Override
-    public String toString() {
-        return "ScienceDegree{" +
-                "name='" + name + '\'' +
-                '}';
-    }
-
-    public static class Builder {
-        private String name;
-
-        private Builder() {
-        }
-
-        public Builder withName(String name) {
-            this.name = name;
-            return this;
-        }
-
-        public ScienceDegree build() {
-            return new ScienceDegree(this);
-        }
-    }
 }

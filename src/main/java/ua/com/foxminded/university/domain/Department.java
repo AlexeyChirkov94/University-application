@@ -5,37 +5,26 @@ import java.util.Objects;
 
 public class Department {
 
+    private final Long id;
     private final String name;
-    private final List<Professor> professors;
-    private final List<Group> groups;
-    private final List<Discipline> disciplines;
 
     private Department(Builder builder){
+        this.id = builder.id;
         this.name = builder.name;
-        this.professors = builder.professors;
-        this.groups = builder.groups;
-        this.disciplines = builder.disciplines;
     }
 
     public static Builder builder() {
         return new Builder();
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public String getName() {
         return name;
     }
 
-    public List<Professor> getProfessors() {
-        return professors;
-    }
-
-    public List<Group> getGroups() {
-        return groups;
-    }
-
-    public List<Discipline> getDisciplines() {
-        return disciplines;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -46,53 +35,37 @@ public class Department {
             return false;
         }
         Department that = (Department) o;
-        return Objects.equals(name, that.name) &&
-                Objects.equals(professors, that.professors) &&
-                Objects.equals(groups, that.groups) &&
-                Objects.equals(disciplines, that.disciplines);
+        return Objects.equals(id, that.id) &&
+                Objects.equals(name, that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, professors, groups, disciplines);
+        return Objects.hash(id, name);
     }
 
     @Override
     public String toString() {
         return "Department{" +
-                "name='" + name + '\'' +
-                ", professors=" + professors +
-                ", groups=" + groups +
-                ", disciplines=" + disciplines +
+                "id=" + id +
+                ", name='" + name + '\'' +
                 '}';
     }
 
     public static class Builder {
+        private Long id;
         private String name;
-        private List<Professor> professors;
-        private List<Group> groups;
-        private List<Discipline> disciplines;
 
         private Builder() {
         }
 
+        public Builder withId(Long id) {
+            this.id = id;
+            return this;
+        }
+
         public Builder withName(String name) {
             this.name = name;
-            return this;
-        }
-
-        public Builder withProfessors(List<Professor> professors) {
-            this.professors = professors;
-            return this;
-        }
-
-        public Builder withGroups(List<Group> groups) {
-            this.groups = groups;
-            return this;
-        }
-
-        public Builder withDisciplines(List<Discipline> disciplines) {
-            this.disciplines = disciplines;
             return this;
         }
 
