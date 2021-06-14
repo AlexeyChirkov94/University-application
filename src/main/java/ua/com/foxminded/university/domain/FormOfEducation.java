@@ -4,14 +4,20 @@ import java.util.Objects;
 
 public class FormOfEducation {
 
+    private final Long id;
     private final String name;
 
     private FormOfEducation(Builder builder) {
+        this.id = builder.id;
         this.name = builder.name;
     }
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getName() {
@@ -27,25 +33,33 @@ public class FormOfEducation {
             return false;
         }
         FormOfEducation that = (FormOfEducation) o;
-        return Objects.equals(name, that.name);
+        return Objects.equals(id, that.id) &&
+                Objects.equals(name, that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return Objects.hash(id, name);
     }
 
     @Override
     public String toString() {
         return "FormOfEducation{" +
-                "name='" + name + '\'' +
+                "id=" + id +
+                ", name='" + name + '\'' +
                 '}';
     }
 
     public static class Builder {
+        private Long id;
         private String name;
 
         private Builder() {
+        }
+
+        public Builder withId(Long id) {
+            this.id = id;
+            return this;
         }
 
         public Builder withName(String name) {

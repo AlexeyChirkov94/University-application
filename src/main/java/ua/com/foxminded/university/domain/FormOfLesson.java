@@ -1,14 +1,15 @@
 package ua.com.foxminded.university.domain;
 
-import java.time.Duration;
 import java.util.Objects;
 
 public class FormOfLesson {
 
+    private final Long id;
     private final String name;
-    private final Duration duration;
+    private final Integer duration;
 
     private FormOfLesson(Builder builder) {
+        this.id = builder.id;
         this.name = builder.name;
         this.duration = builder.duration;
     }
@@ -17,11 +18,15 @@ public class FormOfLesson {
         return new Builder();
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public String getName() {
         return name;
     }
 
-    public Duration getDuration() {
+    public Integer getDuration() {
         return duration;
     }
 
@@ -34,28 +39,36 @@ public class FormOfLesson {
             return false;
         }
         FormOfLesson that = (FormOfLesson) o;
-        return Objects.equals(name, that.name) &&
+        return Objects.equals(id, that.id) &&
+                Objects.equals(name, that.name) &&
                 Objects.equals(duration, that.duration);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, duration);
+        return Objects.hash(id, name, duration);
     }
 
     @Override
     public String toString() {
         return "FormOfLesson{" +
-                "name='" + name + '\'' +
+                "id=" + id +
+                ", name='" + name + '\'' +
                 ", duration=" + duration +
                 '}';
     }
 
     public static class Builder {
+        private Long id;
         private String name;
-        private Duration duration;
+        private Integer duration;
 
         private Builder() {
+        }
+
+        public Builder withId(Long id) {
+            this.id = id;
+            return this;
         }
 
         public Builder withName(String name) {
@@ -63,7 +76,7 @@ public class FormOfLesson {
             return this;
         }
 
-        public Builder withDuration(Duration duration) {
+        public Builder withDuration(Integer duration) {
             this.duration = duration;
             return this;
         }

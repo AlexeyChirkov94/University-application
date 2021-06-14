@@ -5,34 +5,19 @@ import java.util.Objects;
 
 public class Professor extends User{
 
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String password;
-    private Faculty faculty;
     private Department department;
     private ScienceDegree scienceDegree;
-    private List<Group> slavesGroups;
-    private List<Discipline> disciplines;
+    private List<Course> courses;
 
     protected Professor(ProfessorBuilder userUserBuilder) {
         super(userUserBuilder);
+        this.department = userUserBuilder.department;
+        this.scienceDegree = userUserBuilder.scienceDegree;
+        this.courses = userUserBuilder.courses;
     }
 
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public Faculty getFaculty() {
-        return faculty;
+    public static ProfessorBuilder builder() {
+        return new ProfessorBuilder();
     }
 
     public Department getDepartment() {
@@ -43,12 +28,8 @@ public class Professor extends User{
         return scienceDegree;
     }
 
-    public List<Group> getSlavesGroups() {
-        return slavesGroups;
-    }
-
-    public List<Discipline> getDisciplines() {
-        return disciplines;
+    public List<Course> getCourses() {
+        return courses;
     }
 
     @Override
@@ -59,46 +40,39 @@ public class Professor extends User{
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
+        if (!super.equals(o)) {
+            return false;
+        }
         Professor professor = (Professor) o;
-        return Objects.equals(firstName, professor.firstName) &&
-                Objects.equals(lastName, professor.lastName) &&
-                Objects.equals(email, professor.email) &&
-                Objects.equals(password, professor.password) &&
-                Objects.equals(faculty, professor.faculty) &&
-                Objects.equals(department, professor.department) &&
+        return Objects.equals(department, professor.department) &&
                 Objects.equals(scienceDegree, professor.scienceDegree) &&
-                Objects.equals(slavesGroups, professor.slavesGroups) &&
-                Objects.equals(disciplines, professor.disciplines);
+                Objects.equals(courses, professor.courses);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(firstName, lastName, email, password, faculty, department, scienceDegree, slavesGroups, disciplines);
+        return Objects.hash(super.hashCode(), department, scienceDegree, courses);
     }
 
     @Override
     public String toString() {
         return "Professor{" +
-                "firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", faculty=" + faculty +
+                "id=" + this.getId() +
+                ", firstName='" + this.getFirstName() + '\'' +
+                ", lastName='" + this.getLastName() + '\'' +
+                ", email='" + this.getEmail() + '\'' +
                 ", department=" + department +
                 ", scienceDegree=" + scienceDegree +
-                ", slavesGroups=" + slavesGroups +
-                ", disciplines=" + disciplines +
+                ", disciplines=" + courses +
                 '}';
     }
 
     public static class ProfessorBuilder extends UserBuilder<ProfessorBuilder> {
-        private Faculty faculty;
         private Department department;
         private ScienceDegree scienceDegree;
-        private List<Group> slavesGroups;
-        private List<Discipline> disciplines;
+        private List<Course> courses;
 
-        public ProfessorBuilder() {
+        private ProfessorBuilder() {
         }
 
         @Override
@@ -108,11 +82,6 @@ public class Professor extends User{
 
         public Professor build() {
             return new Professor(self());
-        }
-
-        public ProfessorBuilder withFaculty(Faculty faculty) {
-            this.faculty = faculty;
-            return self();
         }
 
         public ProfessorBuilder withDepartment(Department department) {
@@ -125,13 +94,8 @@ public class Professor extends User{
             return self();
         }
 
-        public ProfessorBuilder withGroups(List<Group> slavesGroups) {
-            this.slavesGroups = slavesGroups;
-            return self();
-        }
-
-        public ProfessorBuilder withDisciplines(List<Discipline> disciplines) {
-            this.disciplines = disciplines;
+        public ProfessorBuilder withCourses(List<Course> courses) {
+            this.courses = courses;
             return self();
         }
     }

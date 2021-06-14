@@ -5,17 +5,17 @@ import java.util.Objects;
 
 public class Lesson {
 
-    private final Discipline discipline;
+    private final Long id;
+    private final Course course;
     private final LocalDateTime timeOfStartLesson;
-    private final LocalDateTime timeOfEndLesson;
     private final Group group;
     private final Professor teacher;
     private final FormOfLesson formOfLesson;
 
     private Lesson(Builder builder) {
-        this.discipline = builder.discipline;
+        this.id = builder.id;
+        this.course = builder.course;
         this.timeOfStartLesson = builder.timeOfStartLesson;
-        this.timeOfEndLesson = builder.timeOfEndLesson;
         this.group = builder.group;
         this.teacher = builder.teacher;
         this.formOfLesson = builder.formOfLesson;
@@ -25,16 +25,16 @@ public class Lesson {
         return new Builder();
     }
 
-    public Discipline getDiscipline() {
-        return discipline;
+    public Long getId() {
+        return id;
+    }
+
+    public Course getCourse() {
+        return course;
     }
 
     public LocalDateTime getTimeOfStartLesson() {
         return timeOfStartLesson;
-    }
-
-    public LocalDateTime getTimeOfEndLesson() {
-        return timeOfEndLesson;
     }
 
     public Group getGroup() {
@@ -58,9 +58,9 @@ public class Lesson {
             return false;
         }
         Lesson lesson = (Lesson) o;
-        return Objects.equals(discipline, lesson.discipline) &&
+        return Objects.equals(id, lesson.id) &&
+                Objects.equals(course, lesson.course) &&
                 Objects.equals(timeOfStartLesson, lesson.timeOfStartLesson) &&
-                Objects.equals(timeOfEndLesson, lesson.timeOfEndLesson) &&
                 Objects.equals(group, lesson.group) &&
                 Objects.equals(teacher, lesson.teacher) &&
                 Objects.equals(formOfLesson, lesson.formOfLesson);
@@ -68,15 +68,15 @@ public class Lesson {
 
     @Override
     public int hashCode() {
-        return Objects.hash(discipline, timeOfStartLesson, timeOfEndLesson, group, teacher, formOfLesson);
+        return Objects.hash(id, course, timeOfStartLesson, group, teacher, formOfLesson);
     }
 
     @Override
     public String toString() {
         return "Lesson{" +
-                "discipline=" + discipline +
+                "id=" + id +
+                ", discipline=" + course +
                 ", timeOfStartLesson=" + timeOfStartLesson +
-                ", timeOfEndLesson=" + timeOfEndLesson +
                 ", group=" + group +
                 ", teacher=" + teacher +
                 ", formOfLesson=" + formOfLesson +
@@ -84,9 +84,9 @@ public class Lesson {
     }
 
     public static class Builder {
-        private Discipline discipline;
+        private Long id;
+        private Course course;
         private LocalDateTime timeOfStartLesson;
-        private LocalDateTime timeOfEndLesson;
         private Group group;
         private Professor teacher;
         private FormOfLesson formOfLesson;
@@ -94,18 +94,18 @@ public class Lesson {
         private Builder() {
         }
 
-        public Builder withDiscipline(Discipline discipline) {
-            this.discipline = discipline;
+        public Builder withId(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder withCourse(Course course) {
+            this.course = course;
             return this;
         }
 
         public Builder withTimeOfStartLesson(LocalDateTime timeOfStartLesson) {
             this.timeOfStartLesson = timeOfStartLesson;
-            return this;
-        }
-
-        public Builder withTimeOfEndLesson(LocalDateTime timeOfEndLesson) {
-            this.timeOfEndLesson = timeOfEndLesson;
             return this;
         }
 

@@ -4,51 +4,21 @@ import java.util.Objects;
 
 public class Student extends User {
 
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String password;
-    private Integer course;
-    private Faculty faculty;
-    private Department department;
     private Group group;
-    private FormOfEducation formOfEducation;
 
     protected Student(StudentBuilder userUserBuilder) {
         super(userUserBuilder);
+        this.group = userUserBuilder.group;
     }
 
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public Integer getCourse() {
-        return course;
-    }
-
-    public Faculty getFaculty() {
-        return faculty;
-    }
-
-    public Department getDepartment() {
-        return department;
+    public static StudentBuilder builder() {
+        return new StudentBuilder();
     }
 
     public Group getGroup() {
         return group;
     }
 
-    public FormOfEducation getFormOfEducation() {
-        return formOfEducation;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -58,46 +28,33 @@ public class Student extends User {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
+        if (!super.equals(o)) {
+            return false;
+        }
         Student student = (Student) o;
-        return Objects.equals(firstName, student.firstName) &&
-                Objects.equals(lastName, student.lastName) &&
-                Objects.equals(email, student.email) &&
-                Objects.equals(password, student.password) &&
-                Objects.equals(course, student.course) &&
-                Objects.equals(faculty, student.faculty) &&
-                Objects.equals(department, student.department) &&
-                Objects.equals(group, student.group) &&
-                Objects.equals(formOfEducation, student.formOfEducation);
+        return Objects.equals(group, student.group);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(firstName, lastName, email, password, course, faculty, department, group, formOfEducation);
+        return Objects.hash(super.hashCode(), group);
     }
 
     @Override
     public String toString() {
         return "Student{" +
-                "firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", course=" + course +
-                ", faculty=" + faculty +
-                ", department=" + department +
+                "id=" + this.getId() +
+                ", firstName='" + this.getFirstName() + '\'' +
+                ", lastName='" + this.getLastName() + '\'' +
+                ", email='" + this.getEmail() + '\'' +
                 ", group=" + group +
-                ", formOfEducation=" + formOfEducation +
                 '}';
     }
 
     public static class StudentBuilder extends UserBuilder<StudentBuilder> {
-        private Integer course;
-        private Faculty faculty;
-        private Department department;
         private Group group;
-        private FormOfEducation formOfEducation;
 
-        public StudentBuilder() {
+        private StudentBuilder() {
         }
 
         @Override
@@ -109,30 +66,11 @@ public class Student extends User {
             return new Student(self());
         }
 
-        public StudentBuilder withCourse(Integer course) {
-            this.course = course;
-            return self();
-        }
-
-        public StudentBuilder withFaculty(Faculty faculty) {
-            this.faculty = faculty;
-            return self();
-        }
-
-        public StudentBuilder withDepartment(Department department) {
-            this.department = department;
-            return self();
-        }
-
         public StudentBuilder withGroup(Group group) {
             this.group = group;
             return self();
         }
 
-        public StudentBuilder withFormOfEducation(FormOfEducation formOfEducation) {
-            this.formOfEducation = formOfEducation;
-            return self();
-        }
     }
 
 }

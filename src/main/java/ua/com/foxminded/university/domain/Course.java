@@ -2,18 +2,16 @@ package ua.com.foxminded.university.domain;
 
 import java.util.Objects;
 
-public class Group {
+public class Course {
 
     private final Long id;
     private final String name;
     private final Department department;
-    private final FormOfEducation formOfEducation;
 
-    private Group(Builder builder){
+    private Course(Builder builder) {
         this.id = builder.id;
         this.name = builder.name;
         this.department = builder.department;
-        this.formOfEducation = builder.formOfEducation;
     }
 
     public static Builder builder() {
@@ -24,16 +22,12 @@ public class Group {
         return id;
     }
 
-    public String getName() {
-        return name;
-    }
-
     public Department getDepartment() {
         return department;
     }
 
-    public FormOfEducation getFormOfEducation() {
-        return formOfEducation;
+    public String getName() {
+        return name;
     }
 
     @Override
@@ -44,25 +38,23 @@ public class Group {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Group group = (Group) o;
-        return Objects.equals(id, group.id) &&
-                Objects.equals(name, group.name) &&
-                Objects.equals(department, group.department) &&
-                Objects.equals(formOfEducation, group.formOfEducation);
+        Course that = (Course) o;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(department, that.department);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, department, formOfEducation);
+        return Objects.hash(id, name, department);
     }
 
     @Override
     public String toString() {
-        return "Group{" +
+        return "Course{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", department=" + department +
-                ", formOfEducation=" + formOfEducation +
                 '}';
     }
 
@@ -70,7 +62,6 @@ public class Group {
         private Long id;
         private String name;
         private Department department;
-        private FormOfEducation formOfEducation;
 
         private Builder() {
         }
@@ -90,13 +81,8 @@ public class Group {
             return this;
         }
 
-        public Builder withFormOfEducation(FormOfEducation formOfEducation) {
-            this.formOfEducation = formOfEducation;
-            return this;
-        }
-
-        public Group build() {
-            return new Group(this);
+        public Course build() {
+            return new Course(this);
         }
     }
 
