@@ -50,7 +50,7 @@ create table users
     first_name varchar(30),
     last_name varchar(30),
     email varchar(50),
-    password varchar(30),
+    password varchar(60),
     group_id bigint references groups(id),
     department_id bigint references departments(id),
     scienceDegree_id int

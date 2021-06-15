@@ -1,20 +1,20 @@
 package ua.com.foxminded.university.testUtils;
 
-import ua.com.foxminded.university.domain.Course;
-import ua.com.foxminded.university.domain.Department;
-import ua.com.foxminded.university.domain.FormOfEducation;
-import ua.com.foxminded.university.domain.FormOfLesson;
-import ua.com.foxminded.university.domain.Group;
-import ua.com.foxminded.university.domain.Lesson;
-import ua.com.foxminded.university.domain.Professor;
-import ua.com.foxminded.university.domain.Student;
-import ua.com.foxminded.university.domain.User;
-
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import ua.com.foxminded.university.entity.Course;
+import ua.com.foxminded.university.entity.Department;
+import ua.com.foxminded.university.entity.FormOfEducation;
+import ua.com.foxminded.university.entity.FormOfLesson;
+import ua.com.foxminded.university.entity.Group;
+import ua.com.foxminded.university.entity.Lesson;
+import ua.com.foxminded.university.entity.Professor;
+import ua.com.foxminded.university.entity.Student;
+import ua.com.foxminded.university.entity.User;
 import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestUtility<T> {
+public class TestUtility {
 
     public static void assertCourses(Course actual, Course expected) {
         assertThat(actual.getName()).isEqualTo(expected.getName());

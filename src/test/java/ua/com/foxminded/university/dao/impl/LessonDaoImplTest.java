@@ -3,18 +3,17 @@ package ua.com.foxminded.university.dao.impl;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ua.com.foxminded.university.TestsContextConfiguration;
 import ua.com.foxminded.university.dao.interfaces.CourseDao;
 import ua.com.foxminded.university.dao.interfaces.FormOfLessonDao;
 import ua.com.foxminded.university.dao.interfaces.GroupDao;
 import ua.com.foxminded.university.dao.interfaces.LessonDao;
 import ua.com.foxminded.university.dao.interfaces.ProfessorDao;
-import ua.com.foxminded.university.domain.Course;
-import ua.com.foxminded.university.domain.FormOfLesson;
-import ua.com.foxminded.university.domain.Group;
-import ua.com.foxminded.university.domain.Lesson;
-import ua.com.foxminded.university.domain.Professor;
+import ua.com.foxminded.university.entity.Course;
+import ua.com.foxminded.university.entity.FormOfLesson;
+import ua.com.foxminded.university.entity.Group;
+import ua.com.foxminded.university.entity.Lesson;
+import ua.com.foxminded.university.entity.Professor;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -73,17 +72,17 @@ public class LessonDaoImplTest {
 
     @Test
     void createAndReadShouldAddListOfNewLessonsToDatabaseIfArgumentIsListOfLessons(){
-        List<Lesson> addingLessons = Arrays.asList (Lesson.builder()
+        List<Lesson> addingLessonEntities = Arrays.asList (Lesson.builder()
                 .withCourse(courseForTest)
                 .withTimeOfStartLesson(LocalDateTime.parse("2020-01-15_12:00:00.000", FORMATTER))
                 .withGroup(groupForTest)
                 .withTeacher(professorForTest)
                 .withFormOfLesson(formOfLessonForTest)
                 .build());
-        lessonDao.saveAll(addingLessons);
-        List<Lesson> readingLessons = Arrays.asList(lessonDao.findById((long)6).get());
+        lessonDao.saveAll(addingLessonEntities);
+        List<Lesson> readingLessonEntities = Arrays.asList(lessonDao.findById((long)6).get());
 
-        assertLessons(readingLessons, addingLessons);
+        assertLessons(readingLessonEntities, addingLessonEntities);
     }
 
     @Test

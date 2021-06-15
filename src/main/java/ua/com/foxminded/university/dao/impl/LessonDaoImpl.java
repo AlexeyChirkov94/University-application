@@ -6,11 +6,12 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ua.com.foxminded.university.dao.interfaces.LessonDao;
-import ua.com.foxminded.university.domain.Course;
-import ua.com.foxminded.university.domain.FormOfLesson;
-import ua.com.foxminded.university.domain.Group;
-import ua.com.foxminded.university.domain.Lesson;
-import ua.com.foxminded.university.domain.Professor;
+import ua.com.foxminded.university.entity.Course;
+import ua.com.foxminded.university.entity.FormOfLesson;
+import ua.com.foxminded.university.entity.Group;
+import ua.com.foxminded.university.entity.Lesson;
+import ua.com.foxminded.university.entity.Professor;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -37,7 +38,6 @@ public class LessonDaoImpl extends AbstractPageableCrudDaoImpl<Lesson> implement
     private static final String CHANGE_COURSE_QUERY = "UPDATE lessons SET course_id = ? WHERE id = ?";
     private static final String FIND_BY_GROUP_ID = FIND_QUERY + "WHERE l.group_id=? ORDER BY timeOfStart";
     private static final String FIND_BY_PROFESSOR_ID = FIND_QUERY + "WHERE l.professor_id=? ORDER BY timeOfStart";
-
     private static final RowMapper<Lesson> ROW_MAPPER = (rs, rowNum) ->
         Lesson.builder()
                 .withId(rs.getLong("id"))
@@ -60,7 +60,6 @@ public class LessonDaoImpl extends AbstractPageableCrudDaoImpl<Lesson> implement
                         .withName(rs.getString("formoflesson_name"))
                         .build())
                 .build();
-
 
     public LessonDaoImpl(JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate, SAVE_QUERY, FIND_BY_ID_QUERY, FIND_ALL_NO_PAGES_QUERY, UPDATE_QUERY, DELETE_QUERY, ROW_MAPPER,
@@ -98,18 +97,18 @@ public class LessonDaoImpl extends AbstractPageableCrudDaoImpl<Lesson> implement
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection
                     .prepareStatement(SAVE_QUERY, Statement.RETURN_GENERATED_KEYS);
-            preparePSForInsert(ps, lesson);
+            preparePreparedStatementForInsert(ps, lesson);
             return ps;
         }, keyHolder);
 
         return Lesson.builder()
-                    .withId(new Long(String.valueOf(keyHolder.getKeyList().get(0).get("id"))))
+                    .withId(getIdOfSavedEntity(keyHolder))
                     .withTimeOfStartLesson(lesson.getTimeOfStartLesson())
                     .build();
     }
 
     @Override
-    protected void preparePSForInsert(PreparedStatement ps, Lesson lesson) throws SQLException {
+    protected void preparePreparedStatementForInsert(PreparedStatement ps, Lesson lesson) throws SQLException {
         ps.setTimestamp(1, Timestamp.valueOf(lesson.getTimeOfStartLesson()));
     }
 
@@ -119,8 +118,8 @@ public class LessonDaoImpl extends AbstractPageableCrudDaoImpl<Lesson> implement
     }
 
     @Override
-    protected void preparePSForUpdate(PreparedStatement ps, Lesson lesson) throws SQLException {
-        preparePSForInsert(ps, lesson);
+    protected void preparePreparedStatementForUpdate(PreparedStatement ps, Lesson lesson) throws SQLException {
+        preparePreparedStatementForInsert(ps, lesson);
         ps.setLong(2, lesson.getId());
     }
 

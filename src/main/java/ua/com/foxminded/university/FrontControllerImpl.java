@@ -1,7 +1,6 @@
 package ua.com.foxminded.university;
 
 import org.springframework.stereotype.Service;
-import ua.com.foxminded.university.dao.impl.CourseDaoImpl;
 import ua.com.foxminded.university.dao.interfaces.CourseDao;
 import ua.com.foxminded.university.dao.interfaces.DepartmentDao;
 import ua.com.foxminded.university.dao.interfaces.FormOfEducationDao;
@@ -10,11 +9,22 @@ import ua.com.foxminded.university.dao.interfaces.GroupDao;
 import ua.com.foxminded.university.dao.interfaces.LessonDao;
 import ua.com.foxminded.university.dao.interfaces.ProfessorDao;
 import ua.com.foxminded.university.dao.interfaces.StudentDao;
-import ua.com.foxminded.university.domain.Lesson;
-import ua.com.foxminded.university.domain.Student;
+import ua.com.foxminded.university.dto.LessonResponse;
+import ua.com.foxminded.university.dto.StudentRequest;
+import ua.com.foxminded.university.dto.StudentResponse;
+import ua.com.foxminded.university.entity.FormOfLesson;
+import ua.com.foxminded.university.entity.Lesson;
+import ua.com.foxminded.university.entity.Student;
 import ua.com.foxminded.university.providers.ViewProvider;
+import ua.com.foxminded.university.service.interfaces.CourseService;
+import ua.com.foxminded.university.service.interfaces.DepartmentService;
+import ua.com.foxminded.university.service.interfaces.FormOfEducationService;
+import ua.com.foxminded.university.service.interfaces.FormOfLessonService;
+import ua.com.foxminded.university.service.interfaces.GroupService;
+import ua.com.foxminded.university.service.interfaces.LessonService;
+import ua.com.foxminded.university.service.interfaces.ProfessorService;
+import ua.com.foxminded.university.service.interfaces.StudentService;
 
-import javax.inject.Inject;
 import java.util.List;
 
 @Service
@@ -29,33 +39,33 @@ public class FrontControllerImpl implements FrontController {
             "Press 4 show all students; \n" +
             "Press 5 delete student; \n";
 
-    private final CourseDao courseDao;
-    private final DepartmentDao departmentDao;
-    private final FormOfEducationDao formOfEducationDao;
-    private final FormOfLessonDao formOfLessonDao;
-    private final GroupDao groupDao;
-    private final LessonDao lessonDao;
-    private final ProfessorDao professorDao;
-    private final StudentDao studentDao;
+    private final CourseService courseService;
+    private final DepartmentService departmentService;
+    private final FormOfEducationService formOfEducationService;
+    private final FormOfLessonService formOfLessonService;
+    private final GroupService groupService;
+    private final LessonService lessonService;
+    private final ProfessorService professorService;
+    private final StudentService studentService;
     private final ViewProvider viewProvider;
 
-    @Inject
-    public FrontControllerImpl(CourseDao courseDao, DepartmentDao departmentDao, FormOfEducationDao formOfEducationDao,
-                               FormOfLessonDao formOfLessonDao, GroupDao groupDao, LessonDao lessonDao,
-                               ProfessorDao professorDao, StudentDao studentDao, ViewProvider viewProvider) {
-        this.courseDao = courseDao;
-        this.departmentDao = departmentDao;
-        this.formOfEducationDao = formOfEducationDao;
-        this.formOfLessonDao = formOfLessonDao;
-        this.groupDao = groupDao;
-        this.lessonDao = lessonDao;
-        this.professorDao = professorDao;
-        this.studentDao = studentDao;
+    public FrontControllerImpl(CourseService courseService, DepartmentService departmentService,
+                               FormOfEducationService formOfEducationService, FormOfLessonService formOfLessonService,
+                               GroupService groupService, LessonService lessonService, ProfessorService professorService,
+                               StudentService studentService, ViewProvider viewProvider) {
+        this.courseService = courseService;
+        this.departmentService = departmentService;
+        this.formOfEducationService = formOfEducationService;
+        this.formOfLessonService = formOfLessonService;
+        this.groupService = groupService;
+        this.lessonService = lessonService;
+        this.professorService = professorService;
+        this.studentService = studentService;
         this.viewProvider = viewProvider;
     }
 
     @Override
-    public void startMenu(int itemsPerPage) {
+    public void startMenu() {
         boolean cycleBreaker = false;
 
         while (!cycleBreaker){
@@ -67,7 +77,7 @@ public class FrontControllerImpl implements FrontController {
                 case 1: timeTableForStudent(); break;
                 case 2: timeTableForProfessor(); break;
                 case 3: createStudent(); break;
-                case 4: showAllStudents(itemsPerPage); break;
+                case 4: showAllStudents(); break;
                 case 5: deleteStudent(); break;
                 default: viewProvider.printMessage("Incorrect number, try again");
             }
@@ -78,12 +88,12 @@ public class FrontControllerImpl implements FrontController {
     private void timeTableForStudent(){
         viewProvider.printMessage("Input student Id");
         long studentId = viewProvider.readLong();
-        long groupId = studentDao.findById(studentId).get().getGroup().getId();
-        List<Lesson> lessons = lessonDao.formTimeTableForGroup(groupId);
+        long groupId = studentService.findById(studentId).get().getGroupResponse().getId();
+        List<LessonResponse> LessonResponses = lessonService.formTimeTableForGroup(groupId);
 
         viewProvider.printMessage("Time table for group with id: " + groupId + ": \n");
-        for(Lesson lesson : lessons){
-            viewProvider.printMessage(lesson.toString());
+        for(LessonResponse lessonResponse : LessonResponses){
+            viewProvider.printMessage(lessonResponse.toString());
         }
     }
 
@@ -91,45 +101,41 @@ public class FrontControllerImpl implements FrontController {
         viewProvider.printMessage("Input professor Id");
         long professorId = viewProvider.readLong();
 
-        List<Lesson> lessons = lessonDao.formTimeTableForProfessor(professorId);
+        List<LessonResponse> LessonResponses = lessonService.formTimeTableForProfessor(professorId);
 
         viewProvider.printMessage("Time table for professor with id: " + professorId + ": \n");
-        for(Lesson lesson : lessons){
-            viewProvider.printMessage(lesson.toString());
+        for(LessonResponse lessonResponse : LessonResponses){
+            viewProvider.printMessage(lessonResponse.toString());
         }
     }
 
     private void createStudent(){
+        StudentRequest studentRequest = new StudentRequest();
         viewProvider.printMessage("Input student first name");
-        String studentFirstName = viewProvider.read();
+        studentRequest.setFirstName(viewProvider.read());
         viewProvider.printMessage("Input student last name");
-        String studentLastName = viewProvider.read();
+        studentRequest.setLastName(viewProvider.read());
         viewProvider.printMessage("Input student email");
-        String studentEmail = viewProvider.read();
+        studentRequest.setEmail(viewProvider.read());
         viewProvider.printMessage("Input student password");
-        String studentPassword = viewProvider.read();
+        studentRequest.setPassword(viewProvider.read());
 
-        studentDao.save(Student.builder()
-                .withFirstName(studentFirstName)
-                .withLastName(studentLastName)
-                .withEmail(studentEmail)
-                .withPassword(studentPassword)
-                .build());
+        studentService.register(studentRequest);
     }
 
-    private void showAllStudents(int itemsPerPage){
+    private void showAllStudents(){
             viewProvider.printMessage(REQUEST_PAGE_NUMBER);
-            int numberOfPage = viewProvider.readInt();
-            List<Student> students = studentDao.findAll(numberOfPage, itemsPerPage);
-            for(Student student : students){
-                viewProvider.printMessage(student.toString());
+            String numberOfPage = viewProvider.read();
+            List<StudentResponse> studentResponses = studentService.findAll(numberOfPage);
+            for(StudentResponse studentResponse : studentResponses){
+                viewProvider.printMessage(studentResponse.toString());
             }
     }
 
     private void deleteStudent(){
         viewProvider.printMessage(REQUEST_STUDENT_ID);
         long studentId = viewProvider.readLong();
-        studentDao.deleteById(studentId);
+        studentService.deleteById(studentId);
     }
 
 }

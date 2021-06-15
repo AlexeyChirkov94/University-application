@@ -1,21 +1,28 @@
 package ua.com.foxminded.university.dao.impl;
 
+import org.apache.log4j.Logger;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ua.com.foxminded.university.dao.interfaces.FormOfLessonDao;
-import ua.com.foxminded.university.domain.FormOfLesson;
+import ua.com.foxminded.university.entity.FormOfLesson;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Optional;
 
 @Repository
 public class FormOfLessonDaoImpl extends AbstractPageableCrudDaoImpl<FormOfLesson> implements FormOfLessonDao {
 
+    private static final Logger LOGGER = Logger.getLogger(FormOfLessonDaoImpl.class);
+
     private static final String SAVE_QUERY = "INSERT INTO formsOfLesson (name, durationOfLesson) VALUES(?, ?)";
     private static final String FIND_BY_ID_QUERY = "SELECT id, name, durationOfLesson from formsOfLesson WHERE id=?";
+    private static final String FIND_BY_NAME_QUERY = "SELECT id, name, durationOfLesson from formsOfLesson WHERE name=?";
     private static final String FIND_ALL_NO_PAGES_QUERY = "SELECT id, name, durationOfLesson FROM formsOfLesson ORDER BY id";
     private static final String FIND_ALL_WITH_PAGES_QUERY = "SELECT * FROM formsOfLesson order by id offset ? row FETCH NEXT ? ROWS ONLY";
     private static final String UPDATE_QUERY = "UPDATE formsOfLesson SET name = ?, durationOfLesson = ? WHERE id = ?";
@@ -34,24 +41,34 @@ public class FormOfLessonDaoImpl extends AbstractPageableCrudDaoImpl<FormOfLesso
     }
 
     @Override
+    public Optional<FormOfLesson> findByName(String name) {
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject(FIND_BY_NAME_QUERY, ROW_MAPPER, name));
+        } catch (DataAccessException e) {
+            LOGGER.info("FormOfLesson with this name not registered, Name: " + name);
+            return Optional.empty();
+        }
+    }
+
+    @Override
     protected FormOfLesson insertCertainEntity(FormOfLesson formOflesson) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection
                     .prepareStatement(SAVE_QUERY, Statement.RETURN_GENERATED_KEYS);
-            preparePSForInsert(ps, formOflesson);
+            preparePreparedStatementForInsert(ps, formOflesson);
             return ps;
         }, keyHolder);
 
         return FormOfLesson.builder()
-                .withId(new Long(String.valueOf(keyHolder.getKeyList().get(0).get("id"))))
+                .withId(getIdOfSavedEntity(keyHolder))
                 .withName(formOflesson.getName())
                 .withDuration(formOflesson.getDuration())
                 .build();
     }
 
     @Override
-    protected void preparePSForInsert(PreparedStatement ps, FormOfLesson formOfEducation) throws SQLException {
+    protected void preparePreparedStatementForInsert(PreparedStatement ps, FormOfLesson formOfEducation) throws SQLException {
         ps.setString(1, formOfEducation.getName());
         ps.setInt(2, formOfEducation.getDuration());
     }
@@ -63,8 +80,8 @@ public class FormOfLessonDaoImpl extends AbstractPageableCrudDaoImpl<FormOfLesso
     }
 
     @Override
-    protected void preparePSForUpdate(PreparedStatement ps, FormOfLesson formOflesson) throws SQLException {
-        preparePSForInsert(ps, formOflesson);
+    protected void preparePreparedStatementForUpdate(PreparedStatement ps, FormOfLesson formOflesson) throws SQLException {
+        preparePreparedStatementForInsert(ps, formOflesson);
         ps.setLong(3, formOflesson.getId());
     }
 

@@ -1,6 +1,6 @@
 package ua.com.foxminded.university.dao.interfaces;
 
-import ua.com.foxminded.university.domain.Lesson;
+import ua.com.foxminded.university.entity.Lesson;
 
 import java.util.List;
 

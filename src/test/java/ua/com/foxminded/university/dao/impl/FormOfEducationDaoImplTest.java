@@ -12,7 +12,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import ua.com.foxminded.university.TestsContextConfiguration;
 import ua.com.foxminded.university.dao.interfaces.FormOfEducationDao;
 import ua.com.foxminded.university.dao.interfaces.GroupDao;
-import ua.com.foxminded.university.domain.FormOfEducation;
+import ua.com.foxminded.university.entity.Department;
+import ua.com.foxminded.university.entity.FormOfEducation;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -22,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static ua.com.foxminded.university.testUtils.TestUtility.assertDepartments;
 import static ua.com.foxminded.university.testUtils.TestUtility.assertFormsOfEducation;
 
 
@@ -53,13 +56,13 @@ public class FormOfEducationDaoImplTest {
 
     @Test
     void createAndReadShouldAddNewListOfFormOfEducationToDBIfArgumentIsListOfFormOfEducation(){
-        List<FormOfEducation> addingFormOfEducation = Arrays.asList(FormOfEducation.builder().withName("Evening").build(),
+        List<FormOfEducation> addingFormOfEducationEntities = Arrays.asList(FormOfEducation.builder().withName("Evening").build(),
                 FormOfEducation.builder().withName("Morning").build());
-        formOfEducationDao.saveAll(addingFormOfEducation);
-        List<FormOfEducation> readingFormOfEducation =  Arrays.asList(formOfEducationDao.findById((long)5).get(),
+        formOfEducationDao.saveAll(addingFormOfEducationEntities);
+        List<FormOfEducation> readingFormOfEducationEntities =  Arrays.asList(formOfEducationDao.findById((long)5).get(),
                 formOfEducationDao.findById((long)6).get());
 
-        assertFormsOfEducation(readingFormOfEducation, addingFormOfEducation);
+        assertFormsOfEducation(readingFormOfEducationEntities, addingFormOfEducationEntities);
     }
 
     @Test
@@ -144,6 +147,24 @@ public class FormOfEducationDaoImplTest {
                 .thenReturn(new int[]{0});
 
         assertThat(formOfEducationDaoFromMock.deleteByIds(idsDeletingStudents)).isFalse();
+    }
+
+    @Test
+    void findByNameShouldReturnOptionalOfFormOfEducationIfArgumentIsName(){
+        FormOfEducation expected = FormOfEducation.builder()
+                .withName("full-time")
+                .build();
+        FormOfEducation actual = formOfEducationDao.findByName("full-time").get();
+
+        assertFormsOfEducation(actual, expected);
+    }
+
+    @Test
+    void findByNameShouldReturnOptionalEmptyIfArgumentIsNameAndItDontExist(){
+        Optional<FormOfEducation> expected = Optional.empty();
+        Optional<FormOfEducation> actual = formOfEducationDao.findByName("unknown name");
+
+        assertThat(expected).isEqualTo(actual);
     }
 
 }

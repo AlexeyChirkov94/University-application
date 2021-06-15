@@ -3,13 +3,13 @@ package ua.com.foxminded.university.dao.impl;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ua.com.foxminded.university.TestsContextConfiguration;
 import ua.com.foxminded.university.dao.interfaces.DepartmentDao;
 import ua.com.foxminded.university.dao.interfaces.ProfessorDao;
-import ua.com.foxminded.university.domain.Department;
-import ua.com.foxminded.university.domain.Professor;
-import ua.com.foxminded.university.domain.ScienceDegree;
+import ua.com.foxminded.university.entity.Department;
+import ua.com.foxminded.university.entity.Professor;
+import ua.com.foxminded.university.entity.ScienceDegree;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -49,7 +49,7 @@ public class ProfessorDaoImplTest {
 
     @Test
     void createAndReadShouldAddListOfNewProfessorToDatabaseIfArgumentIsListOfProfessors(){
-        List<Professor> addingProfessor = Arrays.asList (Professor.builder()
+        List<Professor> addingProfessorEntities = Arrays.asList (Professor.builder()
                 .withFirstName("Alex")
                 .withLastName("Chirkov")
                 .withEmail("chirkov@gmail.com")
@@ -57,10 +57,10 @@ public class ProfessorDaoImplTest {
                 .withDepartment(departmentForTest)
                 .withScienceDegree(ScienceDegree.GRADUATE)
                 .build());
-        professorDao.saveAll(addingProfessor);
-        List<Professor> readingProfessor = Arrays.asList(professorDao.findById((long)11).get());
+        professorDao.saveAll(addingProfessorEntities);
+        List<Professor> readingProfessorEntities = Arrays.asList(professorDao.findById((long)11).get());
 
-        assertUsersProfessors(readingProfessor, addingProfessor);
+        assertUsersProfessors(readingProfessorEntities, addingProfessorEntities);
     }
 
     @Test
@@ -102,6 +102,29 @@ public class ProfessorDaoImplTest {
         Optional<Professor> expected = Optional.empty();
         professorDao.deleteById((long)10);
         Optional<Professor> actual = professorDao.findById((long)10);
+
+        assertThat(expected).isEqualTo(actual);
+    }
+
+    @Test
+    void findByEmailShouldReturnOptionalOfProfessorEntityIfArgumentIsEmail(){
+        Professor expected = Professor.builder()
+                .withFirstName("Ivan")
+                .withLastName("Petrov")
+                .withEmail("petrov@gmail.com")
+                .withPassword("RI")
+                .withDepartment(departmentDao.findById((long)1).get())
+                .withScienceDegree(ScienceDegree.GRADUATE)
+                .build();
+        Professor actual = professorDao.findByEmail("petrov@gmail.com").get();
+
+        assertUsers(actual, expected);
+    }
+
+    @Test
+    void findByEmailShouldReturnOptionalEmptyIfArgumentIsEmailAndItDontExist(){
+        Optional<Professor> expected = Optional.empty();
+        Optional<Professor> actual = professorDao.findByEmail("unknownemail@gmail.com");
 
         assertThat(expected).isEqualTo(actual);
     }

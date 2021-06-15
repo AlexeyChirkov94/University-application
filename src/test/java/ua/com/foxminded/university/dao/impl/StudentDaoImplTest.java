@@ -3,12 +3,11 @@ package ua.com.foxminded.university.dao.impl;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ua.com.foxminded.university.TestsContextConfiguration;
 import ua.com.foxminded.university.dao.interfaces.GroupDao;
 import ua.com.foxminded.university.dao.interfaces.StudentDao;
-import ua.com.foxminded.university.domain.Group;
-import ua.com.foxminded.university.domain.Student;
+import ua.com.foxminded.university.entity.Group;
+import ua.com.foxminded.university.entity.Student;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -101,6 +100,29 @@ public class StudentDaoImplTest {
 
         assertThat(expected).isEqualTo(actual);
     }
+
+    @Test
+    void findByEmailShouldReturnOptionalOfStudentEntityIfArgumentIsEmail(){
+        Student expected = Student.builder()
+                .withFirstName("Alexey")
+                .withLastName("Chrikov")
+                .withEmail("chrikov@gmail.com")
+                .withPassword("1234")
+                .withGroup(groupDao.findById((long)1).get())
+                .build();
+        Student actual = studentDao.findByEmail("chrikov@gmail.com").get();
+
+        assertUsers(actual, expected);
+    }
+
+    @Test
+    void findByEmailShouldReturnOptionalEmptyIfArgumentIsEmailAndItDontExist(){
+        Optional<Student> expected = Optional.empty();
+        Optional<Student> actual = studentDao.findByEmail("unknownemail@gmail.com");
+
+        assertThat(expected).isEqualTo(actual);
+    }
+
 
     @Test
     void leaveGroupShouldDeleteStudentsFormGroupIfArgumentIsIdOfStudent(){
