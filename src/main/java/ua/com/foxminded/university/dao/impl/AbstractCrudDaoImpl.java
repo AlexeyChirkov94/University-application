@@ -5,6 +5,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.KeyHolder;
 import ua.com.foxminded.university.dao.interfaces.CrudDao;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -53,7 +54,7 @@ public abstract class AbstractCrudDaoImpl<E> implements CrudDao<E> {
                     public void setValues(PreparedStatement preparedStatement, int numberOfElement)
                             throws SQLException {
                         E entity = entities.get(numberOfElement);
-                        preparePSForInsert(preparedStatement, entity);
+                        preparePreparedStatementForInsert(preparedStatement, entity);
                     }
                     @Override
                     public int getBatchSize() {
@@ -90,7 +91,7 @@ public abstract class AbstractCrudDaoImpl<E> implements CrudDao<E> {
                     public void setValues(PreparedStatement preparedStatement, int numberOfElement)
                             throws SQLException {
                         E entity = entities.get(numberOfElement);
-                        preparePSForUpdate(preparedStatement, entity);
+                        preparePreparedStatementForUpdate(preparedStatement, entity);
                     }
                     @Override
                     public int getBatchSize() {
@@ -135,12 +136,16 @@ public abstract class AbstractCrudDaoImpl<E> implements CrudDao<E> {
         return status;
     }
 
+    protected Long getIdOfSavedEntity(KeyHolder keyHolder){
+        return Long.valueOf(String.valueOf(keyHolder.getKeyList().get(0).get("id")));
+    }
+
     protected abstract E insertCertainEntity(E entity);
 
-    protected abstract void preparePSForInsert(PreparedStatement ps, E entity) throws SQLException;
+    protected abstract void preparePreparedStatementForInsert(PreparedStatement ps, E entity) throws SQLException;
 
     protected abstract int updateCertainEntity(E entity);
 
-    protected abstract void preparePSForUpdate(PreparedStatement ps, E entity) throws SQLException;
+    protected abstract void preparePreparedStatementForUpdate(PreparedStatement ps, E entity) throws SQLException;
 
 }

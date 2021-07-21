@@ -1,8 +1,8 @@
 package ua.com.foxminded.university.dao.interfaces;
 
-import ua.com.foxminded.university.domain.Student;
+import ua.com.foxminded.university.entity.Student;
 
-public interface StudentDao extends CrudPageableDao<Student> {
+public interface StudentDao extends UserDao<Student> {
 
     void leaveGroup(long studentId);
 

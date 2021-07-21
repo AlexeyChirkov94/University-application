@@ -1,20 +1,26 @@
 package ua.com.foxminded.university.dao.impl;
 
+import org.apache.log4j.Logger;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ua.com.foxminded.university.dao.interfaces.GroupDao;
-import ua.com.foxminded.university.domain.Department;
-import ua.com.foxminded.university.domain.FormOfEducation;
-import ua.com.foxminded.university.domain.Group;
+import ua.com.foxminded.university.entity.Department;
+import ua.com.foxminded.university.entity.FormOfEducation;
+import ua.com.foxminded.university.entity.Group;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Optional;
 
 @Repository
 public class GroupDaoImpl extends AbstractPageableCrudDaoImpl<Group> implements GroupDao {
+
+    private static final Logger LOGGER = Logger.getLogger(GroupDaoImpl.class);
 
     private static final String FIND_QUERY = "SELECT g.id, g.name, g.department_id, " +
             "d.name as department_name, g.formOfEducation_id, f.name as formOfEducation_name " +
@@ -22,13 +28,13 @@ public class GroupDaoImpl extends AbstractPageableCrudDaoImpl<Group> implements 
             "left join formsofeducation f on g.formofeducation_id = f.id ";
     private static final String SAVE_QUERY = "INSERT INTO groups (name) VALUES(?)";
     private static final String FIND_BY_ID_QUERY = FIND_QUERY + "WHERE g.id=?";
+    private static final String FIND_BY_NAME_QUERY = FIND_QUERY + "WHERE g.name=?";
     private static final String FIND_ALL_NO_PAGES_QUERY = FIND_QUERY + "ORDER BY g.id";
     private static final String FIND_ALL_WITH_PAGES_QUERY = FIND_QUERY + "order by g.id offset ? row FETCH NEXT ? ROWS ONLY";
     private static final String UPDATE_QUERY = "UPDATE groups SET name = ? WHERE id = ?";
     private static final String DELETE_QUERY = "DELETE FROM groups WHERE id = ?";
     private static final String COUNT_QUERY = "SELECT COUNT(*) as count from groups";
     private static final String CHANGE_FORM_OF_EDUCATION_QUERY = "UPDATE groups SET formOfEducation_id = ? WHERE id = ?";
-
     private static final RowMapper<Group> ROW_MAPPER = (rs, rowNum) ->
         Group.builder()
                 .withId(rs.getLong("id"))
@@ -49,6 +55,16 @@ public class GroupDaoImpl extends AbstractPageableCrudDaoImpl<Group> implements 
     }
 
     @Override
+    public Optional<Group> findByName(String name) {
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject(FIND_BY_NAME_QUERY, ROW_MAPPER, name));
+        } catch (DataAccessException e) {
+            LOGGER.info("Department with this name not registered, Name: " + name);
+            return Optional.empty();
+        }
+    }
+
+    @Override
     public void changeFormOfEducation(long groupId, long newFormOfEducationId) {
         jdbcTemplate.update(CHANGE_FORM_OF_EDUCATION_QUERY, newFormOfEducationId, groupId);
     }
@@ -59,18 +75,18 @@ public class GroupDaoImpl extends AbstractPageableCrudDaoImpl<Group> implements 
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection
                     .prepareStatement(SAVE_QUERY, Statement.RETURN_GENERATED_KEYS);
-            preparePSForInsert(ps, group);
+            preparePreparedStatementForInsert(ps, group);
             return ps;
         }, keyHolder);
 
         return Group.builder()
-                .withId(new Long(String.valueOf(keyHolder.getKeyList().get(0).get("id"))))
+                .withId(getIdOfSavedEntity(keyHolder))
                 .withName(group.getName())
                 .build();
     }
 
     @Override
-    protected void preparePSForInsert(PreparedStatement ps, Group group) throws SQLException {
+    protected void preparePreparedStatementForInsert(PreparedStatement ps, Group group) throws SQLException {
         ps.setString(1, group.getName());
     }
 
@@ -80,8 +96,8 @@ public class GroupDaoImpl extends AbstractPageableCrudDaoImpl<Group> implements 
     }
 
     @Override
-    protected void preparePSForUpdate(PreparedStatement ps, Group group) throws SQLException {
-        preparePSForInsert(ps, group);;
+    protected void preparePreparedStatementForUpdate(PreparedStatement ps, Group group) throws SQLException {
+        preparePreparedStatementForInsert(ps, group);;
         ps.setLong(2, group.getId());
     }
 

@@ -1,23 +1,30 @@
 package ua.com.foxminded.university.dao.impl;
 
+import org.apache.log4j.Logger;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ua.com.foxminded.university.dao.interfaces.CourseDao;
-import ua.com.foxminded.university.domain.Course;
-import ua.com.foxminded.university.domain.Department;
+import ua.com.foxminded.university.entity.Course;
+import ua.com.foxminded.university.entity.Department;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class CourseDaoImpl extends AbstractPageableCrudDaoImpl<Course> implements CourseDao {
 
+    private static final Logger LOGGER = Logger.getLogger(CourseDaoImpl.class);
+
     private static final String FIND_QUERY = "SELECT c.id, c.name, c.department_id, d.name as department_name " +
             "from courses c left join departments d on c.department_id = d.id ";
+    private static final String FIND_BY_NAME_QUERY = FIND_QUERY + "WHERE c.name=?";
     private static final String SAVE_QUERY = "INSERT INTO courses (name) VALUES(?)";
     private static final String FIND_BY_ID_QUERY = FIND_QUERY + "WHERE c.id=?";
     private static final String FIND_ALL_NO_PAGES_QUERY = FIND_QUERY + "ORDER BY c.id";
@@ -47,6 +54,16 @@ public class CourseDaoImpl extends AbstractPageableCrudDaoImpl<Course> implement
     }
 
     @Override
+    public Optional<Course> findByName(String name) {
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject(FIND_BY_NAME_QUERY, ROW_MAPPER, name));
+        } catch (DataAccessException e) {
+            LOGGER.info("Department with this name not registered, Name: " + name);
+            return Optional.empty();
+        }
+    }
+
+    @Override
     public void addCourseToProfessorCourseList(long courseId, long professorId) {
         jdbcTemplate.update(ADD_COURSE_FROM_PROFESSOR_COURSE_LIST_QUERY, professorId, courseId);
     }
@@ -67,18 +84,18 @@ public class CourseDaoImpl extends AbstractPageableCrudDaoImpl<Course> implement
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection
                     .prepareStatement(SAVE_QUERY, Statement.RETURN_GENERATED_KEYS);
-            preparePSForInsert(ps, course);
+            preparePreparedStatementForInsert(ps, course);
             return ps;
         }, keyHolder);
 
         return Course.builder()
-                .withId(new Long(String.valueOf(keyHolder.getKeyList().get(0).get("id"))))
+                .withId(getIdOfSavedEntity(keyHolder))
                 .withName(course.getName())
                 .build();
     }
 
     @Override
-    protected void preparePSForInsert(PreparedStatement ps, Course course) throws SQLException {
+    protected void preparePreparedStatementForInsert(PreparedStatement ps, Course course) throws SQLException {
         ps.setString(1, course.getName());
     }
 
@@ -88,8 +105,8 @@ public class CourseDaoImpl extends AbstractPageableCrudDaoImpl<Course> implement
     }
 
     @Override
-    protected void preparePSForUpdate(PreparedStatement ps, Course course) throws SQLException {
-        preparePSForInsert(ps, course);
+    protected void preparePreparedStatementForUpdate(PreparedStatement ps, Course course) throws SQLException {
+        preparePreparedStatementForInsert(ps, course);
         ps.setLong(2, course.getId());
     }
 

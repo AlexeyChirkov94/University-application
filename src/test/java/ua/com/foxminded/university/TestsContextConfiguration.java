@@ -1,9 +1,12 @@
 package ua.com.foxminded.university;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import ua.com.foxminded.university.dao.impl.CourseDaoImpl;
 import ua.com.foxminded.university.dao.impl.DepartmentDaoImpl;
 import ua.com.foxminded.university.dao.impl.FormOfEducationDaoImpl;
@@ -27,6 +30,7 @@ import javax.sql.DataSource;
 import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.H2;
 
 @Configuration
+@ComponentScan("ua.com.foxminded.university")
 public class TestsContextConfiguration {
 
     @Bean
@@ -40,48 +44,8 @@ public class TestsContextConfiguration {
     }
 
     @Bean
-    public CourseDao courseDao(JdbcTemplate jdbcTemplate){
-        return new CourseDaoImpl(jdbcTemplate);
-    }
-
-    @Bean
-    public DepartmentDao departmentDao(JdbcTemplate jdbcTemplate){
-        return new DepartmentDaoImpl(jdbcTemplate);
-    }
-
-    @Bean
-    public FormOfEducationDao formOfEducationDao(JdbcTemplate jdbcTemplate){
-        return new FormOfEducationDaoImpl(jdbcTemplate);
-    }
-
-    @Bean
-    public FormOfLessonDao formOfLessonDao(JdbcTemplate jdbcTemplate){
-        return new FormOfLessonDaoImpl(jdbcTemplate);
-    }
-
-    @Bean
-    public GroupDao groupDao(JdbcTemplate jdbcTemplate){
-        return new GroupDaoImpl(jdbcTemplate);
-    }
-
-    @Bean
-    public LessonDao lessonDao(JdbcTemplate jdbcTemplate){
-        return new LessonDaoImpl(jdbcTemplate);
-    }
-
-    @Bean
-    public ProfessorDao professorDao(JdbcTemplate jdbcTemplate){
-        return new ProfessorDaoImpl(jdbcTemplate);
-    }
-
-    @Bean
-    public StudentDao studentDao(JdbcTemplate jdbcTemplate){
-        return new StudentDaoImpl(jdbcTemplate);
-    }
-
-    @Bean
-    public ViewProvider viewProvider(){
-        return new ViewProviderImpl();
+    public PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
     }
 
 }

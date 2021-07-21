@@ -1,19 +1,25 @@
 package ua.com.foxminded.university.dao.impl;
 
+import org.apache.log4j.Logger;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ua.com.foxminded.university.dao.interfaces.StudentDao;
-import ua.com.foxminded.university.domain.Group;
-import ua.com.foxminded.university.domain.Student;
+import ua.com.foxminded.university.entity.Group;
+import ua.com.foxminded.university.entity.Student;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Optional;
 
 @Repository
 public class StudentDaoImpl extends AbstractPageableCrudDaoImpl<Student> implements StudentDao {
+
+    private static final Logger LOGGER = Logger.getLogger(StudentDaoImpl.class);
 
     private static final String FIND_QUERY = "SELECT u.id, u.first_name, u.last_name, u.email, u.password, u.group_id, " +
             "g.name as group_name from users u left join groups g on u.group_id = g.id ";
@@ -25,6 +31,7 @@ public class StudentDaoImpl extends AbstractPageableCrudDaoImpl<Student> impleme
     private static final String UPDATE_QUERY = "UPDATE users SET first_name = ?, last_name = ?, email = ?, password = ? WHERE id = ?";
     private static final String DELETE_QUERY = "DELETE FROM users WHERE id = ?";
     private static final String COUNT_QUERY = "SELECT COUNT(*) as count from users where type = 'student'";
+    private static final String FIND_BY_EMAIL_QUERY = FIND_QUERY + "WHERE u.email= ? and type = 'student'";
     private static final String CHANGE_GROUP_QUERY = "UPDATE users SET group_id = ? WHERE id = ?";
     private static final String LEAVE_GROUP_QUERY = "UPDATE users SET group_id = null WHERE id = ?";
     private static final RowMapper<Student> ROW_MAPPER = (rs, rowNum) ->
@@ -47,6 +54,16 @@ public class StudentDaoImpl extends AbstractPageableCrudDaoImpl<Student> impleme
     }
 
     @Override
+    public Optional<Student> findByEmail(String email) {
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject(FIND_BY_EMAIL_QUERY, ROW_MAPPER, email));
+        } catch (DataAccessException e) {
+            LOGGER.info("Email not registered: " + email);
+            return Optional.empty();
+        }
+    }
+
+    @Override
     public void leaveGroup(long studentId) {
         jdbcTemplate.update(LEAVE_GROUP_QUERY, studentId);
     }
@@ -62,12 +79,12 @@ public class StudentDaoImpl extends AbstractPageableCrudDaoImpl<Student> impleme
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection
                     .prepareStatement(SAVE_QUERY, Statement.RETURN_GENERATED_KEYS);
-            preparePSForInsert(ps, student);
+            preparePreparedStatementForInsert(ps, student);
             return ps;
         }, keyHolder);
 
         return Student.builder()
-                    .withId(new Long(String.valueOf(keyHolder.getKeyList().get(0).get("id"))))
+                    .withId(getIdOfSavedEntity(keyHolder))
                     .withFirstName(student.getFirstName())
                     .withLastName(student.getLastName())
                     .withEmail(student.getEmail())
@@ -76,7 +93,7 @@ public class StudentDaoImpl extends AbstractPageableCrudDaoImpl<Student> impleme
     }
 
     @Override
-    protected void preparePSForInsert(PreparedStatement ps, Student student) throws SQLException {
+    protected void preparePreparedStatementForInsert(PreparedStatement ps, Student student) throws SQLException {
         ps.setString(1, student.getFirstName());
         ps.setString(2, student.getLastName());
         ps.setString(3, student.getEmail());
@@ -90,8 +107,8 @@ public class StudentDaoImpl extends AbstractPageableCrudDaoImpl<Student> impleme
     }
 
     @Override
-    protected void preparePSForUpdate(PreparedStatement ps, Student student) throws SQLException {
-        preparePSForInsert(ps, student);
+    protected void preparePreparedStatementForUpdate(PreparedStatement ps, Student student) throws SQLException {
+        preparePreparedStatementForInsert(ps, student);
         ps.setLong(5, student.getId());
     }
 

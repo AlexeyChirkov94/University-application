@@ -1,10 +1,9 @@
 package ua.com.foxminded.university.dao.interfaces;
 
-import ua.com.foxminded.university.domain.Professor;
-
+import ua.com.foxminded.university.entity.Professor;
 import java.util.List;
 
-public interface ProfessorDao extends CrudPageableDao<Professor> {
+public interface ProfessorDao extends UserDao<Professor> {
 
     void changeScienceDegree(long professorId, int idNewScienceDegree);
 

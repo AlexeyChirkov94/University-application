@@ -806,7 +806,7 @@
 											"top": 372,
 											"width": 221.1142578125,
 											"height": 13,
-											"text": "-courses: List<Courses>",
+											"text": "-courseEntities: List<Courses>",
 											"horizontalAlignment": 0
 										}
 									],
@@ -6341,7 +6341,7 @@
 							"_parent": {
 								"$ref": "AAAAAAF4x6HH+kTjSwE="
 							},
-							"name": "courses",
+							"name": "courseEntities",
 							"visibility": "private",
 							"type": "List<Courses>"
 						}
@@ -6758,7 +6758,7 @@
 							"_parent": {
 								"$ref": "AAAAAAF4x7Epcnio1qA="
 							},
-							"name": "lessons",
+							"name": "lessonEntities",
 							"visibility": "private",
 							"type": "List<Lesson>"
 						}

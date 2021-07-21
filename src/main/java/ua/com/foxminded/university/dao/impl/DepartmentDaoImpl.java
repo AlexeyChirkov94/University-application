@@ -1,21 +1,29 @@
 package ua.com.foxminded.university.dao.impl;
 
+import org.apache.log4j.Logger;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ua.com.foxminded.university.dao.interfaces.DepartmentDao;
-import ua.com.foxminded.university.domain.Department;
+import ua.com.foxminded.university.entity.Department;
+import ua.com.foxminded.university.entity.Professor;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Optional;
 
 @Repository
 public class DepartmentDaoImpl extends AbstractPageableCrudDaoImpl<Department> implements DepartmentDao {
 
+    private static final Logger LOGGER = Logger.getLogger(ProfessorDaoImpl.class);
+
     private static final String SAVE_QUERY = "INSERT INTO departments (name) VALUES(?)";
     private static final String FIND_BY_ID_QUERY = "SELECT id, name from departments WHERE id=?";
+    private static final String FIND_BY_NAME_QUERY = "SELECT id, name from departments WHERE name=?";
     private static final String FIND_ALL_NO_PAGES_QUERY = "SELECT id, name FROM departments ORDER BY id";
     private static final String FIND_ALL_WITH_PAGES_QUERY = "SELECT * FROM departments order by id offset ? row FETCH NEXT ? ROWS ONLY";
     private static final String UPDATE_QUERY = "UPDATE departments SET name = ? WHERE id = ?";
@@ -33,24 +41,34 @@ public class DepartmentDaoImpl extends AbstractPageableCrudDaoImpl<Department> i
     }
 
     @Override
+    public Optional<Department> findByName(String name) {
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject(FIND_BY_NAME_QUERY, ROW_MAPPER, name));
+        } catch (DataAccessException e) {
+            LOGGER.info("Department with this name not registered, Name: " + name);
+            return Optional.empty();
+        }
+    }
+    
+    @Override
     protected Department insertCertainEntity(Department department){
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection
                     .prepareStatement(SAVE_QUERY, Statement.RETURN_GENERATED_KEYS);
-            preparePSForInsert(ps, department);
+            preparePreparedStatementForInsert(ps, department);
             return ps;
             }, keyHolder);
 
 
         return Department.builder()
-                .withId(new Long(String.valueOf(keyHolder.getKeyList().get(0).get("id"))))
+                .withId(getIdOfSavedEntity(keyHolder))
                 .withName(department.getName())
                 .build();
     }
 
     @Override
-    protected void preparePSForInsert(PreparedStatement ps, Department department) throws SQLException {
+    protected void preparePreparedStatementForInsert(PreparedStatement ps, Department department) throws SQLException {
         ps.setString(1, department.getName());
     }
 
@@ -60,8 +78,8 @@ public class DepartmentDaoImpl extends AbstractPageableCrudDaoImpl<Department> i
     }
 
     @Override
-    protected void preparePSForUpdate(PreparedStatement ps, Department department) throws SQLException {
-        preparePSForInsert(ps, department);
+    protected void preparePreparedStatementForUpdate(PreparedStatement ps, Department department) throws SQLException {
+        preparePreparedStatementForInsert(ps, department);
         ps.setLong(2, department.getId());
     }
 

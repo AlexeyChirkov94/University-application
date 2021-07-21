@@ -3,17 +3,15 @@ package ua.com.foxminded.university.dao.impl;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ua.com.foxminded.university.TestsContextConfiguration;
 import ua.com.foxminded.university.dao.domain.Page;
 import ua.com.foxminded.university.dao.domain.Pageable;
 import ua.com.foxminded.university.dao.interfaces.DepartmentDao;
 import ua.com.foxminded.university.dao.interfaces.FormOfEducationDao;
 import ua.com.foxminded.university.dao.interfaces.GroupDao;
-import ua.com.foxminded.university.domain.Department;
-import ua.com.foxminded.university.domain.FormOfEducation;
-import ua.com.foxminded.university.domain.Group;
-
+import ua.com.foxminded.university.entity.Department;
+import ua.com.foxminded.university.entity.FormOfEducation;
+import ua.com.foxminded.university.entity.Group;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -54,15 +52,15 @@ public class GroupDaoImplTest {
 
     @Test
     void createAndReadShouldAddListOfNewGroupsToDatabaseIfArgumentIsListOfGroups(){
-        List<Group> addingGroups = Arrays.asList(Group.builder()
+        List<Group> addingGroupEntities = Arrays.asList(Group.builder()
                 .withName("New Test Group")
                 .withDepartment(departmentForTest)
                 .withFormOfEducation(formOfEducationForTest)
                 .build());
-        groupDao.saveAll(addingGroups);
-        List<Group> readingGroups = Arrays.asList(groupDao.findById((long)4).get());
+        groupDao.saveAll(addingGroupEntities);
+        List<Group> readingGroupEntities = Arrays.asList(groupDao.findById((long)4).get());
 
-        assertGroups(readingGroups, addingGroups);
+        assertGroups(readingGroupEntities, addingGroupEntities);
     }
 
     @Test
@@ -148,6 +146,26 @@ public class GroupDaoImplTest {
         assertThat(actual.getPageNumber()).isEqualTo(expected.getPageNumber());
         assertThat(actual.getItemsNumberPerPage()).isEqualTo(expected.getItemsNumberPerPage());
         assertThat(actual.getMaxPageNumber()).isEqualTo(expected.getMaxPageNumber());
+    }
+
+    @Test
+    void findByNameShouldReturnOptionalOfFormOfLessonIfArgumentIsName(){
+        Group expected = Group.builder()
+                .withName("History Group №1")
+                .withDepartment(departmentDao.findById((long)1).get())
+                .withFormOfEducation(formOfEducationDao.findById((long)1).get())
+                .build();
+        Group actual = groupDao.findByName("History Group №1").get();
+
+        assertGroups(actual, expected);
+    }
+
+    @Test
+    void findByNameShouldReturnOptionalEmptyIfArgumentIsNameAndItDontExist(){
+        Optional<Group> expected = Optional.empty();
+        Optional<Group> actual = groupDao.findByName("unknown name");
+
+        assertThat(expected).isEqualTo(actual);
     }
 
 }

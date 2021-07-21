@@ -3,12 +3,11 @@ package ua.com.foxminded.university.dao.impl;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ua.com.foxminded.university.TestsContextConfiguration;
 import ua.com.foxminded.university.dao.interfaces.CourseDao;
 import ua.com.foxminded.university.dao.interfaces.DepartmentDao;
-import ua.com.foxminded.university.domain.Course;
-import ua.com.foxminded.university.domain.Department;
+import ua.com.foxminded.university.entity.Course;
+import ua.com.foxminded.university.entity.Department;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -44,14 +43,14 @@ public class CourseDaoImplTest {
 
     @Test
     void createAndReadShouldAddListOfNewCoursesToDatabaseIfArgumentIsListOfCourses(){
-        List<Course> addingCourse = Arrays.asList(Course.builder()
+        List<Course> addingCourseEntities = Arrays.asList(Course.builder()
                 .withName("Rome History")
                 .withDepartment(departmentForTest)
                 .build());
-        courseDao.saveAll(addingCourse);
-        List<Course> readingCourse = Arrays.asList(courseDao.findById((long)5).get());
+        courseDao.saveAll(addingCourseEntities);
+        List<Course> readingCourseEntities = Arrays.asList(courseDao.findById((long)5).get());
 
-        assertCourses(readingCourse, addingCourse);
+        assertCourses(readingCourseEntities, addingCourseEntities);
     }
 
     @Test
@@ -86,7 +85,7 @@ public class CourseDaoImplTest {
         courseDao.deleteById((long)10);
         Optional<Course> actual = courseDao.findById((long)10);
 
-        assertThat(expected).isEqualTo(actual);
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
@@ -116,6 +115,25 @@ public class CourseDaoImplTest {
         List<Course> expectedAfterRemoving = Arrays.asList (courseDao.findById((long)1).get());
         List<Course> actualAfterRemoving = courseDao.findByProfessorId(7);
         assertCourses(actualAfterRemoving, expectedAfterRemoving);
+    }
+
+    @Test
+    void findByNameShouldReturnOptionalOfDepartmentEntityIfArgumentIsName(){
+        Course expected = Course.builder()
+                .withName("Russia History")
+                .withDepartment(departmentDao.findById((long)1).get())
+                .build();
+        Course actual = courseDao.findByName("Russia History").get();
+
+        assertCourses(actual, expected);
+    }
+
+    @Test
+    void findByNameShouldReturnOptionalEmptyIfArgumentIsNameAndItDontExist(){
+        Optional<Course> expected = Optional.empty();
+        Optional<Course> actual = courseDao.findByName("unknown name");
+
+        assertThat(expected).isEqualTo(actual);
     }
 
 }
