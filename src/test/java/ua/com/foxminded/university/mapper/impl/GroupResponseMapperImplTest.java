@@ -19,9 +19,9 @@ class GroupResponseMapperImplTest {
     {
         context = new AnnotationConfigApplicationContext(TestsContextConfiguration.class);
         groupResponseMapper = context.getBean(GroupResponseMapperImpl.class);
-        group = Group.builder().withId((long)1).withName("Group 1").build();
+        group = Group.builder().withId(1L).withName("Group 1").build();
         groupResponse = new GroupResponse();
-        groupResponse.setId((long)1);
+        groupResponse.setId(1L);
         groupResponse.setName("Group 1");
     }
 

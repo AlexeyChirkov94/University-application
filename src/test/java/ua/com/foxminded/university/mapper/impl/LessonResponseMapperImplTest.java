@@ -19,9 +19,9 @@ class LessonResponseMapperImplTest {
     {
         context = new AnnotationConfigApplicationContext(TestsContextConfiguration.class);
         lessonResponseMapper = context.getBean(LessonResponseMapperImpl.class);
-        lesson = Lesson.builder().withId((long)1).build();
+        lesson = Lesson.builder().withId(1L).build();
         lessonResponse = new LessonResponse();
-        lessonResponse.setId((long)1);
+        lessonResponse.setId(1L);
     }
 
     @Test

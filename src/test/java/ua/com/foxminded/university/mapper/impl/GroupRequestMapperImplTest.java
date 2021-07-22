@@ -19,9 +19,9 @@ class GroupRequestMapperImplTest {
     {
         context = new AnnotationConfigApplicationContext(TestsContextConfiguration.class);
         groupRequestMapper = context.getBean(GroupRequestMapperImpl.class);
-        group = Group.builder().withId((long)1).withName("Group 1").build();
+        group = Group.builder().withId(1L).withName("Group 1").build();
         groupRequest = new GroupRequest();
-        groupRequest.setId((long)1);
+        groupRequest.setId(1L);
         groupRequest.setName("Group 1");
     }
 

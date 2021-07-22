@@ -1,5 +1,6 @@
 package ua.com.foxminded.university.service.impl;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.interfaces.FormOfEducationDao;
@@ -17,6 +18,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class GroupServiceImpl
         extends AbstractPageableCrudService<GroupRequest, GroupResponse>
         implements GroupService {
@@ -25,14 +27,6 @@ public class GroupServiceImpl
     private final FormOfEducationDao formOfEducationDao;
     private final GroupRequestMapper groupRequestMapper;
     private final GroupResponseMapper groupResponseMapper;
-
-    public GroupServiceImpl(GroupDao groupDao, FormOfEducationDao formOfEducationDao,
-                            GroupRequestMapper groupRequestMapper, GroupResponseMapper groupResponseMapper) {
-        this.groupDao = groupDao;
-        this.formOfEducationDao = formOfEducationDao;
-        this.groupRequestMapper = groupRequestMapper;
-        this.groupResponseMapper = groupResponseMapper;
-    }
 
     @Override
     @Transactional(transactionManager = "txManager")

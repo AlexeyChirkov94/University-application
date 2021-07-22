@@ -20,9 +20,9 @@ class StudentRequestMapperImplTest {
     {
         context = new AnnotationConfigApplicationContext(TestsContextConfiguration.class);
         studentRequestMapper = context.getBean(StudentRequestMapperImpl.class);
-        student = Student.builder().withId((long)1).build();
+        student = Student.builder().withId(1L).build();
         studentRequest = new StudentRequest();
-        studentRequest.setId((long)1);
+        studentRequest.setId(1L);
     }
 
     @Test

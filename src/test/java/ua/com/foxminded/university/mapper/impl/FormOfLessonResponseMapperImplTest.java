@@ -19,9 +19,9 @@ class FormOfLessonResponseMapperImplTest {
     {
         context = new AnnotationConfigApplicationContext(TestsContextConfiguration.class);
         formOfLessonResponseMapper = context.getBean(FormOfLessonResponseMapperImpl.class);
-        formOfLesson = FormOfLesson.builder().withId((long)1).withName("FormOfLesson 1").build();
+        formOfLesson = FormOfLesson.builder().withId(1L).withName("FormOfLesson 1").build();
         formOfLessonResponse = new FormOfLessonResponse();
-        formOfLessonResponse.setId((long)1);
+        formOfLessonResponse.setId(1L);
         formOfLessonResponse.setName("FormOfLesson 1");
     }
 

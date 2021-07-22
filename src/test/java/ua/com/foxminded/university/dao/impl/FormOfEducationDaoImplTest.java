@@ -12,7 +12,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import ua.com.foxminded.university.TestsContextConfiguration;
 import ua.com.foxminded.university.dao.interfaces.FormOfEducationDao;
 import ua.com.foxminded.university.dao.interfaces.GroupDao;
-import ua.com.foxminded.university.entity.Department;
 import ua.com.foxminded.university.entity.FormOfEducation;
 
 import java.util.Arrays;
@@ -49,7 +48,7 @@ public class FormOfEducationDaoImplTest {
     void createAndReadShouldAddNewFormOfEducationToDatabaseIfArgumentIsFormOfEducation(){
         FormOfEducation addingFormOfEducation = FormOfEducation.builder().withName("evening").build();
         formOfEducationDao.save(addingFormOfEducation);
-        FormOfEducation readingFormOfEducation = formOfEducationDao.findById((long)5).get();
+        FormOfEducation readingFormOfEducation = formOfEducationDao.findById(5L).get();
 
         assertFormsOfEducation(readingFormOfEducation, addingFormOfEducation);
     }
@@ -59,28 +58,28 @@ public class FormOfEducationDaoImplTest {
         List<FormOfEducation> addingFormOfEducationEntities = Arrays.asList(FormOfEducation.builder().withName("Evening").build(),
                 FormOfEducation.builder().withName("Morning").build());
         formOfEducationDao.saveAll(addingFormOfEducationEntities);
-        List<FormOfEducation> readingFormOfEducationEntities =  Arrays.asList(formOfEducationDao.findById((long)5).get(),
-                formOfEducationDao.findById((long)6).get());
+        List<FormOfEducation> readingFormOfEducationEntities =  Arrays.asList(formOfEducationDao.findById(5L).get(),
+                formOfEducationDao.findById(6L).get());
 
         assertFormsOfEducation(readingFormOfEducationEntities, addingFormOfEducationEntities);
     }
 
     @Test
     void updateShouldUpdateDataOfStudentIfArgumentIsFormOfEducation(){
-        FormOfEducation expected = FormOfEducation.builder().withId((long)2).withName("new name").build();
+        FormOfEducation expected = FormOfEducation.builder().withId(2L).withName("new name").build();
         formOfEducationDao.update(expected);
-        FormOfEducation actual = formOfEducationDao.findById((long)2).get();
+        FormOfEducation actual = formOfEducationDao.findById(2L).get();
 
         assertFormsOfEducation(actual, expected);
     }
 
     @Test
     void updateListShouldUpdateDataOfCourseIfArgumentIsFormOfEducation(){
-        List<FormOfEducation> expected = Arrays.asList(FormOfEducation.builder().withId((long)1).withName("day-time").build(),
-                FormOfEducation.builder().withId((long)2).withName("distance").build());
+        List<FormOfEducation> expected = Arrays.asList(FormOfEducation.builder().withId(1L).withName("day-time").build(),
+                FormOfEducation.builder().withId(2L).withName("distance").build());
         formOfEducationDao.updateAll(expected);
-        List<FormOfEducation> actual = Arrays.asList(formOfEducationDao.findById((long)1).get(),
-                formOfEducationDao.findById((long)2).get());
+        List<FormOfEducation> actual = Arrays.asList(formOfEducationDao.findById(1L).get(),
+                formOfEducationDao.findById(2L).get());
 
         assertFormsOfEducation(actual, expected);
     }
@@ -88,8 +87,8 @@ public class FormOfEducationDaoImplTest {
     @Test
     void deleteShouldDeleteDataOfFormOfEducationIfArgumentIsIdOfFormOfEducation(){
         Optional<FormOfEducation> expected = Optional.empty();
-        formOfEducationDao.deleteById((long)3);
-        Optional<FormOfEducation> actual = formOfEducationDao.findById((long)3);
+        formOfEducationDao.deleteById(3L);
+        Optional<FormOfEducation> actual = formOfEducationDao.findById(3L);
 
         assertThat(expected).isEqualTo(actual);
     }
@@ -98,12 +97,12 @@ public class FormOfEducationDaoImplTest {
     void deleteSetShouldDeleteDataOfFormOfEducationIfArgumentIsIdOfFormOfEducation(){
         List<Optional<FormOfEducation>> expected = Arrays.asList(Optional.empty(), Optional.empty());
         Set<Long> idDeletingStudents = new HashSet<>();
-        idDeletingStudents.add((long)3);
-        idDeletingStudents.add((long)4);
+        idDeletingStudents.add(3L);
+        idDeletingStudents.add(4L);
 
         formOfEducationDao.deleteByIds(idDeletingStudents);
-        List<Optional<FormOfEducation>> actual = Arrays.asList(formOfEducationDao.findById((long)3),
-                formOfEducationDao.findById((long)4));
+        List<Optional<FormOfEducation>> actual = Arrays.asList(formOfEducationDao.findById(3L),
+                formOfEducationDao.findById(4L));
 
         assertThat(expected).isEqualTo(actual);
     }
@@ -140,7 +139,7 @@ public class FormOfEducationDaoImplTest {
     void deleteAllShouldWriteLogMessageIfCanNotDelete() {
 
         Set<Long> idsDeletingStudents = new HashSet<>();
-        idsDeletingStudents.add((long)1);
+        idsDeletingStudents.add(1L);
         FormOfEducationDao formOfEducationDaoFromMock = new FormOfEducationDaoImpl(mockJdbcTemplate);
         when(mockJdbcTemplate.batchUpdate(eq("DELETE FROM formsofeducation WHERE id = ?"),
                 any(BatchPreparedStatementSetter.class)))

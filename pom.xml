@@ -25,6 +25,7 @@
         <org.log4j.version>1.2.17</org.log4j.version>
         <com.h2database.version>1.4.199</com.h2database.version>
         <com.google.inject.version>5.0.1</com.google.inject.version>
+        <org.projectlombok.version>1.18.20</org.projectlombok.version>
     </properties>
 
     <dependencies>
@@ -54,9 +55,10 @@
             <version>${org.log4j.version}</version>
         </dependency>
         <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-api</artifactId>
-            <version>7.0</version>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${org.projectlombok.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -182,7 +184,7 @@
                                         <limit>
                                             <counter>COMPLEXITY</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.70</minimum>
+                                            <minimum>0.5</minimum>
                                         </limit>
                                     </limits>
                                 </rule>

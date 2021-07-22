@@ -1,5 +1,6 @@
 package ua.com.foxminded.university.service.impl;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.interfaces.CourseDao;
@@ -17,6 +18,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class CourseServiceImpl extends AbstractPageableCrudService<CourseRequest, CourseResponse>
         implements CourseService {
 
@@ -24,14 +26,6 @@ public class CourseServiceImpl extends AbstractPageableCrudService<CourseRequest
     private final ProfessorDao professorDao;
     private final CourseRequestMapper courseRequestMapper;
     private final CourseResponseMapper courseResponseMapper;
-
-    public CourseServiceImpl(CourseDao courseDao, ProfessorDao professorDao,
-                             CourseRequestMapper courseRequestMapper, CourseResponseMapper courseResponseMapper) {
-        this.courseDao = courseDao;
-        this.professorDao = professorDao;
-        this.courseRequestMapper = courseRequestMapper;
-        this.courseResponseMapper = courseResponseMapper;
-    }
 
     @Override
     @Transactional(transactionManager = "txManager")

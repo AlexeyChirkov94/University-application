@@ -51,7 +51,8 @@ class FormOfEducationServiceImplTest {
         FormOfEducationRequest formOfEducationRequest = new FormOfEducationRequest();
         formOfEducationRequest.setName(formOfEducationName);
 
-        when(formOfEducationDao.findByName(formOfEducationName)).thenReturn(Optional.of(FormOfEducation.builder().withName(formOfEducationName).build()));
+        when(formOfEducationDao.findByName(formOfEducationName)).thenReturn(Optional.of(FormOfEducation.builder()
+                .withName(formOfEducationName).build()));
 
         assertThatThrownBy(() -> formOfEducationService.register(formOfEducationRequest)).hasMessage("FormOfEducation with same name already exist");
 
@@ -62,7 +63,7 @@ class FormOfEducationServiceImplTest {
     void findByIdShouldReturnOptionalOfFormOfEducationResponseIfArgumentIsFormOfEducationId() {
         long formOfEducationId = 1;
 
-        when(formOfEducationDao.findById(formOfEducationId)).thenReturn(Optional.of(FormOfEducation.builder().withId((long)1).build()));
+        when(formOfEducationDao.findById(formOfEducationId)).thenReturn(Optional.of(FormOfEducation.builder().withId(1L).build()));
 
         formOfEducationService.findById(formOfEducationId);
 
@@ -73,8 +74,8 @@ class FormOfEducationServiceImplTest {
     void findAllIdShouldReturnListOfFormOfEducationResponseIfArgumentIsPageNumber() {
         String pageNumber = "2";
 
-        when(formOfEducationDao.count()).thenReturn((long)11);
-        when(formOfEducationDao.findAll(2, 5)).thenReturn(Arrays.asList(FormOfEducation.builder().withId((long)1).build()));
+        when(formOfEducationDao.count()).thenReturn(11L);
+        when(formOfEducationDao.findAll(2, 5)).thenReturn(Arrays.asList(FormOfEducation.builder().withId(1L).build()));
 
         formOfEducationService.findAll(pageNumber);
 
@@ -84,9 +85,9 @@ class FormOfEducationServiceImplTest {
 
     @Test
     void editShouldEditDataOfFormOfEducationIfArgumentNewFormOfEducationRequest() {
-        FormOfEducation formOfEducation = FormOfEducation.builder().withId((long)1).build();
+        FormOfEducation formOfEducation = FormOfEducation.builder().withId(1L).build();
         FormOfEducationRequest formOfEducationRequest = new FormOfEducationRequest();
-        formOfEducationRequest.setId((long)1);
+        formOfEducationRequest.setId(1L);
 
         when(formOfEducationRequestMapper.mapDtoToEntity(formOfEducationRequest)).thenReturn(formOfEducation);
         doNothing().when(formOfEducationDao).update(formOfEducation);

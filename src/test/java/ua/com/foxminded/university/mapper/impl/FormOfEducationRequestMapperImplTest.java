@@ -19,9 +19,9 @@ class FormOfEducationRequestMapperImplTest {
     {
         context = new AnnotationConfigApplicationContext(TestsContextConfiguration.class);
         formOfEducationRequestMapper = context.getBean(FormOfEducationRequestMapperImpl.class);
-        formOfEducation = FormOfEducation.builder().withId((long)1).withName("FormOfEducation 1").build();
+        formOfEducation = FormOfEducation.builder().withId(1L).withName("FormOfEducation 1").build();
         formOfEducationRequest = new FormOfEducationRequest();
-        formOfEducationRequest.setId((long)1);
+        formOfEducationRequest.setId(1L);
         formOfEducationRequest.setName("FormOfEducation 1");
     }
 

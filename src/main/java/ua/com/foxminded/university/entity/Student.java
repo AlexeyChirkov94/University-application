@@ -1,76 +1,21 @@
 package ua.com.foxminded.university.entity;
 
-import java.util.Objects;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
+@ToString(callSuper=true)
+@Getter()
+@EqualsAndHashCode(callSuper=true)
 public class Student extends User {
 
-    private Group group;
+    Group group;
 
-    protected Student(StudentBuilder userUserBuilder) {
-        super(userUserBuilder);
-        this.group = userUserBuilder.group;
-    }
-
-    public static StudentBuilder builder() {
-        return new StudentBuilder();
-    }
-
-    public Group getGroup() {
-        return group;
-    }
-
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        if (!super.equals(o)) {
-            return false;
-        }
-        Student student = (Student) o;
-        return Objects.equals(group, student.group);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), group);
-    }
-
-    @Override
-    public String toString() {
-        return "Student{" +
-                "id=" + this.getId() +
-                ", firstName='" + this.getFirstName() + '\'' +
-                ", lastName='" + this.getLastName() + '\'' +
-                ", email='" + this.getEmail() + '\'' +
-                ", group=" + group +
-                '}';
-    }
-
-    public static class StudentBuilder extends UserBuilder<StudentBuilder> {
-        private Group group;
-
-        private StudentBuilder() {
-        }
-
-        @Override
-        public StudentBuilder self() {
-            return this;
-        }
-
-        public Student build() {
-            return new Student(self());
-        }
-
-        public StudentBuilder withGroup(Group group) {
-            this.group = group;
-            return self();
-        }
-
+    @Builder(setterPrefix = "with")
+    protected Student(Long id, String email, String password, String firstName, String lastName, Group group) {
+        super(id, email, password, firstName, lastName);
+        this.group = group;
     }
 
 }

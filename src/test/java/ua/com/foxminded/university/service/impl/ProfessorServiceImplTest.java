@@ -69,9 +69,9 @@ class ProfessorServiceImplTest {
     @Test
     void findByCourseIdShouldReturnListOfProfessorIfArgumentIsCourseId() {
         long courseId = 1;
-        List<Professor> professors = Arrays.asList(Professor.builder().withId((long)1).build());
+        List<Professor> professors = Arrays.asList(Professor.builder().withId(1L).build());
         ProfessorResponse professorResponse = new ProfessorResponse();
-        professorResponse.setId((long)1);
+        professorResponse.setId(1L);
         List<ProfessorResponse> professorResponses = Arrays.asList(professorResponse);
 
         when(professorResponseMapper.mapEntityToDto(professors.get(0))).thenReturn(professorResponse);
@@ -87,7 +87,7 @@ class ProfessorServiceImplTest {
     void findByEmailShouldReturnOptionalOfProfessorResponseIfArgumentIsEmail() {
         String email= "Alexey94@gamil.com";
 
-        when(professorDao.findByEmail(email)).thenReturn(Optional.of(Professor.builder().withId((long)1).build()));
+        when(professorDao.findByEmail(email)).thenReturn(Optional.of(Professor.builder().withId(1L).build()));
 
         professorService.findByEmail(email);
 
@@ -134,7 +134,7 @@ class ProfessorServiceImplTest {
     void findByIdShouldReturnOptionalOfProfessorResponseIfArgumentIsProfessorId() {
         long professorId = 1;
 
-        when(professorDao.findById(professorId)).thenReturn(Optional.of(Professor.builder().withId((long)1).build()));
+        when(professorDao.findById(professorId)).thenReturn(Optional.of(Professor.builder().withId(1L).build()));
 
         professorService.findById(professorId);
 
@@ -145,8 +145,8 @@ class ProfessorServiceImplTest {
     void findAllIdShouldReturnListOfProfessorResponseIfArgumentIsPageNumber() {
         String pageNumber = "2";
 
-        when(professorDao.count()).thenReturn((long)11);
-        when(professorDao.findAll(2, 5)).thenReturn(Arrays.asList(Professor.builder().withId((long)1).build()));
+        when(professorDao.count()).thenReturn(11L);
+        when(professorDao.findAll(2, 5)).thenReturn(Arrays.asList(Professor.builder().withId(1L).build()));
 
         professorService.findAll(pageNumber);
 
@@ -156,9 +156,9 @@ class ProfessorServiceImplTest {
 
     @Test
     void editShouldEditDataOfProfessorIfArgumentNewProfessorRequest() {
-        Professor professor = Professor.builder().withId((long)1).build();
+        Professor professor = Professor.builder().withId(1L).build();
         ProfessorRequest professorRequest = new ProfessorRequest();
-        professorRequest.setId((long)1);
+        professorRequest.setId(1L);
 
         when(professorRequestMapper.mapDtoToEntity(professorRequest)).thenReturn(professor);
         doNothing().when(professorDao).update(professor);

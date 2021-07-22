@@ -51,7 +51,7 @@ class StudentServiceImplTest {
         String password= "12345";
 
         when(studentDao.findByEmail(email)).thenReturn(Optional.of(Student.builder().withEmail(email).withPassword(password)
-                .withId((long)1).build()));
+                .withId(1L).build()));
         when(passwordEncoder.matches(password, password)).thenReturn(true);
 
 
@@ -64,7 +64,7 @@ class StudentServiceImplTest {
     void findByEmailShouldReturnOptionalOfStudentResponseIfArgumentIsEmail() {
         String email= "Alexey94@gamil.com";
 
-        when(studentDao.findByEmail(email)).thenReturn(Optional.of(Student.builder().withId((long)1).build()));
+        when(studentDao.findByEmail(email)).thenReturn(Optional.of(Student.builder().withId(1L).build()));
 
         studentService.findByEmail(email);
 
@@ -75,7 +75,7 @@ class StudentServiceImplTest {
     void leaveGroupShouldDeleteStudentFromGroupIfArgumentsIsStudentId() {
         long studentId = 1;
 
-        when(studentDao.findById(studentId)).thenReturn(Optional.of(Student.builder().withId((long)1).build()));
+        when(studentDao.findById(studentId)).thenReturn(Optional.of(Student.builder().withId(1L).build()));
         doNothing().when(studentDao).leaveGroup(studentId);
 
         studentService.leaveGroup(studentId);
@@ -100,8 +100,8 @@ class StudentServiceImplTest {
         long studentId = 1;
         long groupId = 2;
 
-        when(studentDao.findById(studentId)).thenReturn(Optional.of(Student.builder().withId((long)1).build()));
-        when(groupDao.findById(groupId)).thenReturn(Optional.of(Group.builder().withId((long)2).build()));
+        when(studentDao.findById(studentId)).thenReturn(Optional.of(Student.builder().withId(1L).build()));
+        when(groupDao.findById(groupId)).thenReturn(Optional.of(Group.builder().withId(2L).build()));
         doNothing().when(studentDao).enterGroup(studentId, groupId);
 
         studentService.enterGroup(studentId, groupId);
@@ -128,7 +128,7 @@ class StudentServiceImplTest {
         long studentId = 1;
         long groupId = 2;
 
-        when(studentDao.findById(studentId)).thenReturn(Optional.of(Student.builder().withId((long)1).build()));
+        when(studentDao.findById(studentId)).thenReturn(Optional.of(Student.builder().withId(1L).build()));
         when(groupDao.findById(groupId)).thenReturn(Optional.empty());
 
         studentService.enterGroup(studentId, groupId);
@@ -177,7 +177,7 @@ class StudentServiceImplTest {
     void findByIdShouldReturnOptionalOfStudentResponseIfArgumentIsStudentId() {
         long studentId = 1;
 
-        when(studentDao.findById(studentId)).thenReturn(Optional.of(Student.builder().withId((long)1).build()));
+        when(studentDao.findById(studentId)).thenReturn(Optional.of(Student.builder().withId(1L).build()));
 
         studentService.findById(studentId);
 
@@ -188,8 +188,8 @@ class StudentServiceImplTest {
     void findAllIdShouldReturnListOfStudentResponseIfArgumentIsPageNumber() {
         String pageNumber = "2";
 
-        when(studentDao.count()).thenReturn((long)11);
-        when(studentDao.findAll(2, 5)).thenReturn(Arrays.asList(Student.builder().withId((long)1).build()));
+        when(studentDao.count()).thenReturn(11L);
+        when(studentDao.findAll(2, 5)).thenReturn(Arrays.asList(Student.builder().withId(1L).build()));
 
         studentService.findAll(pageNumber);
 
@@ -199,9 +199,9 @@ class StudentServiceImplTest {
 
     @Test
     void editShouldEditDataOfStudentIfArgumentNewStudentRequest() {
-        Student student = Student.builder().withId((long)1).build();
+        Student student = Student.builder().withId(1L).build();
         StudentRequest studentRequest = new StudentRequest();
-        studentRequest.setId((long)1);
+        studentRequest.setId(1L);
 
         when(studentRequestMapper.mapDtoToEntity(studentRequest)).thenReturn(student);
         doNothing().when(studentDao).update(student);

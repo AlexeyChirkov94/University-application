@@ -26,7 +26,7 @@ public class StudentDaoImplTest {
         context = new AnnotationConfigApplicationContext(TestsContextConfiguration.class);
         studentDao = context.getBean(StudentDaoImpl.class);
         groupDao = context.getBean(GroupDaoImpl.class);
-        groupForTests = Group.builder().withId((long)0).build();
+        groupForTests = Group.builder().withId(0L).build();
     }
 
     @Test
@@ -39,7 +39,7 @@ public class StudentDaoImplTest {
                 .withGroup(groupForTests)
                 .build();
         studentDao.save(addingStudent);
-        Student readingStudent = studentDao.findById((long)11).get();
+        Student readingStudent = studentDao.findById(11L).get();
 
         assertUsers(readingStudent, addingStudent);
     }
@@ -54,7 +54,7 @@ public class StudentDaoImplTest {
                 .withGroup(groupForTests)
                 .build());
         studentDao.saveAll(addingStudent);
-        List<Student> readingStudent = Arrays.asList (studentDao.findById((long)11).get());
+        List<Student> readingStudent = Arrays.asList (studentDao.findById(11L).get());
 
         assertUsersStudents(readingStudent, addingStudent);
     }
@@ -62,15 +62,15 @@ public class StudentDaoImplTest {
     @Test
     void updateShouldUpdateDataOfStudentIfArgumentIsStudent(){
         Student expected = Student.builder()
-                .withId((long)3)
+                .withId(3L)
                 .withFirstName("Nikita")
                 .withLastName("Grigirev")
                 .withEmail("newEmailGrigirev@gmail.com")
                 .withPassword("1234")
-                .withGroup(groupDao.findById((long)1).get())
+                .withGroup(groupDao.findById(1L).get())
                 .build();
         studentDao.update(expected);
-        Student actual = studentDao.findById((long)3).get();
+        Student actual = studentDao.findById(3L).get();
 
         assertUsers(actual, expected);
     }
@@ -78,15 +78,15 @@ public class StudentDaoImplTest {
     @Test
     void updateAllShouldUpdateDataOfStudentsIfArgumentIsListOfStudent(){
         List<Student> expected = Arrays.asList(Student.builder()
-                .withId((long)3)
+                .withId(3L)
                 .withFirstName("Nikita")
                 .withLastName("Grigirev")
                 .withEmail("newEmailGrigirev@gmail.com")
                 .withPassword("1234")
-                .withGroup(groupDao.findById((long)1).get())
+                .withGroup(groupDao.findById(1L).get())
                 .build());
         studentDao.updateAll(expected);
-        List<Student> actual = Arrays.asList(studentDao.findById((long)3).get());
+        List<Student> actual = Arrays.asList(studentDao.findById(3L).get());
 
         assertUsersStudents(actual, expected);
     }
@@ -95,8 +95,8 @@ public class StudentDaoImplTest {
     @Test
     void deleteShouldDeleteDataOfStudentIfArgumentIsIdOfStudent(){
         Optional<Student> expected = Optional.empty();
-        studentDao.deleteById((long)3);
-        Optional<Student> actual = studentDao.findById((long)3);
+        studentDao.deleteById(3L);
+        Optional<Student> actual = studentDao.findById(3L);
 
         assertThat(expected).isEqualTo(actual);
     }
@@ -108,7 +108,7 @@ public class StudentDaoImplTest {
                 .withLastName("Chrikov")
                 .withEmail("chrikov@gmail.com")
                 .withPassword("1234")
-                .withGroup(groupDao.findById((long)1).get())
+                .withGroup(groupDao.findById(1L).get())
                 .build();
         Student actual = studentDao.findByEmail("chrikov@gmail.com").get();
 
@@ -135,7 +135,7 @@ public class StudentDaoImplTest {
                 .build();
 
         studentDao.leaveGroup(1);
-        Student actual = studentDao.findById((long)1).get();
+        Student actual = studentDao.findById(1L).get();
 
         assertUsers(actual, expected);
     }
@@ -147,11 +147,11 @@ public class StudentDaoImplTest {
                 .withLastName("Chrikov")
                 .withEmail("chrikov@gmail.com")
                 .withPassword("1234")
-                .withGroup(Group.builder().withId((long)2).withName("History Group №2").build())
+                .withGroup(Group.builder().withId(2L).withName("History Group №2").build())
                 .build();
 
         studentDao.enterGroup(1,2);
-        Student actual = studentDao.findById((long)1).get();
+        Student actual = studentDao.findById(1L).get();
 
         assertUsers(actual, expected);
     }

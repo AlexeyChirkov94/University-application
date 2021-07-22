@@ -42,7 +42,7 @@ class CourseServiceImplTest {
     void addCourseToProfessorCourseListShouldAddCourseToProfessorCourseListIfArgumentsIsCourseIdAndProfessorId() {
         long courseId = 1;
         long professorId = 2;
-        List<Course> coursesOfProfessor = Arrays.asList(Course.builder().withId((long)3).build());
+        List<Course> coursesOfProfessor = Arrays.asList(Course.builder().withId(3L).build());
 
         when(courseDao.findById(courseId)).thenReturn(Optional.of(Course.builder().withId(courseId).build()));
         when(professorDao.findById(professorId)).thenReturn(Optional.of(Professor.builder().withId(professorId).build()));
@@ -61,7 +61,7 @@ class CourseServiceImplTest {
     void addCourseToProfessorCourseListShouldDoNothingIfCourseAlreadyExistInProfessorCourseList() {
         long courseId = 1;
         long professorId = 2;
-        List<Course> coursesOfProfessor = Arrays.asList(Course.builder().withId((long)1).build());
+        List<Course> coursesOfProfessor = Arrays.asList(Course.builder().withId(1L).build());
 
         when(courseDao.findById(courseId)).thenReturn(Optional.of(Course.builder().withId(courseId).build()));
         when(professorDao.findById(professorId)).thenReturn(Optional.of(Professor.builder().withId(professorId).build()));
@@ -104,7 +104,7 @@ class CourseServiceImplTest {
     void removeCourseToProfessorCourseListShouldRemoveCourseToProfessorCourseListIfArgumentsIsCourseIdAndProfessorId() {
         long courseId = 1;
         long professorId = 2;
-        List<Course> coursesOfProfessor = Arrays.asList(Course.builder().withId((long)1).build());
+        List<Course> coursesOfProfessor = Arrays.asList(Course.builder().withId(1L).build());
 
         when(courseDao.findById(courseId)).thenReturn(Optional.of(Course.builder().withId(courseId).build()));
         when(professorDao.findById(professorId)).thenReturn(Optional.of(Professor.builder().withId(professorId).build()));
@@ -123,7 +123,7 @@ class CourseServiceImplTest {
     void removeCourseToProfessorCourseListShouldDoNothingIfThisCourseDontExistInProfessorCourseList() {
         long courseId = 1;
         long professorId = 2;
-        List<Course> coursesOfProfessor = Arrays.asList(Course.builder().withId((long)3).build());
+        List<Course> coursesOfProfessor = Arrays.asList(Course.builder().withId(3L).build());
 
         when(courseDao.findById(courseId)).thenReturn(Optional.of(Course.builder().withId(courseId).build()));
         when(professorDao.findById(professorId)).thenReturn(Optional.of(Professor.builder().withId(professorId).build()));
@@ -141,7 +141,7 @@ class CourseServiceImplTest {
         long professorId = 1;
 
         when(professorDao.findById(professorId)).thenReturn(Optional.of(Professor.builder().withId(professorId).build()));
-        when(courseDao.findByProfessorId(professorId)).thenReturn(Arrays.asList(Course.builder().withId((long)1).build()));
+        when(courseDao.findByProfessorId(professorId)).thenReturn(Arrays.asList(Course.builder().withId(1L).build()));
 
         courseService.findByProfessorId(professorId);
 
@@ -190,7 +190,7 @@ class CourseServiceImplTest {
     void findByIdShouldReturnOptionalOfCourseResponseIfArgumentIsCourseId() {
         long courseId = 1;
 
-        when(courseDao.findById(courseId)).thenReturn(Optional.of(Course.builder().withId((long)1).build()));
+        when(courseDao.findById(courseId)).thenReturn(Optional.of(Course.builder().withId(1L).build()));
 
         courseService.findById(courseId);
 
@@ -201,8 +201,8 @@ class CourseServiceImplTest {
     void findAllIdShouldReturnListOfCourseResponseIfArgumentIsPageNumber() {
         String pageNumber = "2";
 
-        when(courseDao.count()).thenReturn((long)11);
-        when(courseDao.findAll(2, 5)).thenReturn(Arrays.asList(Course.builder().withId((long)1).build()));
+        when(courseDao.count()).thenReturn(11L);
+        when(courseDao.findAll(2, 5)).thenReturn(Arrays.asList(Course.builder().withId(1L).build()));
 
         courseService.findAll(pageNumber);
 
@@ -212,9 +212,9 @@ class CourseServiceImplTest {
 
     @Test
     void editShouldEditDataOfCourseIfArgumentNewCourseRequest() {
-        Course course = Course.builder().withId((long)1).build();
+        Course course = Course.builder().withId(1L).build();
         CourseRequest courseRequest = new CourseRequest();
-        courseRequest.setId((long)1);
+        courseRequest.setId(1L);
 
         when(courseRequestMapper.mapDtoToEntity(courseRequest)).thenReturn(course);
         doNothing().when(courseDao).update(course);

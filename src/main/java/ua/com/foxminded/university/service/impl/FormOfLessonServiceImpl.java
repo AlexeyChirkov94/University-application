@@ -1,5 +1,6 @@
 package ua.com.foxminded.university.service.impl;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.dao.interfaces.FormOfLessonDao;
 import ua.com.foxminded.university.dto.FormOfLessonRequest;
@@ -14,6 +15,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class FormOfLessonServiceImpl
         extends AbstractPageableCrudService<FormOfLessonRequest, FormOfLessonResponse>
         implements FormOfLessonService {
@@ -21,13 +23,6 @@ public class FormOfLessonServiceImpl
     private final FormOfLessonDao formOfLessonDao;
     private final FormOfLessonRequestMapper formOfLessonRequestMapper;
     private final FormOfLessonResponseMapper formOfLessonResponseMapper;
-
-    public FormOfLessonServiceImpl(FormOfLessonDao formOfLessonDao, FormOfLessonRequestMapper formOfLessonRequestMapper,
-                                   FormOfLessonResponseMapper formOfLessonResponseMapper) {
-        this.formOfLessonDao = formOfLessonDao;
-        this.formOfLessonRequestMapper = formOfLessonRequestMapper;
-        this.formOfLessonResponseMapper = formOfLessonResponseMapper;
-    }
 
     @Override
     public FormOfLessonResponse register(FormOfLessonRequest formOfLessonRequest) {

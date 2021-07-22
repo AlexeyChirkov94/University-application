@@ -28,17 +28,17 @@ class ProfessorResponseMapperImplTest {
 
     {
         context = new AnnotationConfigApplicationContext(TestsContextConfiguration.class);
-        List<Course> courses = Arrays.asList(Course.builder().withId((long)1).build(), Course.builder().withId((long)2).build());
+        List<Course> courses = Arrays.asList(Course.builder().withId(1L).build(), Course.builder().withId(2L).build());
         CourseResponse courseResponse1 = new CourseResponse();
         CourseResponse courseResponse2 = new CourseResponse();
-        courseResponse1.setId((long)1);
-        courseResponse2.setId((long)2);
+        courseResponse1.setId(1L);
+        courseResponse2.setId(2L);
         List<CourseResponse> coursesResponse = Arrays.asList(courseResponse1, courseResponse2);
         professorResponseMapper = context.getBean(ProfessorResponseMapperImpl.class);
-        professorWithCourses = Professor.builder().withId((long)1).withFirstName("Professor 1")
+        professorWithCourses = Professor.builder().withId(1L).withFirstName("Professor 1")
                 .withScienceDegree(ScienceDegree.GRADUATE).withCourses(courses).build();
         professorResponseWithCourses = new ProfessorResponse();
-        professorResponseWithCourses.setId((long)1);
+        professorResponseWithCourses.setId(1L);
         professorResponseWithCourses.setFirstName("Professor 1");
         professorResponseWithCourses.setScienceDegreeResponse(ScienceDegreeResponse.GRADUATE);
         professorResponseWithCourses.setCoursesResponse(coursesResponse);
@@ -56,10 +56,10 @@ class ProfessorResponseMapperImplTest {
 
     @Test
     void mapDtoToEntityShouldMapDtoToEntityIfArgumentIsProfessorWithNoCoursesResponseDto() {
-        professorWithNoCourses = Professor.builder().withId((long)1).withFirstName("Professor 1").
-                withCourses(emptyList()).withScienceDegree(ScienceDegree.GRADUATE).build();
+        professorWithNoCourses = Professor.builder().withId(1L).withFirstName("Professor 1")
+                .withCourses(emptyList()).withScienceDegree(ScienceDegree.GRADUATE).build();
         professorResponseWithNoCourses = new ProfessorResponse();
-        professorResponseWithNoCourses.setId((long)1);
+        professorResponseWithNoCourses.setId(1L);
         professorResponseWithNoCourses.setFirstName("Professor 1");
         professorResponseWithNoCourses.setScienceDegreeResponse(ScienceDegreeResponse.GRADUATE);
 
@@ -85,11 +85,11 @@ class ProfessorResponseMapperImplTest {
     @Test
     void mapEntityToDtoShouldMapEntityToDtoIfArgumentIsProfessorWithNoCoursesEntity() {
         professorResponseWithNoCourses = new ProfessorResponse();
-        professorResponseWithNoCourses.setId((long)1);
+        professorResponseWithNoCourses.setId(1L);
         professorResponseWithNoCourses.setFirstName("Professor 1");
         professorResponseWithNoCourses.setCoursesResponse(emptyList());
         professorResponseWithNoCourses.setScienceDegreeResponse(ScienceDegreeResponse.GRADUATE);
-        professorWithNoCourses = Professor.builder().withId((long)1).withFirstName("Professor 1")
+        professorWithNoCourses = Professor.builder().withId(1L).withFirstName("Professor 1")
                 .withScienceDegree(ScienceDegree.GRADUATE).build();
 
         ProfessorResponse expected = professorResponseWithNoCourses;

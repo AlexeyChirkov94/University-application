@@ -62,7 +62,7 @@ class DepartmentServiceImplTest {
     void findByIdShouldReturnOptionalOfDepartmentResponseIfArgumentIsDepartmentId() {
         long departmentId = 1;
 
-        when(departmentDao.findById(departmentId)).thenReturn(Optional.of(Department.builder().withId((long)1).build()));
+        when(departmentDao.findById(departmentId)).thenReturn(Optional.of(Department.builder().withId(1L).build()));
 
         departmentService.findById(departmentId);
 
@@ -73,8 +73,8 @@ class DepartmentServiceImplTest {
     void findAllIdShouldReturnListOfDepartmentResponseIfArgumentIsPageNumber() {
         String pageNumber = "2";
 
-        when(departmentDao.count()).thenReturn((long)11);
-        when(departmentDao.findAll(2, 5)).thenReturn(Arrays.asList(Department.builder().withId((long)1).build()));
+        when(departmentDao.count()).thenReturn(11L);
+        when(departmentDao.findAll(2, 5)).thenReturn(Arrays.asList(Department.builder().withId(1L).build()));
 
         departmentService.findAll(pageNumber);
 
@@ -84,9 +84,9 @@ class DepartmentServiceImplTest {
 
     @Test
     void editShouldEditDataOfDepartmentIfArgumentNewDepartmentRequest() {
-        Department department = Department.builder().withId((long)1).build();
+        Department department = Department.builder().withId(1L).build();
         DepartmentRequest departmentRequest = new DepartmentRequest();
-        departmentRequest.setId((long)1);
+        departmentRequest.setId(1L);
 
         when(departmentRequestMapper.mapDtoToEntity(departmentRequest)).thenReturn(department);
         doNothing().when(departmentDao).update(department);

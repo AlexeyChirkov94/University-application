@@ -1,6 +1,6 @@
 package ua.com.foxminded.university.dao.impl;
 
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -15,9 +15,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+@Log4j
 public abstract class AbstractCrudDaoImpl<E> implements CrudDao<E> {
-
-    private static final Logger LOGGER = Logger.getLogger(AbstractCrudDaoImpl.class);
 
     private static final String MESSAGE_OF_SUCCESS_DELETING = "Entity deleted, id = ";
     private static final String MESSAGE_OF_ERROR_IN_DELETING = "Error entity deleting, id = ";
@@ -68,7 +67,7 @@ public abstract class AbstractCrudDaoImpl<E> implements CrudDao<E> {
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(findByIdQuery, rowMapper, id));
         } catch (DataAccessException e) {
-            LOGGER.info("Entity not found: " + id);
+            log.info("Entity not found: " + id);
             return Optional.empty();
         }
     }
@@ -104,10 +103,10 @@ public abstract class AbstractCrudDaoImpl<E> implements CrudDao<E> {
     public boolean deleteById(Long id) {
         int result = jdbcTemplate.update(deleteQuery, id);
         if (result == 1){
-            LOGGER.info(MESSAGE_OF_SUCCESS_DELETING + id);
+            log.info(MESSAGE_OF_SUCCESS_DELETING + id);
             return true;
         } else {
-            LOGGER.info(MESSAGE_OF_ERROR_IN_DELETING + id);
+            log.info(MESSAGE_OF_ERROR_IN_DELETING + id);
             return false;
         }
     }

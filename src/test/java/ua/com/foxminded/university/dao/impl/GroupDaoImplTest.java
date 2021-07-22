@@ -32,9 +32,9 @@ public class GroupDaoImplTest {
         context = new AnnotationConfigApplicationContext(TestsContextConfiguration.class);
         groupDao = context.getBean(GroupDaoImpl.class);
         departmentDao = context.getBean(DepartmentDaoImpl.class);
-        departmentForTest = Department.builder().withId((long)0).build();
+        departmentForTest = Department.builder().withId(0L).build();
         formOfEducationDao = context.getBean(FormOfEducationDaoImpl.class);
-        formOfEducationForTest = FormOfEducation.builder().withId((long)0).build();
+        formOfEducationForTest = FormOfEducation.builder().withId(0L).build();
     }
 
     @Test
@@ -45,7 +45,7 @@ public class GroupDaoImplTest {
                 .withFormOfEducation(formOfEducationForTest)
                 .build();
         groupDao.save(addingGroup);
-        Group readingGroup = groupDao.findById((long)4).get();
+        Group readingGroup = groupDao.findById(4L).get();
 
         assertGroups(readingGroup, addingGroup);
     }
@@ -58,7 +58,7 @@ public class GroupDaoImplTest {
                 .withFormOfEducation(formOfEducationForTest)
                 .build());
         groupDao.saveAll(addingGroupEntities);
-        List<Group> readingGroupEntities = Arrays.asList(groupDao.findById((long)4).get());
+        List<Group> readingGroupEntities = Arrays.asList(groupDao.findById(4L).get());
 
         assertGroups(readingGroupEntities, addingGroupEntities);
     }
@@ -66,13 +66,13 @@ public class GroupDaoImplTest {
     @Test
     void updateShouldUpdateDataOfGroupIfArgumentIsGroup(){
         Group expected = Group.builder()
-                .withId((long)1)
+                .withId(1L)
                 .withName("New Test Group")
-                .withDepartment(departmentDao.findById((long)1).get())
-                .withFormOfEducation(formOfEducationDao.findById((long)1).get())
+                .withDepartment(departmentDao.findById(1L).get())
+                .withFormOfEducation(formOfEducationDao.findById(1L).get())
                 .build();
         groupDao.update(expected);
-        Group actual = groupDao.findById((long)1).get();
+        Group actual = groupDao.findById(1L).get();
 
         assertGroups(actual, expected);
     }
@@ -80,13 +80,13 @@ public class GroupDaoImplTest {
     @Test
     void updateAllShouldUpdateDataOfGroupsIfArgumentIsListOfGroups(){
         List<Group> expected = Arrays.asList(Group.builder()
-                .withId((long)1)
+                .withId(1L)
                 .withName("New Test Group")
-                .withDepartment(departmentDao.findById((long)1).get())
-                .withFormOfEducation(formOfEducationDao.findById((long)1).get())
+                .withDepartment(departmentDao.findById(1L).get())
+                .withFormOfEducation(formOfEducationDao.findById(1L).get())
                 .build());
         groupDao.updateAll(expected);
-        List<Group> actual = Arrays.asList(groupDao.findById((long)1).get());
+        List<Group> actual = Arrays.asList(groupDao.findById(1L).get());
 
         assertGroups(actual, expected);
     }
@@ -94,8 +94,8 @@ public class GroupDaoImplTest {
     @Test
     void deleteShouldDeleteDataOfProfessorIfArgumentIsIdOfProfessor(){
         Optional<Group> expected = Optional.empty();
-        groupDao.deleteById((long)3);
-        Optional<Group> actual = groupDao.findById((long)3);
+        groupDao.deleteById(3L);
+        Optional<Group> actual = groupDao.findById(3L);
 
         assertThat(expected).isEqualTo(actual);
     }
@@ -103,23 +103,23 @@ public class GroupDaoImplTest {
     @Test
     void changeFormOfEducationShouldChangeFormOfEducationOfGroupsIfArgumentIsIdOfGroupAndIdOfNewFormOfEducation(){
         Group expectedBeforeChange = Group.builder()
-                .withId((long)1)
+                .withId(1L)
                 .withName("History Group №1")
-                .withDepartment(departmentDao.findById((long)1).get())
-                .withFormOfEducation(formOfEducationDao.findById((long)1).get())
+                .withDepartment(departmentDao.findById(1L).get())
+                .withFormOfEducation(formOfEducationDao.findById(1L).get())
                 .build();
-        Group actualBeforeChange = groupDao.findById((long)1).get();
+        Group actualBeforeChange = groupDao.findById(1L).get();
         assertGroups(actualBeforeChange, expectedBeforeChange);
 
         groupDao.changeFormOfEducation(1, 2);
 
         Group expectedAfterChange = Group.builder()
-                .withId((long)1)
+                .withId(1L)
                 .withName("History Group №1")
-                .withDepartment(departmentDao.findById((long)1).get())
-                .withFormOfEducation(formOfEducationDao.findById((long)2).get())
+                .withDepartment(departmentDao.findById(1L).get())
+                .withFormOfEducation(formOfEducationDao.findById(2L).get())
                 .build();
-        Group actualAfterChange = groupDao.findById((long)1).get();
+        Group actualAfterChange = groupDao.findById(1L).get();
         assertGroups(actualAfterChange, expectedAfterChange);
     }
 
@@ -127,16 +127,16 @@ public class GroupDaoImplTest {
     void findAllWithPagesShouldReturnAllGroupEntitiesInCurrentPageIfArgumentNumberOfPage(){
         List<Group> items = new ArrayList<>();
         items.add(Group.builder()
-                .withId((long)1)
+                .withId(1L)
                 .withName("History Group №1")
-                .withDepartment(departmentDao.findById((long)1).get())
-                .withFormOfEducation(formOfEducationDao.findById((long)1).get())
+                .withDepartment(departmentDao.findById(1L).get())
+                .withFormOfEducation(formOfEducationDao.findById(1L).get())
                 .build());
         items.add(Group.builder()
-                .withId((long)2)
+                .withId(2L)
                 .withName("History Group №2")
-                .withDepartment(departmentDao.findById((long)1).get())
-                .withFormOfEducation(formOfEducationDao.findById((long)2).get())
+                .withDepartment(departmentDao.findById(1L).get())
+                .withFormOfEducation(formOfEducationDao.findById(2L).get())
                 .build());
 
         Pageable<Group> actual = groupDao.findAll(new Page(1,2),2);
@@ -152,8 +152,8 @@ public class GroupDaoImplTest {
     void findByNameShouldReturnOptionalOfFormOfLessonIfArgumentIsName(){
         Group expected = Group.builder()
                 .withName("History Group №1")
-                .withDepartment(departmentDao.findById((long)1).get())
-                .withFormOfEducation(formOfEducationDao.findById((long)1).get())
+                .withDepartment(departmentDao.findById(1L).get())
+                .withFormOfEducation(formOfEducationDao.findById(1L).get())
                 .build();
         Group actual = groupDao.findByName("History Group №1").get();
 

@@ -35,7 +35,7 @@ class ViewProviderImplTest {
     void readLongReturnLongArgumentsIsInputConsoleStream() {
         String data = "5";
         System.setIn(new ByteArrayInputStream(data.getBytes()));
-        Long expected = (long)5;
+        Long expected = 5L;
         Long actual = VIEW_PROVIDER.readLong();
 
         assertThat(actual).isEqualTo(expected);

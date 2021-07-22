@@ -9,7 +9,6 @@ import ua.com.foxminded.university.dao.interfaces.ProfessorDao;
 import ua.com.foxminded.university.entity.Department;
 import ua.com.foxminded.university.entity.Professor;
 import ua.com.foxminded.university.entity.ScienceDegree;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +27,7 @@ public class ProfessorDaoImplTest {
         context = new AnnotationConfigApplicationContext(TestsContextConfiguration.class);
         professorDao = context.getBean(ProfessorDaoImpl.class);
         departmentDao = context.getBean(DepartmentDaoImpl.class);
-        departmentForTest = Department.builder().withId((long)0).build();
+        departmentForTest = Department.builder().withId(0L).build();
     }
 
     @Test
@@ -42,7 +41,7 @@ public class ProfessorDaoImplTest {
                 .withScienceDegree(ScienceDegree.GRADUATE)
                 .build();
         professorDao.save(addingProfessor);
-        Professor readingProfessor = professorDao.findById((long)11).get();
+        Professor readingProfessor = professorDao.findById(11L).get();
 
         assertUsers(readingProfessor, addingProfessor);
     }
@@ -58,7 +57,7 @@ public class ProfessorDaoImplTest {
                 .withScienceDegree(ScienceDegree.GRADUATE)
                 .build());
         professorDao.saveAll(addingProfessorEntities);
-        List<Professor> readingProfessorEntities = Arrays.asList(professorDao.findById((long)11).get());
+        List<Professor> readingProfessorEntities = Arrays.asList(professorDao.findById(11L).get());
 
         assertUsersProfessors(readingProfessorEntities, addingProfessorEntities);
     }
@@ -66,16 +65,16 @@ public class ProfessorDaoImplTest {
     @Test
     void updateShouldUpdateDataOfProfessorIfArgumentIsProfessor(){
         Professor expected = Professor.builder()
-                .withId((long)9)
+                .withId(9L)
                 .withFirstName("Alex")
                 .withLastName("Chirkov")
                 .withEmail("chirkov@gmail.com")
                 .withPassword("1234")
-                .withDepartment(departmentDao.findById((long)1).get())
+                .withDepartment(departmentDao.findById(1L).get())
                 .withScienceDegree(ScienceDegree.GRADUATE)
                 .build();
         professorDao.update(expected);
-        Professor actual = professorDao.findById((long)9).get();
+        Professor actual = professorDao.findById(9L).get();
 
         assertUsers(actual, expected);
     }
@@ -83,16 +82,16 @@ public class ProfessorDaoImplTest {
     @Test
     void updateAllShouldUpdateDataOfProfessorIfArgumentIsListOfProfessor(){
         List<Professor> expected = Arrays.asList(Professor.builder()
-                .withId((long)9)
+                .withId(9L)
                 .withFirstName("Alex")
                 .withLastName("Chirkov")
                 .withEmail("chirkov@gmail.com")
                 .withPassword("1234")
-                .withDepartment(departmentDao.findById((long)1).get())
+                .withDepartment(departmentDao.findById(1L).get())
                 .withScienceDegree(ScienceDegree.GRADUATE)
                 .build());
         professorDao.updateAll(expected);
-        List<Professor> actual = Arrays.asList(professorDao.findById((long)9).get());
+        List<Professor> actual = Arrays.asList(professorDao.findById(9L).get());
 
         assertUsersProfessors(actual, expected);
     }
@@ -100,8 +99,8 @@ public class ProfessorDaoImplTest {
     @Test
     void deleteShouldDeleteDataOfProfessorIfArgumentIsIdOfProfessor(){
         Optional<Professor> expected = Optional.empty();
-        professorDao.deleteById((long)10);
-        Optional<Professor> actual = professorDao.findById((long)10);
+        professorDao.deleteById(10L);
+        Optional<Professor> actual = professorDao.findById(10L);
 
         assertThat(expected).isEqualTo(actual);
     }
@@ -113,7 +112,7 @@ public class ProfessorDaoImplTest {
                 .withLastName("Petrov")
                 .withEmail("petrov@gmail.com")
                 .withPassword("RI")
-                .withDepartment(departmentDao.findById((long)1).get())
+                .withDepartment(departmentDao.findById(1L).get())
                 .withScienceDegree(ScienceDegree.GRADUATE)
                 .build();
         Professor actual = professorDao.findByEmail("petrov@gmail.com").get();
@@ -132,24 +131,24 @@ public class ProfessorDaoImplTest {
     @Test
     void changeScienceDegreeShouldChangeScienceDegreeOfProfessorIfArgumentIsIdOfProfessorAndIdOfNewScienceDegree(){
         Professor expected = Professor.builder()
-                .withId((long)10)
+                .withId(10L)
                 .withFirstName("Ivan")
                 .withLastName("Mazurin")
                 .withEmail("Mazurin@gmail.com")
                 .withPassword("1234")
-                .withDepartment(departmentDao.findById((long)1).get())
+                .withDepartment(departmentDao.findById(1L).get())
                 .withScienceDegree(ScienceDegree.MASTER)
                 .build();
         professorDao.changeScienceDegree(10, 2);
-        Professor actual = professorDao.findById((long)10).get();
+        Professor actual = professorDao.findById(10L).get();
 
         assertUsers(actual, expected);
     }
 
     @Test
     void findByCourseIdShouldFindListOfProfessorsIfArgumentIsIdOfCourse(){
-        List<Professor> expected = Arrays.asList(professorDao.findById((long)7).get(),
-                professorDao.findById((long)9).get());
+        List<Professor> expected = Arrays.asList(professorDao.findById(7L).get(),
+                professorDao.findById(9L).get());
         List<Professor> actual = professorDao.findByCourseId(1);
 
         assertUsersProfessors(actual, expected);
