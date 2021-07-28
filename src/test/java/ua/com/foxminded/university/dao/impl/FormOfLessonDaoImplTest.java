@@ -5,7 +5,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import ua.com.foxminded.university.TestsContextConfiguration;
 import ua.com.foxminded.university.dao.interfaces.FormOfLessonDao;
-import ua.com.foxminded.university.entity.Department;
 import ua.com.foxminded.university.entity.FormOfLesson;
 
 import java.util.Arrays;
@@ -29,7 +28,7 @@ public class FormOfLessonDaoImplTest {
     void createAndReadShouldAddNewFormOfLessonToDatabaseIfArgumentIsFormOfLesson(){
         FormOfLesson addingFormOfLesson = FormOfLesson.builder().withName("new Form").withDuration(100).build();
         formOfLessonDao.save(addingFormOfLesson);
-        FormOfLesson readingFormOfLesson = formOfLessonDao.findById((long)4).get();
+        FormOfLesson readingFormOfLesson = formOfLessonDao.findById(4L).get();
 
         assertFormsOfLesson(readingFormOfLesson, addingFormOfLesson);
     }
@@ -39,7 +38,7 @@ public class FormOfLessonDaoImplTest {
         List<FormOfLesson> addingFormOfLessonEntities = Arrays.asList (FormOfLesson.builder().withName("new Form")
                 .withDuration(100).build());
         formOfLessonDao.saveAll(addingFormOfLessonEntities);
-        List<FormOfLesson> readingFormOfLessonEntities = Arrays.asList(formOfLessonDao.findById((long)4).get());
+        List<FormOfLesson> readingFormOfLessonEntities = Arrays.asList(formOfLessonDao.findById(4L).get());
 
         assertFormsOfLesson(readingFormOfLessonEntities, addingFormOfLessonEntities);
     }
@@ -47,13 +46,13 @@ public class FormOfLessonDaoImplTest {
     @Test
     void updateShouldUpdateDataOfFormOfLessonIfArgumentIsFormOfLesson(){
         FormOfLesson expected = FormOfLesson.builder()
-                .withId((long)1)
+                .withId(1L)
                 .withName("new Form")
                 .withDuration(100)
                 .build();
 
         formOfLessonDao.update(expected);
-        FormOfLesson actual = formOfLessonDao.findById((long)1).get();
+        FormOfLesson actual = formOfLessonDao.findById(1L).get();
 
         assertFormsOfLesson(actual, expected);
     }
@@ -61,12 +60,12 @@ public class FormOfLessonDaoImplTest {
     @Test
     void updateAllShouldUpdateDataOfFormOfLessonsIfArgumentIsListOfFormOfLessons() {
         List<FormOfLesson> expected = Arrays.asList(FormOfLesson.builder()
-                .withId((long)1)
+                .withId(1L)
                 .withName("new Form")
                 .withDuration(100)
                 .build());
         formOfLessonDao.updateAll(expected);
-        List<FormOfLesson> actual = Arrays.asList(formOfLessonDao.findById((long)1).get());
+        List<FormOfLesson> actual = Arrays.asList(formOfLessonDao.findById(1L).get());
 
         assertFormsOfLesson(actual, expected);
     }
@@ -74,8 +73,8 @@ public class FormOfLessonDaoImplTest {
     @Test
     void deleteShouldDeleteDataOfFormOfLessonIfArgumentIsIdOfFormOfLesson(){
         Optional<FormOfLesson> expected = Optional.empty();
-        formOfLessonDao.deleteById((long)3);
-        Optional<FormOfLesson> actual = formOfLessonDao.findById((long)3);
+        formOfLessonDao.deleteById(3L);
+        Optional<FormOfLesson> actual = formOfLessonDao.findById(3L);
 
         assertThat(expected).isEqualTo(actual);
     }

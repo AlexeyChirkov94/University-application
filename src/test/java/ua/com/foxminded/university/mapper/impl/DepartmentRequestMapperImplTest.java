@@ -19,9 +19,9 @@ class DepartmentRequestMapperImplTest {
     {
         context = new AnnotationConfigApplicationContext(TestsContextConfiguration.class);
         departmentRequestMapper = context.getBean(DepartmentRequestMapperImpl.class);
-        department = Department.builder().withId((long)1).withName("Dep 1").build();
+        department = Department.builder().withId(1L).withName("Dep 1").build();
         departmentRequest = new DepartmentRequest();
-        departmentRequest.setId((long)1);
+        departmentRequest.setId(1L);
         departmentRequest.setName("Dep 1");
     }
 

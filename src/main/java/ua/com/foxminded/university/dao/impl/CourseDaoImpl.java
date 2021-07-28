@@ -1,6 +1,6 @@
 package ua.com.foxminded.university.dao.impl;
 
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -10,7 +10,6 @@ import org.springframework.stereotype.Repository;
 import ua.com.foxminded.university.dao.interfaces.CourseDao;
 import ua.com.foxminded.university.entity.Course;
 import ua.com.foxminded.university.entity.Department;
-
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -18,9 +17,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
+@Log4j
 public class CourseDaoImpl extends AbstractPageableCrudDaoImpl<Course> implements CourseDao {
-
-    private static final Logger LOGGER = Logger.getLogger(CourseDaoImpl.class);
 
     private static final String FIND_QUERY = "SELECT c.id, c.name, c.department_id, d.name as department_name " +
             "from courses c left join departments d on c.department_id = d.id ";
@@ -58,7 +56,7 @@ public class CourseDaoImpl extends AbstractPageableCrudDaoImpl<Course> implement
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(FIND_BY_NAME_QUERY, ROW_MAPPER, name));
         } catch (DataAccessException e) {
-            LOGGER.info("Department with this name not registered, Name: " + name);
+            log.info("Department with this name not registered, Name: " + name);
             return Optional.empty();
         }
     }

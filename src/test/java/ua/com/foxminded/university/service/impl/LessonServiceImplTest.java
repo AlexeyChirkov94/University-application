@@ -61,11 +61,11 @@ class LessonServiceImplTest {
     @Test
     void formTimeTableForGroupShouldReturnListOfLessonResponsesIfArgumentsIsGroupId() {
         long groupId = 2;
-        Lesson lesson1 = Lesson.builder().withId((long)1).build();
-        Lesson lesson2 = Lesson.builder().withId((long)2).build();
+        Lesson lesson1 = Lesson.builder().withId(1L).build();
+        Lesson lesson2 = Lesson.builder().withId(2L).build();
         List<Lesson> lessons = Arrays.asList(lesson1, lesson2);
 
-        when(groupDao.findById(groupId)).thenReturn(Optional.of(Group.builder().withId((long)2).build()));
+        when(groupDao.findById(groupId)).thenReturn(Optional.of(Group.builder().withId(2L).build()));
         when(lessonDao.formTimeTableForGroup(groupId)).thenReturn(lessons);
 
         lessonService.formTimeTableForGroup(groupId);
@@ -77,11 +77,11 @@ class LessonServiceImplTest {
     @Test
     void formTimeTableForProfessorShouldReturnListOfLessonResponsesIfArgumentsIsProfessorId() {
         long professorId = 2;
-        Lesson lesson1 = Lesson.builder().withId((long)1).build();
-        Lesson lesson2 = Lesson.builder().withId((long)2).build();
+        Lesson lesson1 = Lesson.builder().withId(1L).build();
+        Lesson lesson2 = Lesson.builder().withId(2L).build();
         List<Lesson> lessons = Arrays.asList(lesson1, lesson2);
 
-        when(professorDao.findById(professorId)).thenReturn(Optional.of(Professor.builder().withId((long)2).build()));
+        when(professorDao.findById(professorId)).thenReturn(Optional.of(Professor.builder().withId(2L).build()));
         when(lessonDao.formTimeTableForProfessor(professorId)).thenReturn(lessons);
 
         lessonService.formTimeTableForProfessor(professorId);
@@ -95,8 +95,8 @@ class LessonServiceImplTest {
         long lessonId = 1;
         long formOfLessonId = 2;
 
-        when(lessonDao.findById(lessonId)).thenReturn(Optional.of(Lesson.builder().withId((long)1).build()));
-        when(formOfLessonDao.findById(formOfLessonId)).thenReturn(Optional.of(FormOfLesson.builder().withId((long)2).build()));
+        when(lessonDao.findById(lessonId)).thenReturn(Optional.of(Lesson.builder().withId(1L).build()));
+        when(formOfLessonDao.findById(formOfLessonId)).thenReturn(Optional.of(FormOfLesson.builder().withId(2L).build()));
         doNothing().when(lessonDao).changeFormOfLesson(lessonId, formOfLessonId);
 
         lessonService.changeFormOfLesson(lessonId, formOfLessonId);
@@ -111,8 +111,8 @@ class LessonServiceImplTest {
         long lessonId = 1;
         long professorId = 2;
 
-        when(lessonDao.findById(lessonId)).thenReturn(Optional.of(Lesson.builder().withId((long)1).build()));
-        when(professorDao.findById(professorId)).thenReturn(Optional.of(Professor.builder().withId((long)2).build()));
+        when(lessonDao.findById(lessonId)).thenReturn(Optional.of(Lesson.builder().withId(1L).build()));
+        when(professorDao.findById(professorId)).thenReturn(Optional.of(Professor.builder().withId(2L).build()));
         doNothing().when(lessonDao).changeTeacher(lessonId, professorId);
 
         lessonService.changeTeacher(lessonId, professorId);
@@ -127,8 +127,8 @@ class LessonServiceImplTest {
         long lessonId = 1;
         long courseId = 2;
 
-        when(lessonDao.findById(lessonId)).thenReturn(Optional.of(Lesson.builder().withId((long)1).build()));
-        when(courseDao.findById(courseId)).thenReturn(Optional.of(Course.builder().withId((long)2).build()));
+        when(lessonDao.findById(lessonId)).thenReturn(Optional.of(Lesson.builder().withId(1L).build()));
+        when(courseDao.findById(courseId)).thenReturn(Optional.of(Course.builder().withId(2L).build()));
         doNothing().when(lessonDao).changeCourse(lessonId, courseId);
 
         lessonService.changeCourse(lessonId, courseId);
@@ -141,14 +141,14 @@ class LessonServiceImplTest {
     @Test
     void registerShouldAddLessonToDBIfArgumentsIsLessonRequest() {
         Lesson lesson = Lesson.builder()
-                .withTeacher(Professor.builder().withId((long)1).build())
-                .withGroup(Group.builder().withId((long)1).build())
+                .withTeacher(Professor.builder().withId(1L).build())
+                .withGroup(Group.builder().withId(1L).build())
                 .withTimeOfStartLesson(LocalDateTime.of(2020, 1, 10, 10, 00, 00))
                 .build();
         LessonRequest lessonRequest = new LessonRequest();
-        lessonRequest.setId((long)1);
+        lessonRequest.setId(1L);
         LessonResponse lessonResponse = new LessonResponse();
-        lessonResponse.setId((long)1);
+        lessonResponse.setId(1L);
         List<Lesson> lessonsOfGroup = Collections.emptyList();
         List<Lesson> lessonsOfProfessor = Collections.emptyList();
 
@@ -171,7 +171,7 @@ class LessonServiceImplTest {
     void findByIdShouldReturnOptionalOfLessonIfArgumentIsLessonId() {
         long lessonId = 1;
 
-        when(lessonDao.findById(lessonId)).thenReturn(Optional.of(Lesson.builder().withId((long)1).build()));
+        when(lessonDao.findById(lessonId)).thenReturn(Optional.of(Lesson.builder().withId(1L).build()));
 
         lessonService.findById(lessonId);
 
@@ -182,8 +182,8 @@ class LessonServiceImplTest {
     void findAllIdShouldReturnListOfLessonResponseIfArgumentIsPageNumber() {
         String pageNumber = "2";
 
-        when(lessonDao.count()).thenReturn((long)11);
-        when(lessonDao.findAll(2, 5)).thenReturn(Arrays.asList(Lesson.builder().withId((long)1).build()));
+        when(lessonDao.count()).thenReturn(11L);
+        when(lessonDao.findAll(2, 5)).thenReturn(Arrays.asList(Lesson.builder().withId(1L).build()));
 
         lessonService.findAll(pageNumber);
 
@@ -193,9 +193,9 @@ class LessonServiceImplTest {
 
     @Test
     void editShouldEditDataOfLessonIfArgumentNewLessonRequest() {
-        Lesson lesson = Lesson.builder().withId((long)1).build();
+        Lesson lesson = Lesson.builder().withId(1L).build();
         LessonRequest lessonRequest = new LessonRequest();
-        lessonRequest.setId((long)1);
+        lessonRequest.setId(1L);
 
         when(lessonRequestMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
         doNothing().when(lessonDao).update(lesson);
@@ -236,7 +236,7 @@ class LessonServiceImplTest {
         long lessonId = 1;
         long formOfLessonId = 200;
 
-        when(lessonDao.findById(lessonId)).thenReturn(Optional.of(Lesson.builder().withId((long)1).build()));
+        when(lessonDao.findById(lessonId)).thenReturn(Optional.of(Lesson.builder().withId(1L).build()));
         when(formOfLessonDao.findById(formOfLessonId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> lessonService.changeFormOfLesson(lessonId, formOfLessonId)).hasMessage("There no form of lesson with id: 200");
@@ -250,7 +250,7 @@ class LessonServiceImplTest {
         long lessonId = 1;
         long professorId = 100;
 
-        when(lessonDao.findById(lessonId)).thenReturn(Optional.of(Lesson.builder().withId((long)1).build()));
+        when(lessonDao.findById(lessonId)).thenReturn(Optional.of(Lesson.builder().withId(1L).build()));
         when(professorDao.findById(professorId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> lessonService.changeTeacher(lessonId, professorId)).hasMessage("There no professor with id: 100");
@@ -264,7 +264,7 @@ class LessonServiceImplTest {
         long lessonId = 1;
         long courseId = 200;
 
-        when(lessonDao.findById(lessonId)).thenReturn(Optional.of(Lesson.builder().withId((long)1).build()));
+        when(lessonDao.findById(lessonId)).thenReturn(Optional.of(Lesson.builder().withId(1L).build()));
         when(courseDao.findById(courseId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> lessonService.changeCourse(lessonId, courseId)).hasMessage("There no course with id: 200");
@@ -287,14 +287,14 @@ class LessonServiceImplTest {
     @Test
     void registerShouldThrowExceptionIfLessonCantBeCreatedBecauseGroupAlreadyHaveLessonOnThisTime() {
         Lesson lesson = Lesson.builder()
-                .withTeacher(Professor.builder().withId((long)1).build())
-                .withGroup(Group.builder().withId((long)1).build())
+                .withTeacher(Professor.builder().withId(1L).build())
+                .withGroup(Group.builder().withId(1L).build())
                 .withTimeOfStartLesson(LocalDateTime.of(2020, 1, 10, 10, 00, 00))
                 .build();
         LessonRequest lessonRequest = new LessonRequest();
-        lessonRequest.setId((long)1);
+        lessonRequest.setId(1L);
         LessonResponse lessonResponse = new LessonResponse();
-        lessonResponse.setId((long)1);
+        lessonResponse.setId(1L);
         List<Lesson> lessonsOfGroup = Arrays.asList(Lesson.builder().withTimeOfStartLesson(lesson.getTimeOfStartLesson()).build());
         List<Lesson> lessonsOfProfessor = Collections.emptyList();
 
@@ -312,14 +312,14 @@ class LessonServiceImplTest {
     @Test
     void registerShouldThrowExceptionIfLessonCantBeCreatedBecauseProfessorAlreadyHaveLessonOnThisTime() {
         Lesson lesson = Lesson.builder()
-                .withTeacher(Professor.builder().withId((long)1).build())
-                .withGroup(Group.builder().withId((long)1).build())
+                .withTeacher(Professor.builder().withId(1L).build())
+                .withGroup(Group.builder().withId(1L).build())
                 .withTimeOfStartLesson(LocalDateTime.of(2020, 1, 10, 10, 00, 00))
                 .build();
         LessonRequest lessonRequest = new LessonRequest();
-        lessonRequest.setId((long)1);
+        lessonRequest.setId(1L);
         LessonResponse lessonResponse = new LessonResponse();
-        lessonResponse.setId((long)1);
+        lessonResponse.setId(1L);
         List<Lesson> lessonsOfGroup = Collections.emptyList();
         List<Lesson> lessonsOfProfessor = Arrays.asList(Lesson.builder().withTimeOfStartLesson(lesson.getTimeOfStartLesson()).build());
 
@@ -338,8 +338,8 @@ class LessonServiceImplTest {
     void findAllIdShouldReturnListOfLessonResponseIfArgumentIsPageNumberCountOfElementIsSharesEntirelyOnCountElementPerPage() {
         String pageNumber = "2";
 
-        when(lessonDao.count()).thenReturn((long)10);
-        when(lessonDao.findAll(2, 5)).thenReturn(Arrays.asList(Lesson.builder().withId((long)1).build()));
+        when(lessonDao.count()).thenReturn(10L);
+        when(lessonDao.findAll(2, 5)).thenReturn(Arrays.asList(Lesson.builder().withId(1L).build()));
 
         lessonService.findAll(pageNumber);
 
@@ -351,7 +351,7 @@ class LessonServiceImplTest {
     void findAllIdShouldReturnListOfLessonResponseFromDefaultPageIfArgumentNotNumber() {
         String pageNumber = "a";
 
-        when(lessonDao.count()).thenReturn((long)11);
+        when(lessonDao.count()).thenReturn(11L);
 
         lessonService.findAll(pageNumber);
 
@@ -363,7 +363,7 @@ class LessonServiceImplTest {
     void findAllIdShouldReturnListOfLessonResponseFromDefaultPageIfArgumentIsNull() {
         String pageNumber = null;
 
-        when(lessonDao.count()).thenReturn((long)11);
+        when(lessonDao.count()).thenReturn(11L);
 
         lessonService.findAll(pageNumber);
 
@@ -375,7 +375,7 @@ class LessonServiceImplTest {
     void findAllIdShouldReturnListOfLessonResponseFromDefaultPageIfArgumentNegativeCount() {
         String pageNumber = "-1";
 
-        when(lessonDao.count()).thenReturn((long)11);
+        when(lessonDao.count()).thenReturn(11L);
 
         lessonService.findAll(pageNumber);
 
@@ -387,7 +387,7 @@ class LessonServiceImplTest {
     void findAllIdShouldReturnListOfLessonResponseFromMaxPAgeIfArgumentIsMoreThatMaxPage() {
         String pageNumber = "100";
 
-        when(lessonDao.count()).thenReturn((long)11);
+        when(lessonDao.count()).thenReturn(11L);
 
         lessonService.findAll(pageNumber);
 

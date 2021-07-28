@@ -2,7 +2,6 @@ package ua.com.foxminded.university.mapper.impl;
 
 import org.springframework.stereotype.Component;
 import ua.com.foxminded.university.dto.CourseRequest;
-import ua.com.foxminded.university.dto.CourseResponse;
 import ua.com.foxminded.university.dto.ProfessorRequest;
 import ua.com.foxminded.university.entity.Course;
 import ua.com.foxminded.university.entity.Professor;

@@ -1,5 +1,6 @@
 package ua.com.foxminded.university.service.impl;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.dao.interfaces.DepartmentDao;
 import ua.com.foxminded.university.dto.DepartmentRequest;
@@ -14,6 +15,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class DepartmentServiceImpl
         extends AbstractPageableCrudService<DepartmentRequest, DepartmentResponse>
         implements DepartmentService {
@@ -21,13 +23,6 @@ public class DepartmentServiceImpl
     private final DepartmentDao departmentDao;
     private final DepartmentRequestMapper departmentRequestMapper;
     private final DepartmentResponseMapper departmentResponseMapper;
-
-    public DepartmentServiceImpl(DepartmentDao departmentDao, DepartmentRequestMapper departmentRequestMapper,
-                                 DepartmentResponseMapper departmentResponseMapper) {
-        this.departmentDao = departmentDao;
-        this.departmentRequestMapper = departmentRequestMapper;
-        this.departmentResponseMapper = departmentResponseMapper;
-    }
 
     @Override
     public DepartmentResponse register(DepartmentRequest departmentRequest) {

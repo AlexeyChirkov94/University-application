@@ -62,7 +62,7 @@ class FormOfLessonServiceImplTest {
     void findByIdShouldReturnOptionalOfFormOfLessonResponseIfArgumentIsFormOfLessonId() {
         long formOfLessonId = 1;
 
-        when(formOfLessonDao.findById(formOfLessonId)).thenReturn(Optional.of(FormOfLesson.builder().withId((long)1).build()));
+        when(formOfLessonDao.findById(formOfLessonId)).thenReturn(Optional.of(FormOfLesson.builder().withId(1L).build()));
 
         formOfLessonService.findById(formOfLessonId);
 
@@ -73,8 +73,8 @@ class FormOfLessonServiceImplTest {
     void findAllIdShouldReturnListOfFormOfLessonResponseIfArgumentIsPageNumber() {
         String pageNumber = "2";
 
-        when(formOfLessonDao.count()).thenReturn((long)11);
-        when(formOfLessonDao.findAll(2, 5)).thenReturn(Arrays.asList(FormOfLesson.builder().withId((long)1).build()));
+        when(formOfLessonDao.count()).thenReturn(11L);
+        when(formOfLessonDao.findAll(2, 5)).thenReturn(Arrays.asList(FormOfLesson.builder().withId(1L).build()));
 
         formOfLessonService.findAll(pageNumber);
 
@@ -84,9 +84,9 @@ class FormOfLessonServiceImplTest {
 
     @Test
     void editShouldEditDataOfFormOfLessonIfArgumentNewFormOfLessonRequest() {
-        FormOfLesson formOfLesson = FormOfLesson.builder().withId((long)1).build();
+        FormOfLesson formOfLesson = FormOfLesson.builder().withId(1L).build();
         FormOfLessonRequest formOfLessonRequest = new FormOfLessonRequest();
-        formOfLessonRequest.setId((long)1);
+        formOfLessonRequest.setId(1L);
 
         when(formOfLessonRequestMapper.mapDtoToEntity(formOfLessonRequest)).thenReturn(formOfLesson);
         doNothing().when(formOfLessonDao).update(formOfLesson);

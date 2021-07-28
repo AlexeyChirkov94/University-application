@@ -5,20 +5,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ua.com.foxminded.university.dao.interfaces.CourseDao;
-import ua.com.foxminded.university.dao.interfaces.DepartmentDao;
-import ua.com.foxminded.university.dao.interfaces.FormOfEducationDao;
-import ua.com.foxminded.university.dao.interfaces.FormOfLessonDao;
-import ua.com.foxminded.university.dao.interfaces.GroupDao;
-import ua.com.foxminded.university.dao.interfaces.LessonDao;
-import ua.com.foxminded.university.dao.interfaces.ProfessorDao;
-import ua.com.foxminded.university.dao.interfaces.StudentDao;
 import ua.com.foxminded.university.dto.GroupResponse;
 import ua.com.foxminded.university.dto.LessonResponse;
 import ua.com.foxminded.university.dto.StudentRequest;
 import ua.com.foxminded.university.dto.StudentResponse;
-import ua.com.foxminded.university.entity.Group;
-import ua.com.foxminded.university.entity.Lesson;
 import ua.com.foxminded.university.entity.Student;
 import ua.com.foxminded.university.providers.ViewProvider;
 import ua.com.foxminded.university.service.interfaces.CourseService;
@@ -95,11 +85,11 @@ public class FrontControllerImplTest {
     @InjectMocks
     private FrontControllerImpl frontController;
 
-    {
-        LESSON_RESPONSE_1.setId((long)1);
-        LESSON_RESPONSE_2.setId((long)2);
-        LESSON_RESPONSE_3.setId((long)3);
-        GROUP_RESPONSE_1.setId((long)1);
+    static {
+        LESSON_RESPONSE_1.setId(1L);
+        LESSON_RESPONSE_2.setId(2L);
+        LESSON_RESPONSE_3.setId(3L);
+        GROUP_RESPONSE_1.setId(1L);
         STUDENT_RESPONSE_1.setGroupResponse(GROUP_RESPONSE_1);
         STUDENT_RESPONSE_2.setFirstName("Nikita");
         STUDENT_RESPONSE_2.setLastName("Grigirev");
@@ -112,8 +102,8 @@ public class FrontControllerImplTest {
         doNothing().when(viewProvider).printMessage(START_MENU);
         when(viewProvider.readInt()).thenReturn(1, 0);
         doNothing().when(viewProvider).printMessage("Input student Id");
-        when(viewProvider.readLong()).thenReturn((long)2);
-        when(studentService.findById((long)2)).thenReturn(Optional.of(STUDENT_RESPONSE_1));
+        when(viewProvider.readLong()).thenReturn(2L);
+        when(studentService.findById(2)).thenReturn(Optional.of(STUDENT_RESPONSE_1));
         when(lessonService.formTimeTableForGroup(1)).thenReturn(LESSON_RESPONSES);
         doNothing().when(viewProvider).printMessage("Time table for group with id: 1: \n");
         doNothing().when(viewProvider).printMessage(LESSON_RESPONSES.get(0).toString());
@@ -126,7 +116,7 @@ public class FrontControllerImplTest {
         verify(viewProvider, times(2)).readInt();
         verify(viewProvider).readLong();
         verify(viewProvider).printMessage("Input student Id");
-        verify(studentService).findById((long)2);
+        verify(studentService).findById(2);
         verify(lessonService).formTimeTableForGroup(1);
         verify(viewProvider).printMessage("Time table for group with id: 1: \n");
         verify(viewProvider).printMessage(LESSON_RESPONSES.get(0).toString());
@@ -139,7 +129,7 @@ public class FrontControllerImplTest {
         doNothing().when(viewProvider).printMessage(START_MENU);
         when(viewProvider.readInt()).thenReturn(2, 0);
         doNothing().when(viewProvider).printMessage("Input professor Id");
-        when(viewProvider.readLong()).thenReturn((long)2);
+        when(viewProvider.readLong()).thenReturn(2L);
         when(lessonService.formTimeTableForProfessor(2)).thenReturn(LESSON_RESPONSES);
         doNothing().when(viewProvider).printMessage("Time table for professor with id: 2: \n");
         doNothing().when(viewProvider).printMessage(LESSON_RESPONSES.get(0).toString());
@@ -168,7 +158,7 @@ public class FrontControllerImplTest {
         studentRequestToRegistration.setPassword("12AsqW!L");
 
         StudentResponse studentResponseAfterRegistration = new StudentResponse();
-        studentResponseAfterRegistration.setId((long)11);
+        studentResponseAfterRegistration.setId(11L);
         studentResponseAfterRegistration.setFirstName("Alex");
         studentResponseAfterRegistration.setLastName("Chrikov");
         studentResponseAfterRegistration.setEmail("Chrikov@gmail.com");
@@ -213,8 +203,8 @@ public class FrontControllerImplTest {
         verify(viewProvider).read();
         verify(viewProvider).printMessage("Input number of page");
         verify(studentService).findAll("1");
-        verify(viewProvider).printMessage(STUDENT_ENTITIES.get(0).toString());
-        verify(viewProvider).printMessage(STUDENT_ENTITIES.get(1).toString());
+        verify(viewProvider).printMessage(STUDENT_RESPONSES.get(0).toString());
+        verify(viewProvider).printMessage(STUDENT_RESPONSES.get(1).toString());
     }
 
         @Test
@@ -222,8 +212,8 @@ public class FrontControllerImplTest {
         doNothing().when(viewProvider).printMessage(START_MENU);
         when(viewProvider.readInt()).thenReturn(5, 0);
         doNothing().when(viewProvider).printMessage("Enter Id of the student");
-        when(viewProvider.readLong()).thenReturn((long)1);
-        when(studentService.deleteById((long)1)).thenReturn(true);
+        when(viewProvider.readLong()).thenReturn(1L);
+        when(studentService.deleteById(1)).thenReturn(true);
 
         frontController.startMenu();
 
@@ -231,7 +221,7 @@ public class FrontControllerImplTest {
         verify(viewProvider, times(2)).readInt();
         verify(viewProvider).printMessage("Enter Id of the student");
         verify(viewProvider).readLong();
-        verify(studentService).deleteById((long)1);
+        verify(studentService).deleteById(1);
     }
 
     @Test

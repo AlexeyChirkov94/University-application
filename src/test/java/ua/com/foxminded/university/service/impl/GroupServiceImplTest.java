@@ -111,7 +111,7 @@ class GroupServiceImplTest {
     void findByIdShouldReturnOptionalOfGroupResponseIfArgumentIsGroupId() {
         long groupId = 1;
 
-        when(groupDao.findById(groupId)).thenReturn(Optional.of(Group.builder().withId((long)1).build()));
+        when(groupDao.findById(groupId)).thenReturn(Optional.of(Group.builder().withId(1L).build()));
 
         groupService.findById(groupId);
 
@@ -122,8 +122,8 @@ class GroupServiceImplTest {
     void findAllIdShouldReturnListOfGroupResponseIfArgumentIsPageNumber() {
         String pageNumber = "2";
 
-        when(groupDao.count()).thenReturn((long)11);
-        when(groupDao.findAll(2, 5)).thenReturn(Arrays.asList(Group.builder().withId((long)1).build()));
+        when(groupDao.count()).thenReturn(11L);
+        when(groupDao.findAll(2, 5)).thenReturn(Arrays.asList(Group.builder().withId(1L).build()));
 
         groupService.findAll(pageNumber);
 
@@ -133,9 +133,9 @@ class GroupServiceImplTest {
 
     @Test
     void editShouldEditDataOfGroupIfArgumentNewGroupRequest() {
-        Group group = Group.builder().withId((long)1).build();
+        Group group = Group.builder().withId(1L).build();
         GroupRequest groupRequest = new GroupRequest();
-        groupRequest.setId((long)1);
+        groupRequest.setId(1L);
 
         when(groupRequestMapper.mapDtoToEntity(groupRequest)).thenReturn(group);
         doNothing().when(groupDao).update(group);

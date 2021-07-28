@@ -1,6 +1,6 @@
 package ua.com.foxminded.university.dao.impl;
 
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -16,9 +16,8 @@ import java.sql.Statement;
 import java.util.Optional;
 
 @Repository
+@Log4j
 public class FormOfEducationDaoImpl extends AbstractPageableCrudDaoImpl<FormOfEducation> implements FormOfEducationDao {
-
-    private static final Logger LOGGER = Logger.getLogger(FormOfEducationDaoImpl.class);
 
     private static final String SAVE_QUERY = "INSERT INTO formsofeducation (name) VALUES(?)";
     private static final String FIND_BY_ID_QUERY = "SELECT id, name from formsofeducation WHERE id=?";
@@ -44,7 +43,7 @@ public class FormOfEducationDaoImpl extends AbstractPageableCrudDaoImpl<FormOfEd
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(FIND_BY_NAME_QUERY, ROW_MAPPER, name));
         } catch (DataAccessException e) {
-            LOGGER.info("FormOfEducation with this name not registered, Name: " + name);
+            log.info("FormOfEducation with this name not registered, Name: " + name);
             return Optional.empty();
         }
     }

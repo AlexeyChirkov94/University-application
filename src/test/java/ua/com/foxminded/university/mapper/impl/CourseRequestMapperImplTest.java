@@ -20,9 +20,9 @@ class CourseRequestMapperImplTest {
     {
         context = new AnnotationConfigApplicationContext(TestsContextConfiguration.class);
         courseRequestMapper = context.getBean(CourseRequestMapperImpl.class);
-        course = Course.builder().withId((long)1).withName("Course 1").build();
+        course = Course.builder().withId(1L).withName("Course 1").build();
         courseRequest = new CourseRequest();
-        courseRequest.setId((long)1);
+        courseRequest.setId(1L);
         courseRequest.setName("Course 1");
     }
 

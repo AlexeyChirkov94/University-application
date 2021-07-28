@@ -19,9 +19,9 @@ class LessonRequestMapperImplTest {
     {
         context = new AnnotationConfigApplicationContext(TestsContextConfiguration.class);
         lessonRequestMapper = context.getBean(LessonRequestMapperImpl.class);
-        lesson = Lesson.builder().withId((long)1).build();
+        lesson = Lesson.builder().withId(1L).build();
         lessonRequest = new LessonRequest();
-        lessonRequest.setId((long)1);
+        lessonRequest.setId(1L);
     }
 
     @Test

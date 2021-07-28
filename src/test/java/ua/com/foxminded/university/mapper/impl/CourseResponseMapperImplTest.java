@@ -21,9 +21,9 @@ class CourseResponseMapperImplTest {
     {
         context = new AnnotationConfigApplicationContext(TestsContextConfiguration.class);
         courseResponseMapper = context.getBean(CourseResponseMapperImpl.class);
-        course = Course.builder().withId((long)1).withName("Course 1").build();
+        course = Course.builder().withId(1L).withName("Course 1").build();
         courseResponse = new CourseResponse();
-        courseResponse.setId((long)1);
+        courseResponse.setId(1L);
         courseResponse.setName("Course 1");
     }
 

@@ -6,8 +6,6 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import ua.com.foxminded.university.TestsContextConfiguration;
 import ua.com.foxminded.university.dao.interfaces.DepartmentDao;
 import ua.com.foxminded.university.entity.Department;
-import ua.com.foxminded.university.entity.Professor;
-import ua.com.foxminded.university.entity.ScienceDegree;
 
 import java.util.Arrays;
 import java.util.List;
@@ -30,7 +28,7 @@ public class DepartmentDaoImplTest {
     void createAndReadShouldAddNewDepartmentToDatabaseIfArgumentIsDepartment(){
         Department addingDepartment = Department.builder().withName("new Department").build();
         departmentDao.save(addingDepartment);
-        Department readingDepartment = departmentDao.findById((long)3).get();
+        Department readingDepartment = departmentDao.findById(3L).get();
 
         assertDepartments(readingDepartment, addingDepartment);
     }
@@ -39,7 +37,7 @@ public class DepartmentDaoImplTest {
     void createAndReadShouldAddListOfNewDepartmentsToDatabaseIfArgumentIsListOfDepartments(){
         List<Department> addingDepartmentEntities = Arrays.asList (Department.builder().withName("new Department").build());
         departmentDao.saveAll(addingDepartmentEntities);
-        List<Department> readingDepartmentEntities = Arrays.asList(departmentDao.findById((long)3).get());
+        List<Department> readingDepartmentEntities = Arrays.asList(departmentDao.findById(3L).get());
 
         assertDepartments(readingDepartmentEntities, addingDepartmentEntities);
     }
@@ -47,12 +45,12 @@ public class DepartmentDaoImplTest {
     @Test
     void updateShouldUpdateDataOfDepartmentIfArgumentIsDepartment(){
         Department expected = Department.builder()
-                .withId((long)1)
+                .withId(1L)
                 .withName("History")
                 .build();
 
         departmentDao.update(expected);
-        Department actual = departmentDao.findById((long)1).get();
+        Department actual = departmentDao.findById(1L).get();
 
         assertDepartments(actual, expected);
     }
@@ -60,11 +58,11 @@ public class DepartmentDaoImplTest {
     @Test
     void updateAllShouldUpdateDataOfDepartmentsIfArgumentIsListOfDepartments() {
         List<Department> expected = Arrays.asList(Department.builder()
-                .withId((long)1)
+                .withId(1L)
                 .withName("History")
                 .build());
         departmentDao.updateAll(expected);
-        List<Department> actual = Arrays.asList(departmentDao.findById((long)1).get());
+        List<Department> actual = Arrays.asList(departmentDao.findById(1L).get());
 
         assertDepartments(actual, expected);
     }
@@ -72,8 +70,8 @@ public class DepartmentDaoImplTest {
     @Test
     void deleteShouldDeleteDataOfDepartmentIfArgumentIsIdOfDepartment(){
         Optional<Department> expected = Optional.empty();
-        departmentDao.deleteById((long)3);
-        Optional<Department> actual = departmentDao.findById((long)3);
+        departmentDao.deleteById(3L);
+        Optional<Department> actual = departmentDao.findById(3L);
 
         assertThat(expected).isEqualTo(actual);
     }

@@ -1,6 +1,6 @@
 package ua.com.foxminded.university.dao.impl;
 
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -11,7 +11,6 @@ import ua.com.foxminded.university.dao.interfaces.ProfessorDao;
 import ua.com.foxminded.university.entity.Department;
 import ua.com.foxminded.university.entity.Professor;
 import ua.com.foxminded.university.entity.ScienceDegree;
-
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -19,9 +18,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
+@Log4j
 public class ProfessorDaoImpl extends AbstractPageableCrudDaoImpl<Professor> implements ProfessorDao {
-
-    private static final Logger LOGGER = Logger.getLogger(ProfessorDaoImpl.class);
 
     private static final String FIND_QUERY = "SELECT u.id, u.first_name, u.last_name, u.email, u.password, " +
             "u.department_id, d.name as department_name, u.sciencedegree_id " +
@@ -65,7 +63,7 @@ public class ProfessorDaoImpl extends AbstractPageableCrudDaoImpl<Professor> imp
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(FIND_BY_EMAIL_QUERY, ROW_MAPPER, email));
         } catch (DataAccessException e) {
-            LOGGER.info("Email not registered: " + email);
+            log.info("Email not registered: " + email);
             return Optional.empty();
         }
     }

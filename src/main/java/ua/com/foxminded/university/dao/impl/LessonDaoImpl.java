@@ -11,7 +11,6 @@ import ua.com.foxminded.university.entity.FormOfLesson;
 import ua.com.foxminded.university.entity.Group;
 import ua.com.foxminded.university.entity.Lesson;
 import ua.com.foxminded.university.entity.Professor;
-
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;

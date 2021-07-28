@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 public enum ScienceDegree {
 
-
     GRADUATE(1),
     MASTER(2),
     PH_D_CANDIDATE(3),

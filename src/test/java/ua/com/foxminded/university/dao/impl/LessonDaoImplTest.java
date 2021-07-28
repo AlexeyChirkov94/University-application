@@ -42,16 +42,16 @@ public class LessonDaoImplTest {
         lessonDao = context.getBean(LessonDaoImpl.class);
 
         groupDao = context.getBean(GroupDaoImpl.class);
-        groupForTest = Group.builder().withId((long)0).build();
+        groupForTest = Group.builder().withId(0L).build();
 
         courseDao = context.getBean(CourseDaoImpl.class);
-        courseForTest = Course.builder().withId((long)0).build();
+        courseForTest = Course.builder().withId(0L).build();
 
         professorDao = context.getBean(ProfessorDaoImpl.class);
-        professorForTest = Professor.builder().withId((long)0).build();
+        professorForTest = Professor.builder().withId(0L).build();
 
         formOfLessonDao = context.getBean(FormOfLessonDaoImpl.class);
-        formOfLessonForTest = FormOfLesson.builder().withId((long)0).build();
+        formOfLessonForTest = FormOfLesson.builder().withId(0L).build();
     }
 
     @Test
@@ -64,7 +64,7 @@ public class LessonDaoImplTest {
                 .withFormOfLesson(formOfLessonForTest)
                 .build();
         lessonDao.save(addingLesson);
-        Lesson readingLesson = lessonDao.findById((long)6).get();
+        Lesson readingLesson = lessonDao.findById(6L).get();
 
 
         assertLessons(readingLesson, addingLesson);
@@ -80,7 +80,7 @@ public class LessonDaoImplTest {
                 .withFormOfLesson(formOfLessonForTest)
                 .build());
         lessonDao.saveAll(addingLessonEntities);
-        List<Lesson> readingLessonEntities = Arrays.asList(lessonDao.findById((long)6).get());
+        List<Lesson> readingLessonEntities = Arrays.asList(lessonDao.findById(6L).get());
 
         assertLessons(readingLessonEntities, addingLessonEntities);
     }
@@ -88,15 +88,15 @@ public class LessonDaoImplTest {
     @Test
     void updateShouldUpdateDataOfLessonIfArgumentIsLesson(){
         Lesson expected = Lesson.builder()
-                .withId((long)1)
-                .withCourse(courseDao.findById((long)1).get())
+                .withId(1L)
+                .withCourse(courseDao.findById(1L).get())
                 .withTimeOfStartLesson(LocalDateTime.parse("2020-01-15_12:00:00.000", FORMATTER))
-                .withGroup(groupDao.findById((long)1).get())
-                .withTeacher(professorDao.findById((long)7).get())
-                .withFormOfLesson(formOfLessonDao.findById((long)1).get())
+                .withGroup(groupDao.findById(1L).get())
+                .withTeacher(professorDao.findById(7L).get())
+                .withFormOfLesson(formOfLessonDao.findById(1L).get())
                 .build();
         lessonDao.update(expected);
-        Lesson actual = lessonDao.findById((long)1).get();
+        Lesson actual = lessonDao.findById(1L).get();
 
         assertLessons(actual, expected);
     }
@@ -104,15 +104,15 @@ public class LessonDaoImplTest {
     @Test
     void updateAllShouldUpdateDataOfLessonIfArgumentIsListOfLesson(){
         List<Lesson> expected = Arrays.asList(Lesson.builder()
-                .withId((long)1)
-                .withCourse(courseDao.findById((long)1).get())
+                .withId(1L)
+                .withCourse(courseDao.findById(1L).get())
                 .withTimeOfStartLesson(LocalDateTime.parse("2020-01-15_12:00:00.000", FORMATTER))
-                .withGroup(groupDao.findById((long)1).get())
-                .withTeacher(professorDao.findById((long)7).get())
-                .withFormOfLesson(formOfLessonDao.findById((long)1).get())
+                .withGroup(groupDao.findById(1L).get())
+                .withTeacher(professorDao.findById(7L).get())
+                .withFormOfLesson(formOfLessonDao.findById(1L).get())
                 .build());
         lessonDao.updateAll(expected);
-        List<Lesson> actual = Arrays.asList(lessonDao.findById((long)1).get());
+        List<Lesson> actual = Arrays.asList(lessonDao.findById(1L).get());
 
         assertLessons(actual, expected);
     }
@@ -120,17 +120,17 @@ public class LessonDaoImplTest {
     @Test
     void deleteShouldDeleteDataOfLessonIfArgumentIsIdOfLesson(){
         Optional<Lesson> expected = Optional.empty();
-        lessonDao.deleteById((long)1);
-        Optional<Lesson> actual = lessonDao.findById((long)1);
+        lessonDao.deleteById(1L);
+        Optional<Lesson> actual = lessonDao.findById(1L);
 
         assertThat(expected).isEqualTo(actual);
     }
 
     @Test
     void formTimeTableForGroupShouldReturnListOfLessonForGroupIfArgumentIsIdOfGroup(){
-        List<Lesson> expected = Arrays.asList(lessonDao.findById((long)1).get(),
-                lessonDao.findById((long)2).get(),
-                lessonDao.findById((long)3).get());
+        List<Lesson> expected = Arrays.asList(lessonDao.findById(1L).get(),
+                lessonDao.findById(2L).get(),
+                lessonDao.findById(3L).get());
         List<Lesson> actual = lessonDao.formTimeTableForGroup(1);
 
         assertThat(expected).isEqualTo(actual);
@@ -138,8 +138,8 @@ public class LessonDaoImplTest {
 
     @Test
     void formTimeTableForProfessorShouldReturnListOfLessonForProfessorIfArgumentIsIdOfProfessor(){
-        List<Lesson> expected = Arrays.asList(lessonDao.findById((long)1).get(),
-                lessonDao.findById((long)2).get());
+        List<Lesson> expected = Arrays.asList(lessonDao.findById(1L).get(),
+                lessonDao.findById(2L).get());
         List<Lesson> actual = lessonDao.formTimeTableForProfessor(7);
 
         assertThat(expected).isEqualTo(actual);
@@ -148,17 +148,17 @@ public class LessonDaoImplTest {
     @Test
     void changeFormOfLessonShouldChangeFormOfLessonIfArgumentIsIdOfLessonAndIdOfNewFormOfLesson(){
         Lesson expected = Lesson.builder()
-                .withId((long)1)
-                .withCourse(courseDao.findById((long)1).get())
+                .withId(1L)
+                .withCourse(courseDao.findById(1L).get())
                 .withTimeOfStartLesson(LocalDateTime.parse("2020-01-11_13:00:00.000", FORMATTER))
-                .withGroup(groupDao.findById((long)1).get())
-                .withTeacher(professorDao.findById((long)7).get())
-                .withFormOfLesson(formOfLessonDao.findById((long)2).get())
+                .withGroup(groupDao.findById(1L).get())
+                .withTeacher(professorDao.findById(7L).get())
+                .withFormOfLesson(formOfLessonDao.findById(2L).get())
                 .build();
 
         lessonDao.changeFormOfLesson(1, 2);
 
-        Lesson actual = lessonDao.findById((long)1).get();
+        Lesson actual = lessonDao.findById(1L).get();
 
         assertLessons(actual, expected);
     }
@@ -166,17 +166,17 @@ public class LessonDaoImplTest {
     @Test
     void changeTeacherShouldChangeTeacherOfLessonIfArgumentIsIdOfLessonAndIdOfNewProfessor(){
         Lesson expected = Lesson.builder()
-                .withId((long)1)
-                .withCourse(courseDao.findById((long)1).get())
+                .withId(1L)
+                .withCourse(courseDao.findById(1L).get())
                 .withTimeOfStartLesson(LocalDateTime.parse("2020-01-11_13:00:00.000", FORMATTER))
-                .withGroup(groupDao.findById((long)1).get())
-                .withTeacher(professorDao.findById((long)9).get())
-                .withFormOfLesson(formOfLessonDao.findById((long)1).get())
+                .withGroup(groupDao.findById(1L).get())
+                .withTeacher(professorDao.findById(9L).get())
+                .withFormOfLesson(formOfLessonDao.findById(1L).get())
                 .build();
 
         lessonDao.changeTeacher(1, 9);
 
-        Lesson actual = lessonDao.findById((long)1).get();
+        Lesson actual = lessonDao.findById(1L).get();
 
         assertLessons(actual, expected);
     }
@@ -184,17 +184,17 @@ public class LessonDaoImplTest {
     @Test
     void changeCourseShouldChangeCourseOfLessonIfArgumentIsIdOfLessonAndIdOfNewCourse(){
         Lesson expected = Lesson.builder()
-                .withId((long)1)
-                .withCourse(courseDao.findById((long)2).get())
+                .withId(1L)
+                .withCourse(courseDao.findById(2L).get())
                 .withTimeOfStartLesson(LocalDateTime.parse("2020-01-11_13:00:00.000", FORMATTER))
-                .withGroup(groupDao.findById((long)1).get())
-                .withTeacher(professorDao.findById((long)7).get())
-                .withFormOfLesson(formOfLessonDao.findById((long)1).get())
+                .withGroup(groupDao.findById(1L).get())
+                .withTeacher(professorDao.findById(7L).get())
+                .withFormOfLesson(formOfLessonDao.findById(1L).get())
                 .build();
 
         lessonDao.changeCourse(1, 2);
 
-        Lesson actual = lessonDao.findById((long)1).get();
+        Lesson actual = lessonDao.findById(1L).get();
 
         assertLessons(actual, expected);
     }

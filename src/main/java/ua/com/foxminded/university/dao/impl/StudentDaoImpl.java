@@ -1,6 +1,6 @@
 package ua.com.foxminded.university.dao.impl;
 
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -10,16 +10,14 @@ import org.springframework.stereotype.Repository;
 import ua.com.foxminded.university.dao.interfaces.StudentDao;
 import ua.com.foxminded.university.entity.Group;
 import ua.com.foxminded.university.entity.Student;
-
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Optional;
 
 @Repository
+@Log4j
 public class StudentDaoImpl extends AbstractPageableCrudDaoImpl<Student> implements StudentDao {
-
-    private static final Logger LOGGER = Logger.getLogger(StudentDaoImpl.class);
 
     private static final String FIND_QUERY = "SELECT u.id, u.first_name, u.last_name, u.email, u.password, u.group_id, " +
             "g.name as group_name from users u left join groups g on u.group_id = g.id ";
@@ -58,7 +56,7 @@ public class StudentDaoImpl extends AbstractPageableCrudDaoImpl<Student> impleme
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(FIND_BY_EMAIL_QUERY, ROW_MAPPER, email));
         } catch (DataAccessException e) {
-            LOGGER.info("Email not registered: " + email);
+            log.info("Email not registered: " + email);
             return Optional.empty();
         }
     }
