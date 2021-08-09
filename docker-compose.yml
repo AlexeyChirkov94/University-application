@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  db:
+    image: postgres
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      - ./src/main/resources/database/schema.sql:/docker-entrypoint-initdb.d/create_tables.sql
+      - ./src/main/resources/database/data.sql:/docker-entrypoint-initdb.d/fill_tables.sql
+    environment:
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_USER: postgres
+      POSTGRES_DB: university_db
+      PGDATA: /var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    restart: unless-stopped
+
+volumes:
+  postgres:

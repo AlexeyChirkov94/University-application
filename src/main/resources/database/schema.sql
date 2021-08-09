@@ -6,7 +6,6 @@ drop table if exists "formsoflesson" CASCADE;
 drop table if exists "courses" CASCADE;
 drop table if exists "groups" CASCADE;
 drop table if exists "departments" CASCADE;
-drop table if exists "sciencedegrees"CASCADE ;
 drop table if exists "formsofeducation" CASCADE;
 
 create table departments
