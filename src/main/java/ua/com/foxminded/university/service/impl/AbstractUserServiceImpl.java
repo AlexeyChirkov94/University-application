@@ -11,8 +11,7 @@ import ua.com.foxminded.university.service.validator.UserValidator;
 import java.util.Optional;
 
 public abstract class AbstractUserServiceImpl<REQUEST extends UserRequest, RESPONSE extends UserResponse>
-        extends AbstractPageableCrudService<REQUEST, RESPONSE>
-        implements UserService<REQUEST, RESPONSE> {
+        extends AbstractPageableCrudService implements UserService<REQUEST, RESPONSE> {
 
     protected final PasswordEncoder passwordEncoder;
     protected final UserDao userDao;

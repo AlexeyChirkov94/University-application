@@ -3,6 +3,7 @@ package ua.com.foxminded.university.service.impl;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.dao.interfaces.FormOfLessonDao;
+import ua.com.foxminded.university.dto.FormOfEducationResponse;
 import ua.com.foxminded.university.dto.FormOfLessonRequest;
 import ua.com.foxminded.university.dto.FormOfLessonResponse;
 import ua.com.foxminded.university.entity.FormOfLesson;
@@ -16,9 +17,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-public class FormOfLessonServiceImpl
-        extends AbstractPageableCrudService<FormOfLessonRequest, FormOfLessonResponse>
-        implements FormOfLessonService {
+public class FormOfLessonServiceImpl extends AbstractPageableCrudService implements FormOfLessonService {
 
     private final FormOfLessonDao formOfLessonDao;
     private final FormOfLessonRequestMapper formOfLessonRequestMapper;
@@ -47,6 +46,14 @@ public class FormOfLessonServiceImpl
         int pageNumber = parsePageNumber(page, itemsCount, 1);
 
         return formOfLessonDao.findAll(pageNumber, ITEMS_PER_PAGE).stream()
+                .map(formOfLessonResponseMapper::mapEntityToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<FormOfLessonResponse> findAll() {
+
+        return formOfLessonDao.findAll().stream()
                 .map(formOfLessonResponseMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }

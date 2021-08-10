@@ -3,6 +3,7 @@ package ua.com.foxminded.university.service.impl;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.dao.interfaces.DepartmentDao;
+import ua.com.foxminded.university.dto.CourseResponse;
 import ua.com.foxminded.university.dto.DepartmentRequest;
 import ua.com.foxminded.university.dto.DepartmentResponse;
 import ua.com.foxminded.university.entity.Department;
@@ -16,9 +17,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-public class DepartmentServiceImpl
-        extends AbstractPageableCrudService<DepartmentRequest, DepartmentResponse>
-        implements DepartmentService {
+public class DepartmentServiceImpl extends AbstractPageableCrudService implements DepartmentService {
 
     private final DepartmentDao departmentDao;
     private final DepartmentRequestMapper departmentRequestMapper;
@@ -28,7 +27,7 @@ public class DepartmentServiceImpl
     public DepartmentResponse register(DepartmentRequest departmentRequest) {
         if (departmentDao.findByName(departmentRequest.getName()).isPresent()){
             throw new EntityAlreadyExistException("Department with same name already exist");
-        } else{
+        } else {
             Department departmentBeforeSave = departmentRequestMapper.mapDtoToEntity(departmentRequest);
             Department departmentAfterSave = departmentDao.save(departmentBeforeSave);
 
@@ -47,6 +46,14 @@ public class DepartmentServiceImpl
         int pageNumber = parsePageNumber(page, itemsCount, 1);
 
         return departmentDao.findAll(pageNumber, ITEMS_PER_PAGE).stream()
+                .map(departmentResponseMapper::mapEntityToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<DepartmentResponse> findAll() {
+
+        return departmentDao.findAll().stream()
                 .map(departmentResponseMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }

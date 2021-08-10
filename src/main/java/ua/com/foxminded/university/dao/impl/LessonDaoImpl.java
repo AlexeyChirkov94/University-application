@@ -12,9 +12,11 @@ import ua.com.foxminded.university.entity.Group;
 import ua.com.foxminded.university.entity.Lesson;
 import ua.com.foxminded.university.entity.Professor;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -44,7 +46,7 @@ public class LessonDaoImpl extends AbstractPageableCrudDaoImpl<Lesson> implement
                         .withId(rs.getLong("course_id"))
                         .withName(rs.getString("course_name"))
                         .build())
-                .withTimeOfStartLesson(rs.getTimestamp("timeOfStart").toLocalDateTime())
+                .withTimeOfStartLesson(nullSafeDateExtract(rs, "timeOfStart"))
                 .withGroup(Group.builder()
                         .withId(rs.getLong("group_id"))
                         .withName(rs.getString("group_name"))
@@ -108,7 +110,12 @@ public class LessonDaoImpl extends AbstractPageableCrudDaoImpl<Lesson> implement
 
     @Override
     protected void preparePreparedStatementForInsert(PreparedStatement ps, Lesson lesson) throws SQLException {
-        ps.setTimestamp(1, Timestamp.valueOf(lesson.getTimeOfStartLesson()));
+        if (lesson.getTimeOfStartLesson() == null) {
+            ps.setTimestamp(1, null);
+        } else {
+            ps.setTimestamp(1, Timestamp.valueOf(lesson.getTimeOfStartLesson()));
+        }
+
     }
 
     @Override
@@ -120,6 +127,16 @@ public class LessonDaoImpl extends AbstractPageableCrudDaoImpl<Lesson> implement
     protected void preparePreparedStatementForUpdate(PreparedStatement ps, Lesson lesson) throws SQLException {
         preparePreparedStatementForInsert(ps, lesson);
         ps.setLong(2, lesson.getId());
+    }
+
+    private static LocalDateTime nullSafeDateExtract(ResultSet rs, String columnName){
+        LocalDateTime localDateTime;
+        try{
+            localDateTime = rs.getTimestamp(columnName).toLocalDateTime();
+            return localDateTime;
+        } catch (Exception exception) {
+            return null;
+        }
     }
 
 }

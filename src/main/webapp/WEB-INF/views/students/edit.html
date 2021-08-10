@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{templates/layout.html}"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Update student</title>
+</head>
+
+<body>
+
+<section layout:fragment="header"> <div th:replace="templates/fragments/header.html"></div> </section>
+<section layout:fragment="footer"> <div th:replace="templates/fragments/footer.html"></div> </section>
+<section layout:fragment="sidebar"> <div th:replace="templates/fragments/sidebar.html"></div> </section>
+
+<section layout:fragment="page-content">
+
+    <h4 th:text="${'Update of student with ID: ' + student.getId()}" >ID</h4>
+    <br>
+
+    <h4>Common info</h4>
+    <form th:method="PATCH" th:action="@{/students/{id}(id=${student.getId()})}" th:object="${student}">
+        <div class="form-floating mb-2">
+            <input type="text" th:field="*{firstName}" class="form-control" id="firstName1" placeholder="First name">
+            <label for="firstName1">Change first name:</label>
+        </div>
+        <div class="form-floating mb-2">
+            <input type="text" th:field="*{lastName}" class="form-control" id="LastNme2" placeholder="Last name">
+            <label for="LastNme2">Change last name:</label>
+        </div>
+        <div class="form-floating mb-2">
+            <input type="text" th:field="*{email}" class="form-control" id="email1" placeholder="name@example.com">
+            <label for="email1">Change email:</label>
+        </div>
+        <div class="form-floating mb-2">
+            <input type="password" th:field="*{password}" class="form-control" id="floatingPassword" placeholder="Password">
+            <label for="floatingPassword">Change password:</label>
+        </div>
+        <input class="btn btn-success" type="submit" role="button" value="Update"/>
+    </form>
+    <hr>
+    <br>
+
+    <h4>Student group</h4>
+    <h6>Current group:</h6>
+    <div> <text style="margin-left: 20px" th:text="${studentGroup.getName + '(ID: ' + studentGroup.getId() + ')'}" >Name</text> </div>
+    <br>
+
+    <h6>Management:</h6>
+    <form method="post" th:action="@{/students/{id}/enterGroup(id=${student.getId()})}"  class="mb-2">
+        <select class="form-select  mb-2" name="idNewGroup">
+            <option selected="" disabled="" value="">Choose new group:</option>
+            <div th:each="group : ${anotherGroups}">
+                <option th:value="${group.getId()}" th:text="${group.getName()}"> Group </option>
+            </div>
+        </select>
+        <button class="btn btn-success" type="submit">Change group</button>
+    </form>
+    <form th:method="PATCH"  th:action="@{/students/{id}/leaveGroup(id=${student.getId()})}">
+        <input class="btn btn-danger" type="submit" role="button" value="Leave group"/>
+    </form>
+    <br>
+
+</section>
+
+</body>
+</html>
+
+
+
+
+
+

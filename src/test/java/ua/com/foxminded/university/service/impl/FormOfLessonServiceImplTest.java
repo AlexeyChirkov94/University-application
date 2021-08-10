@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ua.com.foxminded.university.dao.interfaces.FormOfLessonDao;
 import ua.com.foxminded.university.dto.FormOfLessonRequest;
+import ua.com.foxminded.university.entity.FormOfEducation;
 import ua.com.foxminded.university.entity.FormOfLesson;
 import ua.com.foxminded.university.mapper.interfaces.FormOfLessonRequestMapper;
 import ua.com.foxminded.university.mapper.interfaces.FormOfLessonResponseMapper;
@@ -21,16 +22,16 @@ import static org.mockito.Mockito.when;
 class FormOfLessonServiceImplTest {
 
     @Mock
-    private FormOfLessonDao formOfLessonDao;
+    FormOfLessonDao formOfLessonDao;
 
     @Mock
-    private FormOfLessonRequestMapper formOfLessonRequestMapper;
+    FormOfLessonRequestMapper formOfLessonRequestMapper;
 
     @Mock
-    private FormOfLessonResponseMapper formOfLessonResponseMapper;
+    FormOfLessonResponseMapper formOfLessonResponseMapper;
 
     @InjectMocks
-    private FormOfLessonServiceImpl formOfLessonService;
+    FormOfLessonServiceImpl formOfLessonService;
 
     @Test
     void registerShouldAddFormOfLessonToDBIfArgumentsIsFormOfLessonRequest() {
@@ -80,6 +81,15 @@ class FormOfLessonServiceImplTest {
 
         verify(formOfLessonDao).count();
         verify(formOfLessonDao).findAll(2, 5);
+    }
+
+    @Test
+    void findAllIdShouldReturnListOfFormOfLessonResponseNoArguments() {
+        when(formOfLessonDao.findAll()).thenReturn(Arrays.asList(FormOfLesson.builder().withId(1L).build()));
+
+        formOfLessonService.findAll();
+
+        verify(formOfLessonDao).findAll();
     }
 
     @Test

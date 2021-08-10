@@ -10,6 +10,7 @@ import ua.com.foxminded.university.dao.interfaces.GroupDao;
 import ua.com.foxminded.university.dao.interfaces.ProfessorDao;
 import ua.com.foxminded.university.dto.ProfessorRequest;
 import ua.com.foxminded.university.dto.ProfessorResponse;
+import ua.com.foxminded.university.entity.Lesson;
 import ua.com.foxminded.university.entity.Professor;
 import ua.com.foxminded.university.entity.ScienceDegree;
 import ua.com.foxminded.university.mapper.interfaces.ProfessorRequestMapper;
@@ -29,28 +30,28 @@ import static org.mockito.Mockito.when;
 class ProfessorServiceImplTest {
 
     @Mock
-    private ProfessorDao professorDao;
+    ProfessorDao professorDao;
 
     @Mock
-    private GroupDao groupDao;
+    GroupDao groupDao;
 
     @Mock
-    private UserValidator userValidator;
+    UserValidator userValidator;
 
     @Mock
-    private ScienceDegreeValidator scienceDegreeValidator;
+    ScienceDegreeValidator scienceDegreeValidator;
 
     @Mock
-    protected PasswordEncoder passwordEncoder;
+    PasswordEncoder passwordEncoder;
 
     @Mock
-    private ProfessorRequestMapper professorRequestMapper;
+    ProfessorRequestMapper professorRequestMapper;
 
     @Mock
-    private ProfessorResponseMapper professorResponseMapper;
+    ProfessorResponseMapper professorResponseMapper;
 
     @InjectMocks
-    private ProfessorServiceImpl professorService;
+    ProfessorServiceImpl professorService;
 
     @Test
     void changeScienceDegreeShouldChangeScienceDegreeOfProfessorIfArgumentIsProfessorIdAndScienceDegreeId() {
@@ -152,6 +153,15 @@ class ProfessorServiceImplTest {
 
         verify(professorDao).count();
         verify(professorDao).findAll(2, 5);
+    }
+
+    @Test
+    void findAllIdShouldReturnListOfProfessorResponseNoArguments() {
+        when(professorDao.findAll()).thenReturn(Arrays.asList(Professor.builder().withId(1L).build()));
+
+        professorService.findAll();
+
+        verify(professorDao).findAll();
     }
 
     @Test

@@ -34,29 +34,28 @@ import static org.mockito.Mockito.when;
 class LessonServiceImplTest {
 
     @Mock
-    private LessonDao lessonDao;
+    LessonDao lessonDao;
 
     @Mock
-    private FormOfLessonDao formOfLessonDao;
+    FormOfLessonDao formOfLessonDao;
 
     @Mock
-    private ProfessorDao professorDao;
+    ProfessorDao professorDao;
 
     @Mock
-    private CourseDao courseDao;
+    CourseDao courseDao;
 
     @Mock
-    private GroupDao groupDao;
+    GroupDao groupDao;
 
     @Mock
-    private LessonRequestMapper lessonRequestMapper;
+    LessonRequestMapper lessonRequestMapper;
 
     @Mock
-    private LessonResponseMapper lessonResponseMapper;
-
+    LessonResponseMapper lessonResponseMapper;
 
     @InjectMocks
-    private LessonServiceImpl lessonService;
+    LessonServiceImpl lessonService;
 
     @Test
     void formTimeTableForGroupShouldReturnListOfLessonResponsesIfArgumentsIsGroupId() {
@@ -189,6 +188,15 @@ class LessonServiceImplTest {
 
         verify(lessonDao).count();
         verify(lessonDao).findAll(2, 5);
+    }
+
+    @Test
+    void findAllIdShouldReturnListOfLessonResponseNoArguments() {
+        when(lessonDao.findAll()).thenReturn(Arrays.asList(Lesson.builder().withId(1L).build()));
+
+        lessonService.findAll();
+
+        verify(lessonDao).findAll();
     }
 
     @Test

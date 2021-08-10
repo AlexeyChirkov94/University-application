@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ua.com.foxminded.university.dao.interfaces.FormOfEducationDao;
 import ua.com.foxminded.university.dto.FormOfEducationRequest;
+import ua.com.foxminded.university.entity.Department;
 import ua.com.foxminded.university.entity.FormOfEducation;
 import ua.com.foxminded.university.mapper.interfaces.FormOfEducationRequestMapper;
 import ua.com.foxminded.university.mapper.interfaces.FormOfEducationResponseMapper;
@@ -21,16 +22,16 @@ import static org.mockito.Mockito.when;
 class FormOfEducationServiceImplTest {
 
     @Mock
-    private FormOfEducationDao formOfEducationDao;
+    FormOfEducationDao formOfEducationDao;
 
     @Mock
-    private FormOfEducationRequestMapper formOfEducationRequestMapper;
+    FormOfEducationRequestMapper formOfEducationRequestMapper;
 
     @Mock
-    private FormOfEducationResponseMapper formOfEducationResponseMapper;
+    FormOfEducationResponseMapper formOfEducationResponseMapper;
 
     @InjectMocks
-    private FormOfEducationServiceImpl formOfEducationService;
+    FormOfEducationServiceImpl formOfEducationService;
 
     @Test
     void registerShouldAddFormOfEducationToDBIfArgumentsIsFormOfEducationRequest() {
@@ -81,6 +82,15 @@ class FormOfEducationServiceImplTest {
 
         verify(formOfEducationDao).count();
         verify(formOfEducationDao).findAll(2, 5);
+    }
+
+    @Test
+    void findAllIdShouldReturnListOfFormOfEducationResponseNoArguments() {
+        when(formOfEducationDao.findAll()).thenReturn(Arrays.asList(FormOfEducation.builder().withId(1L).build()));
+
+        formOfEducationService.findAll();
+
+        verify(formOfEducationDao).findAll();
     }
 
     @Test

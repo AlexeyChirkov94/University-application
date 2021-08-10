@@ -1,4 +1,4 @@
-insert into departments (name) values ('Department of History');
+insert into departments (name) values ('Department of History'), ('Department of Mathematics');
 insert into formsOfEducation (name) values ('full-time'), ('correspondence') ,('distance') ,('evening');
 insert into groups (name, department_id, formOfEducation_id) values ('History Group №1', 1, 1);
 insert into groups (name, department_id, formOfEducation_id) values ('History Group №2', 1, 2);

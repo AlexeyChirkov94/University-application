@@ -1,7 +1,5 @@
 package ua.com.foxminded.university.testUtils;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import ua.com.foxminded.university.entity.Course;
 import ua.com.foxminded.university.entity.Department;
 import ua.com.foxminded.university.entity.FormOfEducation;

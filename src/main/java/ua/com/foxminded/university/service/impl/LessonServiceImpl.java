@@ -8,6 +8,7 @@ import ua.com.foxminded.university.dao.interfaces.FormOfLessonDao;
 import ua.com.foxminded.university.dao.interfaces.GroupDao;
 import ua.com.foxminded.university.dao.interfaces.LessonDao;
 import ua.com.foxminded.university.dao.interfaces.ProfessorDao;
+import ua.com.foxminded.university.dto.GroupResponse;
 import ua.com.foxminded.university.dto.LessonRequest;
 import ua.com.foxminded.university.dto.LessonResponse;
 import ua.com.foxminded.university.entity.Group;
@@ -25,9 +26,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-public class LessonServiceImpl
-        extends AbstractPageableCrudService<LessonRequest, LessonResponse>
-        implements LessonService {
+public class LessonServiceImpl extends AbstractPageableCrudService implements LessonService {
 
     private final LessonDao lessonDao;
     private final FormOfLessonDao formOfLessonDao;
@@ -103,6 +102,14 @@ public class LessonServiceImpl
         int pageNumber = parsePageNumber(page, itemsCount, 1);
 
         return lessonDao.findAll(pageNumber, ITEMS_PER_PAGE).stream()
+                .map(lessonResponseMapper::mapEntityToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<LessonResponse> findAll() {
+
+        return lessonDao.findAll().stream()
                 .map(lessonResponseMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }

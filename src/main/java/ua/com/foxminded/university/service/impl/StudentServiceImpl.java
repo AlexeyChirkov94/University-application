@@ -52,7 +52,25 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
     }
 
     @Override
+    public List<StudentResponse> findAll() {
+
+        return studentDao.findAll().stream()
+                .map(studentResponseMapper::mapEntityToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<StudentResponse> findByGroupId(long groupId) {
+
+        return studentDao.findByGroupId(groupId).stream()
+                .map(studentResponseMapper::mapEntityToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public void edit(StudentRequest user) {
+        userValidator.validate(user);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         studentDao.update(studentRequestMapper.mapDtoToEntity(user));
     }
 

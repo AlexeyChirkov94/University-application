@@ -1,6 +1,5 @@
 package ua.com.foxminded.university.dao.impl;
 
-import org.apache.log4j.Logger;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -13,7 +12,6 @@ import ua.com.foxminded.university.TestsContextConfiguration;
 import ua.com.foxminded.university.dao.interfaces.FormOfEducationDao;
 import ua.com.foxminded.university.dao.interfaces.GroupDao;
 import ua.com.foxminded.university.entity.FormOfEducation;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -23,20 +21,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
-import static ua.com.foxminded.university.testUtils.TestUtility.assertDepartments;
 import static ua.com.foxminded.university.testUtils.TestUtility.assertFormsOfEducation;
 
 
 @ExtendWith( MockitoExtension.class)
-public class FormOfEducationDaoImplTest {
+class FormOfEducationDaoImplTest {
 
     ApplicationContext context;
     FormOfEducationDao formOfEducationDao;
     GroupDao groupDao;
-    private final Logger logger = Logger.getRootLogger();
 
     @Mock
-    private JdbcTemplate mockJdbcTemplate;
+    JdbcTemplate mockJdbcTemplate;
 
     {
         context = new AnnotationConfigApplicationContext(TestsContextConfiguration.class);

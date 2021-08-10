@@ -22,7 +22,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ua.com.foxminded.university.testUtils.TestUtility.assertLessons;
 
-public class LessonDaoImplTest {
+class LessonDaoImplTest {
 
     ApplicationContext context;
     LessonDao lessonDao;
@@ -66,6 +66,19 @@ public class LessonDaoImplTest {
         lessonDao.save(addingLesson);
         Lesson readingLesson = lessonDao.findById(6L).get();
 
+        assertLessons(readingLesson, addingLesson);
+    }
+
+    @Test
+    void createAndReadShouldAddNewLessonToDatabaseIfArgumentIsLessonWithNotAppointedDateTime(){
+        Lesson addingLesson = Lesson.builder()
+                .withCourse(courseForTest)
+                .withGroup(groupForTest)
+                .withTeacher(professorForTest)
+                .withFormOfLesson(formOfLessonForTest)
+                .build();
+        lessonDao.save(addingLesson);
+        Lesson readingLesson = lessonDao.findById(6L).get();
 
         assertLessons(readingLesson, addingLesson);
     }

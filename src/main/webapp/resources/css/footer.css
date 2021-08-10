@@ -1,0 +1,12 @@
+body {
+  padding-bottom: 0px;
+}
+
+.navbar {
+  margin-bottom: 0px;
+}
+
+.bg-white {
+  --bs-bg-opacity: 1;
+  background-color: #ffffff; !important;
+}

@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static ua.com.foxminded.university.testUtils.TestUtility.assertDepartments;
 import static ua.com.foxminded.university.testUtils.TestUtility.assertFormsOfLesson;
 
-public class FormOfLessonDaoImplTest {
+class FormOfLessonDaoImplTest {
 
     ApplicationContext context;
     FormOfLessonDao formOfLessonDao;

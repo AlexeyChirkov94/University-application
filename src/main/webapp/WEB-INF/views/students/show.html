@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{templates/layout.html}"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Students</title>
+</head>
+
+<body>
+
+<section layout:fragment="header"> <div th:replace="templates/fragments/header.html"></div> </section>
+<section layout:fragment="footer"> <div th:replace="templates/fragments/footer.html"></div> </section>
+<section layout:fragment="sidebar"> <div th:replace="templates/fragments/sidebar.html"></div> </section>
+
+<section layout:fragment="page-content">
+
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title" th:text="${'Student: ' + student.getFirstName() + ' ' + student.getLastName()}">Card title</h4>
+            <p class="card-text" th:text="${'ID: ' + student.getId()}" >ID</p>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item" th:text="${'Email: ' + student.getEmail()}">email</li>
+            <li class="list-group-item" th:text="${'Group: ' + student.getGroupResponse().getName() +
+                            ' (ID: ' + student.getGroupResponse().getId() + ')'}">group</li>
+            <li class="list-group-item"><a class="btn btn-info" th:href="@{/students/{id}/edit(id=${student.getId()})}" role="button">Edit</a></li>
+            <li class="list-group-item">
+                <form th:method="DELETE" th:action="@{/students/{id}(id=${student.getId()})}">
+                    <input class="btn btn-danger" type="submit" value="Delete"/>
+                </form>
+            </li>
+        </ul>
+    </div>
+
+</section>
+
+</body>
+</html>

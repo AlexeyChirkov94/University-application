@@ -19,18 +19,16 @@ import ua.com.foxminded.university.service.interfaces.GroupService;
 import ua.com.foxminded.university.service.interfaces.LessonService;
 import ua.com.foxminded.university.service.interfaces.ProfessorService;
 import ua.com.foxminded.university.service.interfaces.StudentService;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith( MockitoExtension.class)
-public class FrontControllerImplTest {
+class FrontControllerImplTest {
 
     private static final String START_MENU = "\nPress 0 to exit; \n" +
             "Press 1 show time table for student; \n" +
@@ -56,34 +54,34 @@ public class FrontControllerImplTest {
             STUDENT_RESPONSE_2, STUDENT_RESPONSE_3);
 
     @Mock
-    private CourseService courseService;
+    CourseService courseService;
 
     @Mock
-    private DepartmentService departmentService;
+    DepartmentService departmentService;
 
     @Mock
-    private FormOfEducationService formOfEducationService;
+    FormOfEducationService formOfEducationService;
 
     @Mock
-    private FormOfLessonService formOfLessonService;
+    FormOfLessonService formOfLessonService;
 
     @Mock
-    private GroupService groupService;
+    GroupService groupService;
 
     @Mock
-    private LessonService lessonService;
+    LessonService lessonService;
 
     @Mock
-    private ProfessorService professorService;
+    ProfessorService professorService;
 
     @Mock
-    private StudentService studentService;
+    StudentService studentService;
 
     @Mock
-    private ViewProvider viewProvider;
+    ViewProvider viewProvider;
 
     @InjectMocks
-    private FrontControllerImpl frontController;
+    FrontControllerImpl frontController;
 
     static {
         LESSON_RESPONSE_1.setId(1L);

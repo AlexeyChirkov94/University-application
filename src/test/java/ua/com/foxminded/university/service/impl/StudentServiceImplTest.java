@@ -10,6 +10,7 @@ import ua.com.foxminded.university.dao.interfaces.GroupDao;
 import ua.com.foxminded.university.dao.interfaces.StudentDao;
 import ua.com.foxminded.university.dto.StudentRequest;
 import ua.com.foxminded.university.entity.Group;
+import ua.com.foxminded.university.entity.Professor;
 import ua.com.foxminded.university.entity.Student;
 import ua.com.foxminded.university.mapper.interfaces.StudentRequestMapper;
 import ua.com.foxminded.university.mapper.interfaces.StudentResponseMapper;
@@ -25,25 +26,25 @@ import static org.mockito.Mockito.when;
 class StudentServiceImplTest {
 
     @Mock
-    private StudentDao studentDao;
+    StudentDao studentDao;
 
     @Mock
-    private GroupDao groupDao;
+    GroupDao groupDao;
 
     @Mock
-    private UserValidator userValidator;
+    UserValidator userValidator;
 
     @Mock
-    protected PasswordEncoder passwordEncoder;
+    PasswordEncoder passwordEncoder;
 
     @Mock
-    private StudentRequestMapper studentRequestMapper;
+    StudentRequestMapper studentRequestMapper;
 
     @Mock
-    private StudentResponseMapper studentResponseMapper;
+    StudentResponseMapper studentResponseMapper;
 
     @InjectMocks
-    private StudentServiceImpl studentService;
+    StudentServiceImpl studentService;
 
     @Test
     void loginShouldReturnTrueIfArgumentEmailAndPasswordIsEqualEmailAndPasswordFromDB() {
@@ -185,6 +186,17 @@ class StudentServiceImplTest {
     }
 
     @Test
+    void findByGroupIdShouldReturnListOfStudentResponseIfArgumentIsGroupId() {
+        long groupId = 1;
+
+        when(studentDao.findByGroupId(groupId)).thenReturn(Arrays.asList(Student.builder().withId(1L).build()));
+
+        studentService.findByGroupId(groupId);
+
+        verify(studentDao).findByGroupId(groupId);
+    }
+
+    @Test
     void findAllIdShouldReturnListOfStudentResponseIfArgumentIsPageNumber() {
         String pageNumber = "2";
 
@@ -195,6 +207,15 @@ class StudentServiceImplTest {
 
         verify(studentDao).count();
         verify(studentDao).findAll(2, 5);
+    }
+
+    @Test
+    void findAllIdShouldReturnListOfStudentResponseNoArguments() {
+        when(studentDao.findAll()).thenReturn(Arrays.asList(Student.builder().withId(1L).build()));
+
+        studentService.findAll();
+
+        verify(studentDao).findAll();
     }
 
     @Test

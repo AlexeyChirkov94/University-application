@@ -13,6 +13,7 @@ import ua.com.foxminded.university.entity.Student;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -24,6 +25,7 @@ public class StudentDaoImpl extends AbstractPageableCrudDaoImpl<Student> impleme
     private static final String SAVE_QUERY = "INSERT INTO users (type, first_name, last_name, email, password)" +
             " VALUES('student', ?, ?, ?, ?)";
     private static final String FIND_BY_ID_QUERY = FIND_QUERY + "WHERE u.id=? and type = 'student'";
+    private static final String FIND_GROUP_QUERY = FIND_QUERY + "WHERE g.id=? and type = 'student' ORDER BY u.id";
     private static final String FIND_ALL_NO_PAGES_QUERY = FIND_QUERY + "where type = 'student' ORDER BY u.id";
     private static final String FIND_ALL_WITH_PAGES_QUERY = FIND_QUERY + "where type = 'student' order by u.id offset ? row FETCH NEXT ? ROWS ONLY";
     private static final String UPDATE_QUERY = "UPDATE users SET first_name = ?, last_name = ?, email = ?, password = ? WHERE id = ?";
@@ -59,6 +61,11 @@ public class StudentDaoImpl extends AbstractPageableCrudDaoImpl<Student> impleme
             log.info("Email not registered: " + email);
             return Optional.empty();
         }
+    }
+
+    @Override
+    public List<Student> findByGroupId(long groupId){
+        return jdbcTemplate.query(FIND_GROUP_QUERY, ROW_MAPPER, groupId);
     }
 
     @Override
