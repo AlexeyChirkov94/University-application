@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{templates/layout.html}"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>New student</title>
+</head>
+
+<body>
+
+<section layout:fragment="header"> <div th:replace="templates/fragments/header.html"></div> </section>
+<section layout:fragment="footer"> <div th:replace="templates/fragments/footer.html"></div> </section>
+<section layout:fragment="sidebar"> <div th:replace="templates/fragments/sidebar.html"></div> </section>
+
+<section layout:fragment="page-content">
+
+    <h4>Registration of a new student</h4>
+
+    <br>
+
+    <form th:method="POST" th:action="@{/students}" th:object="${student}">
+
+        <div class="form-floating mb-3">
+            <input type="text" th:field="*{firstName}" class="form-control" id="firstName" placeholder="First name">
+            <label for="firstName">Enter first name:</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <input type="text" th:field="*{lastName}" class="form-control" id="lastName" placeholder="Last name">
+            <label for="lastName">Enter last name:</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <input type="text" th:field="*{email}" class="form-control" id="email" placeholder="name@example.com">
+            <label for="email">Enter email:</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <input type="password" th:field="*{password}" class="form-control" id="floatingPassword" placeholder="Password">
+            <label for="floatingPassword">Enter password:</label>
+        </div>
+
+        <input class="btn btn-success" type="submit" role="button" value="Register"/>
+
+    </form>
+
+</section>
+
+</body>
+</html>

@@ -14,7 +14,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ua.com.foxminded.university.testUtils.TestUtility.assertCourses;
 
-public class CourseDaoImplTest {
+class CourseDaoImplTest {
 
     ApplicationContext context;
     CourseDao courseDao;

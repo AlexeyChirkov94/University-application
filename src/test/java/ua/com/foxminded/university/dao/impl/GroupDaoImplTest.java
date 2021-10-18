@@ -19,7 +19,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ua.com.foxminded.university.testUtils.TestUtility.assertGroups;
 
-public class GroupDaoImplTest {
+class GroupDaoImplTest {
 
     ApplicationContext context;
     GroupDao groupDao;
@@ -118,6 +118,29 @@ public class GroupDaoImplTest {
                 .withName("History Group №1")
                 .withDepartment(departmentDao.findById(1L).get())
                 .withFormOfEducation(formOfEducationDao.findById(2L).get())
+                .build();
+        Group actualAfterChange = groupDao.findById(1L).get();
+        assertGroups(actualAfterChange, expectedAfterChange);
+    }
+
+    @Test
+    void changeDepartmentShouldChangeDepartmentOfGroupIfArgumentIsIdOfGroupAndIdOfNewDepartment(){
+        Group expectedBeforeChange = Group.builder()
+                .withId(1L)
+                .withName("History Group №1")
+                .withDepartment(departmentDao.findById(1L).get())
+                .withFormOfEducation(formOfEducationDao.findById(1L).get())
+                .build();
+        Group actualBeforeChange = groupDao.findById(1L).get();
+        assertGroups(actualBeforeChange, expectedBeforeChange);
+
+        groupDao.changeDepartment(1, 2);
+
+        Group expectedAfterChange = Group.builder()
+                .withId(1L)
+                .withName("History Group №1")
+                .withDepartment(departmentDao.findById(2L).get())
+                .withFormOfEducation(formOfEducationDao.findById(1L).get())
                 .build();
         Group actualAfterChange = groupDao.findById(1L).get();
         assertGroups(actualAfterChange, expectedAfterChange);

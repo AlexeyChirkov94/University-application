@@ -19,12 +19,6 @@ class ScienceDegreeValidatorImplTest {
     }
 
     @Test
-    void validateShouldThrowExceptionIfIdOfScienceDegreeIsOutOfRange() {
-        assertThatThrownBy(() -> scienceDegreeValidator.validate(ScienceDegree.getById(15)))
-                .hasMessage("Science Degree with this id doesn`t exist");
-    }
-
-    @Test
     void validateShouldThrowNoExceptionIfScienceDegreeIsExistAndInRangeOfIds() {
         assertThatCode(() -> scienceDegreeValidator.validate(ScienceDegree.getById(1))).doesNotThrowAnyException();
     }

@@ -9,4 +9,6 @@ public interface GroupDao extends CrudPageableDao<Group> {
 
     void changeFormOfEducation(long groupId, long newFormOfEducationId);
 
+    void changeDepartment(long groupId, long departmentId);
+
 }

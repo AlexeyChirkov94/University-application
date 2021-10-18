@@ -19,8 +19,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-public class CourseServiceImpl extends AbstractPageableCrudService<CourseRequest, CourseResponse>
-        implements CourseService {
+public class CourseServiceImpl extends AbstractPageableCrudService implements CourseService {
 
     private final CourseDao courseDao;
     private final ProfessorDao professorDao;
@@ -81,6 +80,13 @@ public class CourseServiceImpl extends AbstractPageableCrudService<CourseRequest
         int pageNumber = parsePageNumber(page, itemsCount, 1);
 
         return courseDao.findAll(pageNumber, ITEMS_PER_PAGE).stream()
+                .map(courseResponseMapper::mapEntityToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CourseResponse> findAll() {
+        return courseDao.findAll().stream()
                 .map(courseResponseMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }

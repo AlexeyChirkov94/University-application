@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{templates/layout.html}"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Features</title>
+</head>
+
+<body>
+
+<section layout:fragment="header"> <div th:replace="templates/fragments/header.html"></div> </section>
+<section layout:fragment="footer"> <div th:replace="templates/fragments/footer.html"></div> </section>
+<section layout:fragment="sidebar"> <div th:replace="templates/fragments/sidebar.html"></div> </section>
+
+<section layout:fragment="page-content">
+
+    <h1>Long description of project</h1>
+    How it can be used          <BR>
+    What it can do              <BR>
+    May be what can`t           <BR>
+    ...                         <BR>
+    ...                         <BR>
+    ...                         <BR>
+    ...                         <BR>
+    ...                         <BR>
+    ...                         <BR>
+    ...                         <BR>
+    ...                         <BR>
+
+</section>
+
+</body>
+</html>

@@ -1,9 +1,8 @@
 package ua.com.foxminded.university.service.impl;
 
 import org.apache.log4j.Logger;
-import ua.com.foxminded.university.service.interfaces.CrudService;
 
-public abstract class AbstractPageableCrudService<REQUEST, RESPONSE> implements CrudService<REQUEST, RESPONSE> {
+public abstract class AbstractPageableCrudService {
 
     private static final Logger LOGGER = Logger.getLogger(AbstractPageableCrudService.class);
 

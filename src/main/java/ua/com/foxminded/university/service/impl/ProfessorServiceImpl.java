@@ -3,6 +3,7 @@ package ua.com.foxminded.university.service.impl;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.dao.interfaces.ProfessorDao;
+import ua.com.foxminded.university.dto.LessonResponse;
 import ua.com.foxminded.university.dto.ProfessorRequest;
 import ua.com.foxminded.university.dto.ProfessorResponse;
 import ua.com.foxminded.university.entity.Professor;
@@ -53,8 +54,17 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
     }
 
     @Override
+    public List<ProfessorResponse> findAll() {
+
+        return professorDao.findAll().stream()
+                .map(professorResponseMapper::mapEntityToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public void edit(ProfessorRequest user) {
         userValidator.validate(user);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         professorDao.update(professorRequestMapper.mapDtoToEntity(user));
     }
 

@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static ua.com.foxminded.university.testUtils.TestUtility.assertUsers;
 import static ua.com.foxminded.university.testUtils.TestUtility.assertUsersProfessors;
 
-public class ProfessorDaoImplTest {
+class ProfessorDaoImplTest {
 
     ApplicationContext context;
     ProfessorDao professorDao;

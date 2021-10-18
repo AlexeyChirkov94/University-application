@@ -15,9 +15,6 @@ public class ScienceDegreeValidatorImpl implements ScienceDegreeValidator {
         if (entity == null){
             throw new ValidateException("Science Degree with this id doesn`t exist");
         }
-        if (!Arrays.asList(ScienceDegree.values()).contains(entity)){
-            throw new ValidateException("Science Degree with this id doesn`t exist");
-        }
     }
 
 }

@@ -34,6 +34,7 @@ public class GroupDaoImpl extends AbstractPageableCrudDaoImpl<Group> implements 
     private static final String DELETE_QUERY = "DELETE FROM groups WHERE id = ?";
     private static final String COUNT_QUERY = "SELECT COUNT(*) as count from groups";
     private static final String CHANGE_FORM_OF_EDUCATION_QUERY = "UPDATE groups SET formOfEducation_id = ? WHERE id = ?";
+    private static final String CHANGE_DEPARTMENT_QUERY = "UPDATE groups SET department_id = ? WHERE id = ?";
     private static final RowMapper<Group> ROW_MAPPER = (rs, rowNum) ->
         Group.builder()
                 .withId(rs.getLong("id"))
@@ -69,6 +70,11 @@ public class GroupDaoImpl extends AbstractPageableCrudDaoImpl<Group> implements 
     }
 
     @Override
+    public void changeDepartment(long groupId, long newDepartmentId) {
+        jdbcTemplate.update(CHANGE_DEPARTMENT_QUERY, newDepartmentId, groupId);
+    }
+
+    @Override
     protected Group insertCertainEntity(Group group) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
@@ -96,7 +102,7 @@ public class GroupDaoImpl extends AbstractPageableCrudDaoImpl<Group> implements 
 
     @Override
     protected void preparePreparedStatementForUpdate(PreparedStatement ps, Group group) throws SQLException {
-        preparePreparedStatementForInsert(ps, group);;
+        preparePreparedStatementForInsert(ps, group);
         ps.setLong(2, group.getId());
     }
 

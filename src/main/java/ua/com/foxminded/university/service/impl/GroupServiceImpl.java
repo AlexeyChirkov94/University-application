@@ -3,8 +3,10 @@ package ua.com.foxminded.university.service.impl;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ua.com.foxminded.university.dao.interfaces.DepartmentDao;
 import ua.com.foxminded.university.dao.interfaces.FormOfEducationDao;
 import ua.com.foxminded.university.dao.interfaces.GroupDao;
+import ua.com.foxminded.university.dto.FormOfLessonResponse;
 import ua.com.foxminded.university.dto.GroupRequest;
 import ua.com.foxminded.university.dto.GroupResponse;
 import ua.com.foxminded.university.entity.Group;
@@ -19,12 +21,11 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-public class GroupServiceImpl
-        extends AbstractPageableCrudService<GroupRequest, GroupResponse>
-        implements GroupService {
+public class GroupServiceImpl extends AbstractPageableCrudService implements GroupService {
 
     private final GroupDao groupDao;
     private final FormOfEducationDao formOfEducationDao;
+    private final DepartmentDao departmentDao;
     private final GroupRequestMapper groupRequestMapper;
     private final GroupResponseMapper groupResponseMapper;
 
@@ -33,6 +34,13 @@ public class GroupServiceImpl
     public void changeFormOfEducation(long groupId, long newFormOfEducationId) {
         checkThatGroupAndFormOfLessonExist(groupId, newFormOfEducationId);
         groupDao.changeFormOfEducation(groupId, newFormOfEducationId);
+    }
+
+    @Override
+    @Transactional(transactionManager = "txManager")
+    public void changeDepartment(long groupId, long newDepartmentId) {
+        checkThatGroupAndDepartmentExist(groupId, newDepartmentId);
+        groupDao.changeDepartment(groupId, newDepartmentId);
     }
 
     @Override
@@ -63,6 +71,14 @@ public class GroupServiceImpl
     }
 
     @Override
+    public List<GroupResponse> findAll() {
+
+        return groupDao.findAll().stream()
+                .map(groupResponseMapper::mapEntityToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public void edit(GroupRequest groupRequest) {
         groupDao.update(groupRequestMapper.mapDtoToEntity(groupRequest));
     }
@@ -77,7 +93,13 @@ public class GroupServiceImpl
 
     private void checkThatGroupAndFormOfLessonExist(long groupId, long newFormOfEducationId){
         if (!groupDao.findById(groupId).isPresent() || !formOfEducationDao.findById(newFormOfEducationId).isPresent()) {
-            throw new EntityDontExistException("There no group or FormOfEducation with this ids");
+            throw new EntityDontExistException("There no group or formOfEducation with this ids");
+        }
+    }
+
+    private void checkThatGroupAndDepartmentExist(long groupId, long newDepartmentId){
+        if (!groupDao.findById(groupId).isPresent() || !departmentDao.findById(newDepartmentId).isPresent()) {
+            throw new EntityDontExistException("There no group or department with this ids");
         }
     }
 

@@ -2,11 +2,22 @@ package ua.com.foxminded.university.service.interfaces;
 
 import ua.com.foxminded.university.dto.LessonRequest;
 import ua.com.foxminded.university.dto.LessonResponse;
-import ua.com.foxminded.university.entity.Lesson;
-
 import java.util.List;
+import java.util.Optional;
 
-public interface LessonService extends CrudService<LessonRequest, LessonResponse> {
+public interface LessonService {
+
+    LessonResponse register(LessonRequest requestDto);
+
+    Optional<LessonResponse> findById(long id);
+
+    List<LessonResponse> findAll(String page);
+
+    List<LessonResponse> findAll();
+
+    void edit(LessonRequest requestDto);
+
+    boolean deleteById(long id);
 
     List<LessonResponse> formTimeTableForGroup(long groupId);
 

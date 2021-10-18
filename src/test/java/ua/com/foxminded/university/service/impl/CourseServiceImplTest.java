@@ -24,19 +24,19 @@ import static org.mockito.Mockito.when;
 class CourseServiceImplTest {
 
     @Mock
-    private CourseDao courseDao;
+    CourseDao courseDao;
 
     @Mock
-    private ProfessorDao professorDao;
+    ProfessorDao professorDao;
 
     @Mock
-    private CourseRequestMapper courseRequestMapper;
+    CourseRequestMapper courseRequestMapper;
 
     @Mock
-    private CourseResponseMapper courseResponseMapper;
+    CourseResponseMapper courseResponseMapper;
 
     @InjectMocks
-    private CourseServiceImpl courseService;
+    CourseServiceImpl courseService;
 
     @Test
     void addCourseToProfessorCourseListShouldAddCourseToProfessorCourseListIfArgumentsIsCourseIdAndProfessorId() {
@@ -208,6 +208,15 @@ class CourseServiceImplTest {
 
         verify(courseDao).count();
         verify(courseDao).findAll(2, 5);
+    }
+
+    @Test
+    void findAllIdShouldReturnListOfCourseResponseNoArguments() {
+        when(courseDao.findAll()).thenReturn(Arrays.asList(Course.builder().withId(1L).build()));
+
+        courseService.findAll();
+
+        verify(courseDao).findAll();
     }
 
     @Test

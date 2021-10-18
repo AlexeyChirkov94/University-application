@@ -21,16 +21,16 @@ import static org.mockito.Mockito.when;
 class DepartmentServiceImplTest {
 
     @Mock
-    private DepartmentDao departmentDao;
+    DepartmentDao departmentDao;
 
     @Mock
-    private DepartmentRequestMapper departmentRequestMapper;
+    DepartmentRequestMapper departmentRequestMapper;
 
     @Mock
-    private DepartmentResponseMapper departmentResponseMapper;
+    DepartmentResponseMapper departmentResponseMapper;
 
     @InjectMocks
-    private DepartmentServiceImpl departmentService;
+    DepartmentServiceImpl departmentService;
 
     @Test
     void registerShouldAddDepartmentToDBIfArgumentsIsDepartmentRequest() {
@@ -80,6 +80,15 @@ class DepartmentServiceImplTest {
 
         verify(departmentDao).count();
         verify(departmentDao).findAll(2, 5);
+    }
+
+    @Test
+    void findAllIdShouldReturnListOfDepartmentResponseNoArguments() {
+        when(departmentDao.findAll()).thenReturn(Arrays.asList(Department.builder().withId(1L).build()));
+
+        departmentService.findAll();
+
+        verify(departmentDao).findAll();
     }
 
     @Test

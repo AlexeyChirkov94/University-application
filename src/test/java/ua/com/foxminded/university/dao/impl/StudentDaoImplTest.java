@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static ua.com.foxminded.university.testUtils.TestUtility.assertUsers;
 import static ua.com.foxminded.university.testUtils.TestUtility.assertUsersStudents;
 
-public class StudentDaoImplTest {
+class StudentDaoImplTest {
 
     ApplicationContext context;
     StudentDao studentDao;
@@ -121,6 +121,30 @@ public class StudentDaoImplTest {
         Optional<Student> actual = studentDao.findByEmail("unknownemail@gmail.com");
 
         assertThat(expected).isEqualTo(actual);
+    }
+
+    @Test
+    void findByGroupIdShouldReturnListOfStudentIfArgumentIsGroupId(){
+        List<Student> expected = Arrays.asList(
+                Student.builder()
+                    .withFirstName("Maksim")
+                    .withLastName("Panichev")
+                    .withEmail("panichev@gmail.com")
+                    .withPassword("1234")
+                    .withGroup(groupDao.findById(2L).get())
+                    .build(),
+                Student.builder()
+                    .withFirstName("Petr")
+                    .withLastName("Elematov")
+                    .withEmail("elematov@gmail.com")
+                    .withPassword("1234")
+                    .withGroup(groupDao.findById(2L).get())
+                    .build()
+        );
+
+        List<Student> actual = studentDao.findByGroupId(2L);
+
+        assertUsersStudents(actual, expected);
     }
 
 
