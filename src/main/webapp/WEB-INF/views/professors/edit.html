@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{templates/layout.html}"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Update professor</title>
+</head>
+
+<body>
+
+<section layout:fragment="header"> <div th:replace="templates/fragments/header.html"></div> </section>
+<section layout:fragment="footer"> <div th:replace="templates/fragments/footer.html"></div> </section>
+<section layout:fragment="sidebar"> <div th:replace="templates/fragments/sidebar.html"></div> </section>
+
+<section layout:fragment="page-content">
+
+    <h4 th:text="${'Update of professor with ID: ' + professor.getId()}" >ID</h4>
+    <br>
+
+    <h4>Common info</h4>
+    <form th:method="PATCH" th:action="@{/professors/{id}(id=${professor.getId()})}" th:object="${professor}">
+        <div class="form-floating mb-2">
+            <input type="text" th:field="*{firstName}" class="form-control" id="firstName1" placeholder="First name">
+            <label for="firstName1">Change first name:</label>
+        </div>
+        <div class="form-floating mb-2">
+            <input type="text" th:field="*{lastName}" class="form-control" id="LastNme2" placeholder="Last name">
+            <label for="LastNme2">Change last name:</label>
+        </div>
+        <div class="form-floating mb-2">
+            <input type="text" th:field="*{email}" class="form-control" id="email1" placeholder="name@example.com">
+            <label for="email1">Change email:</label>
+        </div>
+        <div class="form-floating mb-2">
+            <input type="password" th:field="*{password}" class="form-control" id="floatingPassword" placeholder="Password">
+            <label for="floatingPassword">Change password:</label>
+        </div>
+        <input class="btn btn-success" type="submit" role="button" value="Update"/>
+    </form>
+    <hr>
+    <br>
+
+    <h4>Professor Science Degree</h4>
+    <h6>Current Science Degree:</h6>
+    <div> <text style="margin-left: 20px" th:text="${ScienceDegree + '(ID: ' + ScienceDegree.getId() + ')'}" >Name</text> </div>
+    <br>
+
+    <h6>Management:</h6>
+    <form method="post" th:action="@{/professors/{id}/changeScienceDegree/(id=${professor.getId()})}">
+        <select class="form-select  mb-2" name="idNewScienceDegree">
+            <option selected="" disabled="" value="">Choose new Science Degree:</option>
+            <div th:each="scienceDegree : ${ScienceDegrees}">
+                <option th:value="${scienceDegree.getId()}" th:text="${scienceDegree}"> ScienceDegree </option>
+            </div>
+        </select>
+        <button class="btn btn-success" type="submit">Change Science Degree</button>
+    </form>
+    <hr>
+    <br>
+
+    <h4>Professor course list</h4>
+    <h6>Current course list:</h6>
+    <div th:each="professorCourses : ${professorsCourses}">
+        <text style="margin-left: 20px" th:text="${professorCourses.getName() +
+                                                ' (ID: ' + professorCourses.getId() + ')'}"> 11</text>
+    </div>
+    <br>
+
+    <h6>Management:</h6>
+    <form method="post" th:action="@{/professors/{id}/addCourse/(id=${professor.getId()})}" class="mb-2">
+        <select class="form-select  mb-2" name="idOfAddingCourse">
+            <option selected="" disabled="" value="">Choose adding course:</option>
+            <div th:each="course : ${anotherCourses}">
+                <option th:value="${course.getId()}" th:text="${course.getName()}"> ScienceDegree </option>
+            </div>
+        </select>
+        <button class="btn btn-success" type="submit">Add course</button>
+    </form>
+    <form method="post" th:action="@{/professors/{id}/removeCourse/(id=${professor.getId()})}">
+        <select class="form-select  mb-2" name="idOfRemovingCourse">
+            <option selected="" disabled="" value="">Choose removing course:</option>
+            <div th:each="professorsCourse : ${professorsCourses}">
+                <option th:value="${professorsCourse.getId()}" th:text="${professorsCourse.getName()}"> ScienceDegree </option>
+            </div>
+        </select>
+        <button class="btn btn-danger" type="submit">Remove course</button>
+    </form>
+    <br>
+
+</section>
+
+</body>
+</html>
+
+
+
+
+
