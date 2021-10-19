@@ -73,7 +73,7 @@ public class ProfessorsControllerTest {
     }
 
     @Test
-    void index_ShouldAddProfessorsToModelAndRenderIndexViewWherePreviousPageIsDisable() throws Exception {
+    void indexShouldAddProfessorsToModelAndRenderIndexViewWherePreviousPageIsDisable() throws Exception {
 
         ProfessorResponse first = new ProfessorResponse();
         ProfessorResponse second = new ProfessorResponse();
@@ -107,7 +107,7 @@ public class ProfessorsControllerTest {
     }
 
     @Test
-    void index_ShouldAddProfessorsToModelAndRenderIndexViewWherePreviousPageIsActive() throws Exception {
+    void indexShouldAddProfessorsToModelAndRenderIndexViewWherePreviousPageIsActive() throws Exception {
 
         ProfessorResponse first = new ProfessorResponse();
         ProfessorResponse second = new ProfessorResponse();
@@ -131,7 +131,7 @@ public class ProfessorsControllerTest {
     }
 
     @Test
-    void show_ShouldAddProfessorToModelAndRenderShowView() throws Exception {
+    void showShouldAddProfessorToModelAndRenderShowView() throws Exception {
 
         ProfessorResponse professor = new ProfessorResponse();
         professor.setId(1L);
@@ -153,7 +153,7 @@ public class ProfessorsControllerTest {
     }
 
     @Test
-    void new_ShouldGetProfessorFromModelAndRenderNewView() throws Exception {
+    void newShouldGetProfessorFromModelAndRenderNewView() throws Exception {
 
         mockMvc.perform(get("/professors/new"))
                 .andExpect(status().is(200))
@@ -162,7 +162,7 @@ public class ProfessorsControllerTest {
     }
 
     @Test
-    void edit_ShouldAddProfessorToModelAndRenderShowEdit() throws Exception {
+    void editShouldAddProfessorToModelAndRenderShowEdit() throws Exception {
         CourseResponse course1 = new CourseResponse();
         course1.setId(1L);
         course1.setName("Course 1");
@@ -214,7 +214,7 @@ public class ProfessorsControllerTest {
     }
 
     @Test
-    void create_ShouldGetProfessorFromModelAndRenderIndexView() throws Exception {
+    void createShouldGetProfessorFromModelAndRenderIndexView() throws Exception {
         ProfessorRequest professorRequest = new ProfessorRequest();
         professorRequest.setId(1L);
         professorRequest.setFirstName("Alex");
@@ -244,7 +244,7 @@ public class ProfessorsControllerTest {
     }
 
     @Test
-    void update_ShouldGetProfessorFromModelAndRenderIndexView() throws Exception {
+    void updateShouldGetProfessorFromModelAndRenderIndexView() throws Exception {
         ProfessorRequest professorRequest = new ProfessorRequest();
         professorRequest.setId(1L);
         professorRequest.setFirstName("Alex");
@@ -271,7 +271,7 @@ public class ProfessorsControllerTest {
 
 
     @Test
-    void changeScienceDegree_ShouldGetProfessorIdFromUrlAndScienceDegreeIdFromModelAndRenderEditView() throws Exception {
+    void changeScienceDegreeShouldGetProfessorIdFromUrlAndScienceDegreeIdFromModelAndRenderEditView() throws Exception {
 
         doNothing().when(professorService).changeScienceDegree(1L, 2);
 
@@ -289,7 +289,7 @@ public class ProfessorsControllerTest {
     }
 
     @Test
-    void addCourse_ShouldGetProfessorIdFromUrlAndIdOfNewCourseFromModelAndRenderEditView() throws Exception {
+    void addCourseShouldGetProfessorIdFromUrlAndIdOfNewCourseFromModelAndRenderEditView() throws Exception {
 
         doNothing().when(courseService).addCourseToProfessorCourseList(2, 1L);
 
@@ -307,7 +307,7 @@ public class ProfessorsControllerTest {
     }
 
     @Test
-    void removeCourse_ShouldGetProfessorIdFromUrlAndIdOfRemovingCourseFromModelAndRenderEditView() throws Exception {
+    void removeCourseShouldGetProfessorIdFromUrlAndIdOfRemovingCourseFromModelAndRenderEditView() throws Exception {
 
         doNothing().when(courseService).removeCourseFromProfessorCourseList(2, 1L);
 
@@ -325,7 +325,7 @@ public class ProfessorsControllerTest {
     }
 
     @Test
-    void delete_ShouldGetProfessorIdFromUrlAndRenderIndexView() throws Exception {
+    void deleteShouldGetProfessorIdFromUrlAndRenderIndexView() throws Exception {
 
         when(professorService.deleteById(1L)).thenReturn(true);
 
@@ -341,7 +341,7 @@ public class ProfessorsControllerTest {
     }
 
     @Test
-    void validateProfessor_ShouldGetExceptionFromModelAndRenderErrorView() throws Exception {
+    void validateProfessorShouldGetExceptionFromModelAndRenderErrorView() throws Exception {
         ProfessorRequest notValidProfessor = new ProfessorRequest();
         notValidProfessor.setFirstName("Alex");
         Exception exception = new ValidateException("password don`t match the pattern");
@@ -361,7 +361,7 @@ public class ProfessorsControllerTest {
     }
 
     @Test
-    void entityAlreadyExist_ShouldGetExceptionFromModelAndRenderErrorView() throws Exception {
+    void entityAlreadyExistShouldGetExceptionFromModelAndRenderErrorView() throws Exception {
         ProfessorRequest repeatableProfessor = new ProfessorRequest();
         repeatableProfessor.setFirstName("Alex");
         Exception exception = new EntityAlreadyExistException("Student with same email already exist");

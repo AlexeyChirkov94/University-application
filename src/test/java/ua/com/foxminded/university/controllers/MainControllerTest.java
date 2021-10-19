@@ -44,7 +44,7 @@ class MainControllerTest {
     }
 
     @Test
-    void index_ShouldRenderFeaturesView() throws Exception {
+    void indexShouldRenderFeaturesView() throws Exception {
 
         mockMvc.perform(get("/features"))
                 .andExpect(status().is(200))
@@ -52,7 +52,7 @@ class MainControllerTest {
     }
 
     @Test
-    void index_ShouldRenderAboutView() throws Exception {
+    void indexShouldRenderAboutView() throws Exception {
 
         mockMvc.perform(get("/about"))
                 .andExpect(status().is(200))
@@ -60,7 +60,7 @@ class MainControllerTest {
     }
 
     @Test
-    void index_ShouldRenderRegistrationView() throws Exception {
+    void indexShouldRenderRegistrationView() throws Exception {
 
         mockMvc.perform(get("/registration"))
                 .andExpect(status().is(200))
@@ -68,7 +68,7 @@ class MainControllerTest {
     }
 
     @Test
-    void index_ShouldRenderLoginView() throws Exception {
+    void indexShouldRenderLoginView() throws Exception {
 
         mockMvc.perform(get("/login"))
                 .andExpect(status().is(200))
