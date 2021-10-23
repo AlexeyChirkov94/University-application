@@ -3,7 +3,7 @@
       layout:decorate="~{templates/layout.html}"
       xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Students</title>
+    <title>Groups</title>
 </head>
 
 <body>
@@ -14,26 +14,26 @@
 
 <section layout:fragment="page-content">
 
-    <p class="h1">All students</p>
+    <p class="h1">All groups</p>
 
     <table class="table table-striped">
         <thead>
         <tr>
             <th scope="col">Id</th>
-            <th scope="col">First name</th>
-            <th scope="col">Last name</th>
-            <th scope="col">Email</th>
+            <th scope="col">Name</th>
+            <th scope="col">Form of education</th>
+            <th scope="col">Department</th>
             <th scope="col">More</th>
         </tr>
         </thead>
         <tbody>
-        <div th:each="student : ${students}">
+        <div th:each="group : ${groups}">
             <tr>
-                <th scope="row" th:text="${student.getId()}"></th>
-                <td th:text="${student.getFirstName()}"> </td>
-                <td th:text="${student.getLastName()}"></td>
-                <td th:text="${student.getEmail()}"> </td>
-                <td> <a class="btn btn-secondary" th:href="@{/students/{id}(id=${student.getId()})}" role="button">Go to</a> </td>
+                <th scope="row" th:text="${group.getId()}"></th>
+                <td th:text="${group.getName()}"> </td>
+                <td th:text="${group.getFormOfEducationResponse().getName()}"></td>
+                <td th:text="${group.getDepartmentResponse().getName()}"> </td>
+                <td> <a class="btn btn-secondary" th:href="@{/groups/{id}(id=${group.getId()})}" role="button">Go to</a> </td>
             </tr>
         </div>
         </tbody>
@@ -43,19 +43,19 @@
 
     <ul class="pagination pagination-lg flex-wrap justify-content-center">
         <li th:class="${previousPageStatus}">
-            <a class="page-link" th:href="@{/students/?page={page}(page=${previousPage})}">Previous</a>
+            <a class="page-link" th:href="@{/groups/?page={page}(page=${previousPage})}">Previous</a>
         </li>
         <li th:class="${previousPageStatus}">
-            <a class="page-link" th:href="@{/students/?page={page}(page=${previousPage})}" th:text="${previousPage}">Previous</a>
+            <a class="page-link" th:href="@{/groups/?page={page}(page=${previousPage})}" th:text="${previousPage}">Previous</a>
         </li>
         <li class="page-item active" aria-current="page">
             <text class="page-link" th:text="${currentPage}" >currentPage</text>
         </li>
         <li class="page-item">
-            <a class="page-link" th:href="@{/students/?page={page}(page=${nextPage})}" th:text="${nextPage}">Previous</a>
+            <a class="page-link" th:href="@{/groups/?page={page}(page=${nextPage})}" th:text="${nextPage}">Previous</a>
         </li>
         <li class="page-item">
-            <a class="page-link" th:href="@{/students/?page={page}(page=${nextPage})}">Next</a>
+            <a class="page-link" th:href="@{/groups/?page={page}(page=${nextPage})}">Next</a>
         </li>
     </ul>
 

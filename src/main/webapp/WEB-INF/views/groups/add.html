@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{templates/layout.html}"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>New group</title>
+</head>
+
+<body>
+
+<section layout:fragment="header"> <div th:replace="templates/fragments/header.html"></div> </section>
+<section layout:fragment="footer"> <div th:replace="templates/fragments/footer.html"></div> </section>
+<section layout:fragment="sidebar"> <div th:replace="templates/fragments/sidebar.html"></div> </section>
+
+<section layout:fragment="page-content">
+
+    <h4>Registration of a new group</h4>
+
+    <br>
+
+    <form th:method="POST" th:action="@{/groups}" th:object="${group}">
+
+        <div class="form-floating mb-3">
+            <input type="text" th:field="*{name}" class="form-control" id="groupName" placeholder="groupName">
+            <label for="groupName">Enter group name:</label>
+        </div>
+
+        <select class="form-select  mb-2" name="formOfEducationId">
+            <option selected="" value="0">Choose form of education for new group:</option>
+            <div th:each="formOfEducation : ${formsOfEducation}">
+                <option th:value="${formOfEducation.getId()}" th:text="${formOfEducation.getName()}"> FormOfEducation </option>
+            </div>
+        </select>
+
+        <select class="form-select  mb-2" name="departmentId">
+            <option selected="" value="0">Choose new Science Degree:</option>
+            <div th:each="department : ${departments}">
+                <option th:value="${department.getId()}" th:text="${department.getName()}"> FormOfEducation </option>
+            </div>
+        </select>
+
+
+        <input class="btn btn-success" type="submit" role="button" value="Add new group"/>
+
+    </form>
+
+</section>
+
+</body>
+</html>

@@ -72,7 +72,7 @@ class StudentsControllerTest {
     }
 
     @Test
-    void index_ShouldAddStudentsToModelAndRenderIndexViewWherePreviousPageIsDisable() throws Exception {
+    void indexShouldAddStudentsToModelAndRenderIndexViewWherePreviousPageIsDisable() throws Exception {
 
         StudentResponse first = new StudentResponse();
         StudentResponse second = new StudentResponse();
@@ -106,7 +106,7 @@ class StudentsControllerTest {
     }
 
     @Test
-    void index_ShouldAddStudentsToModelAndRenderIndexViewWherePreviousPageIsActive() throws Exception {
+    void indexShouldAddStudentsToModelAndRenderIndexViewWherePreviousPageIsActive() throws Exception {
 
         StudentResponse first = new StudentResponse();
         StudentResponse second = new StudentResponse();
@@ -130,7 +130,7 @@ class StudentsControllerTest {
     }
 
     @Test
-    void show_ShouldAddStudentToModelAndRenderShowView() throws Exception {
+    void showShouldAddStudentToModelAndRenderShowView() throws Exception {
         GroupResponse group = new GroupResponse();
         group.setId(1L);
         group.setName("Group 1");
@@ -156,7 +156,7 @@ class StudentsControllerTest {
     }
 
     @Test
-    void new_ShouldGetStudentFromModelAndRenderNewView() throws Exception {
+    void newShouldGetStudentFromModelAndRenderNewView() throws Exception {
 
         mockMvc.perform(get("/students/new"))
                 .andExpect(status().is(200))
@@ -165,7 +165,7 @@ class StudentsControllerTest {
     }
 
     @Test
-    void edit_ShouldAddStudentToModelAndRenderShowEdit() throws Exception {
+    void editShouldAddStudentToModelAndRenderShowEdit() throws Exception {
         GroupResponse group1 = new GroupResponse();
         group1.setId(1L);
         group1.setName("Group 1");
@@ -206,7 +206,7 @@ class StudentsControllerTest {
     }
 
     @Test
-    void create_ShouldGetStudentFromModelAndRenderIndexView() throws Exception {
+    void createShouldGetStudentFromModelAndRenderIndexView() throws Exception {
         StudentRequest studentRequest = new StudentRequest();
         studentRequest.setId(1L);
         studentRequest.setFirstName("Alex");
@@ -236,7 +236,7 @@ class StudentsControllerTest {
     }
 
     @Test
-    void update_ShouldGetStudentFromModelAndRenderIndexView() throws Exception {
+    void updateShouldGetStudentFromModelAndRenderIndexView() throws Exception {
         StudentRequest studentRequest = new StudentRequest();
         studentRequest.setId(1L);
         studentRequest.setFirstName("Alex");
@@ -262,7 +262,7 @@ class StudentsControllerTest {
     }
 
     @Test
-    void leaveGroup_ShouldGetStudentIdFromUrlAndGroupIdFromModelAndRenderEditView() throws Exception {
+    void leaveGroupShouldGetStudentIdFromUrlAndGroupIdFromModelAndRenderEditView() throws Exception {
 
         when(studentService.leaveGroup(1L)).thenReturn(true);
 
@@ -279,7 +279,7 @@ class StudentsControllerTest {
     }
 
     @Test
-    void enterGroup_ShouldGetStudentIdFromUrlAndGroupIdFromModelAndRenderEditView() throws Exception {
+    void enterGroupShouldGetStudentIdFromUrlAndGroupIdFromModelAndRenderEditView() throws Exception {
 
         when(studentService.enterGroup(1L, 2L)).thenReturn(true);
 
@@ -297,7 +297,7 @@ class StudentsControllerTest {
     }
 
     @Test
-    void delete_ShouldGetStudentIdFromUrlAndRenderIndexView() throws Exception {
+    void deleteShouldGetStudentIdFromUrlAndRenderIndexView() throws Exception {
 
         when(studentService.deleteById(1L)).thenReturn(true);
 
@@ -313,7 +313,7 @@ class StudentsControllerTest {
     }
 
     @Test
-    void validateStudent_ShouldGetExceptionFromModelAndRenderErrorView() throws Exception {
+    void validateStudentShouldGetExceptionFromModelAndRenderErrorView() throws Exception {
         StudentRequest notValidStudent = new StudentRequest();
         notValidStudent.setFirstName("Alex");
         Exception exception = new ValidateException("password don`t match the pattern");
@@ -333,7 +333,7 @@ class StudentsControllerTest {
     }
 
     @Test
-    void entityAlreadyExist_ShouldGetExceptionFromModelAndRenderErrorView() throws Exception {
+    void entityAlreadyExistShouldGetExceptionFromModelAndRenderErrorView() throws Exception {
         StudentRequest repeatableStudent = new StudentRequest();
         repeatableStudent.setFirstName("Alex");
         Exception exception = new EntityAlreadyExistException("Student with same email already exist");
