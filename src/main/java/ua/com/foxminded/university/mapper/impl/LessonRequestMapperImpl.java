@@ -32,11 +32,7 @@ public class LessonRequestMapperImpl implements LessonRequestMapper {
         } else {
             return Lesson.builder()
                     .withId(dto.getId())
-                    .withCourse(courseRequestMapper.mapDtoToEntity(dto.getCourseRequest()))
                     .withTimeOfStartLesson(dto.getTimeOfStartLesson())
-                    .withGroup(groupRequestMapper.mapDtoToEntity(dto.getGroupRequest()))
-                    .withTeacher(professorRequestMapper.mapDtoToEntity(dto.getTeacher()))
-                    .withFormOfLesson(formOfLessonRequestMapper.mapDtoToEntity(dto.getFormOfLessonRequest()))
                     .build();
         }
     }
@@ -48,11 +44,11 @@ public class LessonRequestMapperImpl implements LessonRequestMapper {
         } else {
             LessonRequest lessonRequest = new LessonRequest();
             lessonRequest.setId(entity.getId());
-            lessonRequest.setCourseRequest(courseRequestMapper.mapEntityToDto(entity.getCourse()));
+            lessonRequest.setCourseId(courseRequestMapper.mapEntityToDto(entity.getCourse()).getId());
             lessonRequest.setTimeOfStartLesson(entity.getTimeOfStartLesson());
-            lessonRequest.setGroupRequest(groupRequestMapper.mapEntityToDto(entity.getGroup()));
-            lessonRequest.setTeacher(professorRequestMapper.mapEntityToDto(entity.getTeacher()));
-            lessonRequest.setFormOfLessonRequest(formOfLessonRequestMapper.mapEntityToDto(entity.getFormOfLesson()));
+            lessonRequest.setGroupId(groupRequestMapper.mapEntityToDto(entity.getGroup()).getId());
+            lessonRequest.setTeacherId(professorRequestMapper.mapEntityToDto(entity.getTeacher()).getId());
+            lessonRequest.setFormOfLessonId(formOfLessonRequestMapper.mapEntityToDto(entity.getFormOfLesson()).getId());
 
             return lessonRequest;
         }

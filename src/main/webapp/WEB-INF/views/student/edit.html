@@ -18,7 +18,7 @@
     <br>
 
     <h4>Common info</h4>
-    <form th:method="PATCH" th:action="@{/students/{id}(id=${student.getId()})}" th:object="${student}">
+    <form th:method="PATCH" th:action="@{/student/{id}(id=${student.getId()})}" th:object="${student}">
         <div class="form-floating mb-2">
             <input type="text" th:field="*{firstName}" class="form-control" id="firstName1" placeholder="First name">
             <label for="firstName1">Change first name:</label>
@@ -46,7 +46,7 @@
     <br>
 
     <h6>Management:</h6>
-    <form method="post" th:action="@{/students/{id}/enterGroup(id=${student.getId()})}"  class="mb-2">
+    <form method="post" th:action="@{/student/{id}/enterGroup(id=${student.getId()})}"  class="mb-2">
         <select class="form-select  mb-2" name="idNewGroup">
             <option selected="" disabled="" value="">Choose new group:</option>
             <div th:each="group : ${anotherGroups}">
@@ -55,7 +55,7 @@
         </select>
         <button class="btn btn-success" type="submit">Change group</button>
     </form>
-    <form th:method="PATCH"  th:action="@{/students/{id}/leaveGroup(id=${student.getId()})}">
+    <form th:method="PATCH"  th:action="@{/student/{id}/leaveGroup(id=${student.getId()})}">
         <input class="btn btn-danger" type="submit" role="button" value="Leave group"/>
     </form>
     <br>

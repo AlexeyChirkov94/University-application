@@ -6,9 +6,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ua.com.foxminded.university.dao.interfaces.CourseDao;
+import ua.com.foxminded.university.dao.interfaces.LessonDao;
 import ua.com.foxminded.university.dao.interfaces.ProfessorDao;
 import ua.com.foxminded.university.dto.CourseRequest;
 import ua.com.foxminded.university.entity.Course;
+import ua.com.foxminded.university.entity.Lesson;
 import ua.com.foxminded.university.entity.Professor;
 import ua.com.foxminded.university.mapper.interfaces.CourseRequestMapper;
 import ua.com.foxminded.university.mapper.interfaces.CourseResponseMapper;
@@ -28,6 +30,9 @@ class CourseServiceImplTest {
 
     @Mock
     ProfessorDao professorDao;
+
+    @Mock
+    LessonDao lessonDao;
 
     @Mock
     CourseRequestMapper courseRequestMapper;
@@ -81,7 +86,7 @@ class CourseServiceImplTest {
 
         when(courseDao.findById(courseId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> courseService.addCourseToProfessorCourseList(courseId, professorId)).hasMessage("There no professor or course with this ids");
+        assertThatThrownBy(() -> courseService.addCourseToProfessorCourseList(courseId, professorId)).hasMessage("There no course with id: 1");
 
         verify(courseDao).findById(courseId);
     }
@@ -94,7 +99,7 @@ class CourseServiceImplTest {
         when(courseDao.findById(courseId)).thenReturn(Optional.of(Course.builder().withId(courseId).build()));
         when(professorDao.findById(professorId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> courseService.addCourseToProfessorCourseList(courseId, professorId)).hasMessage("There no professor or course with this ids");
+        assertThatThrownBy(() -> courseService.addCourseToProfessorCourseList(courseId, professorId)).hasMessage("There no professor with id: 2");
 
         verify(courseDao).findById(courseId);
         verify(professorDao).findById(professorId);
@@ -161,14 +166,15 @@ class CourseServiceImplTest {
     }
 
     @Test
-    void registerShouldAddCourseToDBIfArgumentsIsCourseRequest() {
+    void createShouldAddCourseToDBIfArgumentsIsCourseRequest() {
         String courseName= "Math";
         CourseRequest courseRequest = new CourseRequest();
         courseRequest.setName(courseName);
+        courseRequest.setDepartmentId(0L);
 
         when(courseDao.findByName(courseName)).thenReturn(Optional.empty());
 
-        courseService.register(courseRequest);
+        courseService.create(courseRequest);
 
         verify(courseDao).findByName(courseName);
     }
@@ -181,7 +187,7 @@ class CourseServiceImplTest {
 
         when(courseDao.findByName(courseName)).thenReturn(Optional.of(Course.builder().withName(courseName).build()));
 
-        assertThatThrownBy(() -> courseService.register(courseRequest)).hasMessage("Course with same name already exist");
+        assertThatThrownBy(() -> courseService.create(courseRequest)).hasMessage("Course with same name already exist");
 
         verify(courseDao).findByName(courseName);
     }
@@ -224,6 +230,7 @@ class CourseServiceImplTest {
         Course course = Course.builder().withId(1L).build();
         CourseRequest courseRequest = new CourseRequest();
         courseRequest.setId(1L);
+        courseRequest.setDepartmentId(0L);
 
         when(courseRequestMapper.mapDtoToEntity(courseRequest)).thenReturn(course);
         doNothing().when(courseDao).update(course);
@@ -237,13 +244,22 @@ class CourseServiceImplTest {
     @Test
     void deleteShouldDeleteDataOfCourseIfArgumentIsCourseId() {
         long courseId = 1;
+        Lesson lesson1 = Lesson.builder().withId(1L).build();
+        Lesson lesson2 = Lesson.builder().withId(2L).build();
+        List<Lesson> courseLessons = Arrays.asList(lesson1, lesson2);
 
         when(courseDao.findById(courseId)).thenReturn(Optional.of(Course.builder().withId(courseId).build()));
+        when(lessonDao.findByCourseId(courseId)).thenReturn(courseLessons);
+        doNothing().when(lessonDao).removeCourseFromLesson(1L);
+        doNothing().when(lessonDao).removeCourseFromLesson(2L);
         when(courseDao.deleteById(courseId)).thenReturn(true);
 
         courseService.deleteById(courseId);
 
         verify(courseDao).findById(courseId);
+        verify(lessonDao).findByCourseId(courseId);
+        verify(lessonDao).removeCourseFromLesson(1L);
+        verify(lessonDao).removeCourseFromLesson(2L);
         verify(courseDao).deleteById(courseId);
     }
 

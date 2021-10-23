@@ -8,18 +8,16 @@ import ua.com.foxminded.university.dao.interfaces.FormOfLessonDao;
 import ua.com.foxminded.university.dao.interfaces.GroupDao;
 import ua.com.foxminded.university.dao.interfaces.LessonDao;
 import ua.com.foxminded.university.dao.interfaces.ProfessorDao;
-import ua.com.foxminded.university.dto.GroupResponse;
 import ua.com.foxminded.university.dto.LessonRequest;
 import ua.com.foxminded.university.dto.LessonResponse;
-import ua.com.foxminded.university.entity.Group;
-import ua.com.foxminded.university.entity.Lesson;
-import ua.com.foxminded.university.entity.Professor;
+import ua.com.foxminded.university.entity.Lesson;;
+import ua.com.foxminded.university.mapper.interfaces.CourseRequestMapper;
 import ua.com.foxminded.university.mapper.interfaces.LessonRequestMapper;
 import ua.com.foxminded.university.mapper.interfaces.LessonResponseMapper;
+import ua.com.foxminded.university.mapper.interfaces.ProfessorRequestMapper;
 import ua.com.foxminded.university.service.exception.EntityDontExistException;
-import ua.com.foxminded.university.service.exception.ValidateException;
 import ua.com.foxminded.university.service.interfaces.LessonService;
-import java.time.LocalDateTime;
+import ua.com.foxminded.university.service.validator.LessonValidator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -33,15 +31,18 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
     private final ProfessorDao professorDao;
     private final CourseDao courseDao;
     private final GroupDao groupDao;
+    private final LessonValidator lessonValidator;
     private final LessonRequestMapper lessonRequestMapper;
     private final LessonResponseMapper lessonResponseMapper;
+    private final ProfessorRequestMapper professorRequestMapper;
+    private final CourseRequestMapper courseRequestMapper;
 
     @Override
     @Transactional(transactionManager = "txManager")
     public List<LessonResponse> formTimeTableForGroup(long groupId) {
         checkThatGroupExist(groupId);
 
-        return lessonDao.formTimeTableForGroup(groupId).stream().map(lessonResponseMapper::mapEntityToDto)
+        return lessonDao.findByGroupId(groupId).stream().map(lessonResponseMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
@@ -50,43 +51,29 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
     public List<LessonResponse> formTimeTableForProfessor(long professorId) {
         checkThatProfessorExist(professorId);
 
-        return lessonDao.formTimeTableForProfessor(professorId).stream().map(lessonResponseMapper::mapEntityToDto)
+        return lessonDao.findByProfessorId(professorId).stream().map(lessonResponseMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     @Transactional(transactionManager = "txManager")
-    public void changeFormOfLesson(long lessonId, long newFormOfLessonId) {
-        checkThatLessonExist(lessonId);
-        checkThatFormOfLessonExist(newFormOfLessonId);
-
-        lessonDao.changeFormOfLesson(lessonId, newFormOfLessonId);
-    }
-
-    @Override
-    @Transactional(transactionManager = "txManager")
-    public void changeTeacher(long lessonId, long newProfessorId) {
-        checkThatLessonExist(lessonId);
-        checkThatProfessorExist(newProfessorId);
-
-        lessonDao.changeTeacher(lessonId, newProfessorId);
-    }
-
-    @Override
-    @Transactional(transactionManager = "txManager")
-    public void changeCourse(long lessonId, long newCourseId) {
-        checkThatLessonExist(lessonId);
-        checkThatCourseExist(newCourseId);
-
-        lessonDao.changeCourse(lessonId, newCourseId);
-    }
-
-    @Override
-    public LessonResponse register(LessonRequest lessonRequest) {
-        validate(lessonRequest);
+    public LessonResponse create(LessonRequest lessonRequest) {
 
         Lesson lessonBeforeSave = lessonRequestMapper.mapDtoToEntity(lessonRequest);
         Lesson lessonAfterSave = lessonDao.save(lessonBeforeSave);
+
+        if(lessonRequest.getCourseId() != 0L){
+            changeCourse(lessonAfterSave.getId(), lessonRequest.getCourseId());
+        }
+        if(lessonRequest.getGroupId() != 0L){
+            changeGroup(lessonAfterSave.getId(), lessonRequest.getGroupId());
+        }
+        if(lessonRequest.getTeacherId() != 0L){
+            changeTeacher(lessonAfterSave.getId(), lessonRequest.getTeacherId());
+        }
+        if(lessonRequest.getFormOfLessonId() != 0L){
+            changeFormOfLesson(lessonAfterSave.getId(), lessonRequest.getFormOfLessonId());
+        }
 
         return lessonResponseMapper.mapEntityToDto(lessonAfterSave);
     }
@@ -115,8 +102,24 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
     }
 
     @Override
+    @Transactional(transactionManager = "txManager")
     public void edit(LessonRequest lessonRequest) {
+
         lessonDao.update(lessonRequestMapper.mapDtoToEntity(lessonRequest));
+
+        if(lessonRequest.getCourseId() != 0L){
+            changeCourse(lessonRequest.getId(), lessonRequest.getCourseId());
+        }
+        if(lessonRequest.getGroupId() != 0L){
+            changeGroup(lessonRequest.getId(), lessonRequest.getGroupId());
+        }
+        if(lessonRequest.getTeacherId() != 0L){
+            changeTeacher(lessonRequest.getId(), lessonRequest.getTeacherId());
+        }
+        if(lessonRequest.getFormOfLessonId() != 0L){
+            changeFormOfLesson(lessonRequest.getId(), lessonRequest.getFormOfLessonId());
+        }
+
     }
 
     @Override
@@ -125,6 +128,49 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
             return lessonDao.deleteById(id);
         }
         return false;
+    }
+
+    private void changeGroup(long lessonId, long newGroupId) {
+        checkThatLessonExist(lessonId);
+        checkThatGroupExist(newGroupId);
+
+        lessonValidator.checkGroupTimeTableCrossing(lessonId, newGroupId);
+
+        lessonDao.changeGroup(lessonId, newGroupId);
+
+    }
+
+    private void changeFormOfLesson(long lessonId, long newFormOfLessonId) {
+        checkThatLessonExist(lessonId);
+        checkThatFormOfLessonExist(newFormOfLessonId);
+
+        lessonDao.changeFormOfLesson(lessonId, newFormOfLessonId);
+    }
+
+
+    private void changeTeacher(long lessonId, long newProfessorId) {
+        checkThatLessonExist(lessonId);
+        checkThatProfessorExist(newProfessorId);
+
+        lessonDao.changeTeacher(lessonId, newProfessorId);
+
+        Lesson lesson = lessonDao.findById(lessonId).get();
+        if(lesson.getCourse() != null){
+            lessonValidator.validateCompatibilityCourseAndProfessor(lesson.getCourse().getId(), newProfessorId);
+        }
+        lessonValidator.checkProfessorTimeTableCrossing(lessonId, newProfessorId);
+    }
+
+    private void changeCourse(long lessonId, long newCourseId) {
+        checkThatLessonExist(lessonId);
+        checkThatCourseExist(newCourseId);
+
+        lessonDao.changeCourse(lessonId, newCourseId);
+
+        Lesson lesson = lessonDao.findById(lessonId).get();
+        if(lesson.getTeacher() != null){
+            lessonValidator.validateCompatibilityCourseAndProfessor(newCourseId, lesson.getTeacher().getId());
+        }
     }
 
     private void checkThatLessonExist(long lessonId){
@@ -154,27 +200,6 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
     private void checkThatGroupExist(long groupId){
         if (!groupDao.findById(groupId).isPresent()) {
             throw new EntityDontExistException("There no group with id: " + groupId);
-        }
-    }
-
-    private void validate(LessonRequest lessonRequest) {
-        Lesson lesson = lessonRequestMapper.mapDtoToEntity(lessonRequest);
-        Professor professor = lesson.getTeacher();
-        Group group = lesson.getGroup();
-        LocalDateTime timeOfStartLesson = lesson.getTimeOfStartLesson();
-
-        List<Lesson> existingLessonsOfGroup = lessonDao.formTimeTableForGroup(group.getId());
-        List<Lesson> existingLessonOfTeacher = lessonDao.formTimeTableForProfessor(professor.getId());
-
-        boolean isNewLessonMatchesWithAnotherLessonsInGroup = existingLessonsOfGroup.stream()
-                .map(Lesson::getTimeOfStartLesson)
-                .collect(Collectors.toList()).contains(timeOfStartLesson);
-        boolean isNewLessonMatchesWithAnotherLessonsOfProfessor = existingLessonOfTeacher.stream()
-                .map(Lesson::getTimeOfStartLesson)
-                .collect(Collectors.toList()).contains(timeOfStartLesson);
-
-        if (isNewLessonMatchesWithAnotherLessonsInGroup || isNewLessonMatchesWithAnotherLessonsOfProfessor){
-            throw new ValidateException("Lesson can`t be appointed on this time");
         }
     }
 

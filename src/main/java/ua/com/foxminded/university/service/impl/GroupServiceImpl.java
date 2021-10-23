@@ -6,10 +6,13 @@ import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.interfaces.DepartmentDao;
 import ua.com.foxminded.university.dao.interfaces.FormOfEducationDao;
 import ua.com.foxminded.university.dao.interfaces.GroupDao;
-import ua.com.foxminded.university.dto.FormOfLessonResponse;
+import ua.com.foxminded.university.dao.interfaces.LessonDao;
+import ua.com.foxminded.university.dao.interfaces.StudentDao;
 import ua.com.foxminded.university.dto.GroupRequest;
 import ua.com.foxminded.university.dto.GroupResponse;
 import ua.com.foxminded.university.entity.Group;
+import ua.com.foxminded.university.entity.Lesson;
+import ua.com.foxminded.university.entity.Student;
 import ua.com.foxminded.university.mapper.interfaces.GroupRequestMapper;
 import ua.com.foxminded.university.mapper.interfaces.GroupResponseMapper;
 import ua.com.foxminded.university.service.exception.EntityAlreadyExistException;
@@ -24,8 +27,10 @@ import java.util.stream.Collectors;
 public class GroupServiceImpl extends AbstractPageableCrudService implements GroupService {
 
     private final GroupDao groupDao;
+    private final StudentDao studentDao;
     private final FormOfEducationDao formOfEducationDao;
     private final DepartmentDao departmentDao;
+    private final LessonDao lessonDao;
     private final GroupRequestMapper groupRequestMapper;
     private final GroupResponseMapper groupResponseMapper;
 
@@ -84,8 +89,20 @@ public class GroupServiceImpl extends AbstractPageableCrudService implements Gro
     }
 
     @Override
+    @Transactional(transactionManager = "txManager")
     public boolean deleteById(long id) {
         if(groupDao.findById(id).isPresent()){
+
+            List<Student> groupStudents = studentDao.findByGroupId(id);
+            for(Student student : groupStudents){
+                studentDao.leaveGroup(student.getId());
+            }
+
+            List<Lesson> groupLesson = lessonDao.findByGroupId(id);
+            for(Lesson lesson : groupLesson){
+                lessonDao.removeGroupFromLesson(lesson.getId());
+            }
+
             return groupDao.deleteById(id);
         }
         return false;

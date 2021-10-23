@@ -44,7 +44,7 @@
                                     <td th:text="${student.getFirstName()}"> </td>
                                     <td th:text="${student.getLastName()}"></td>
                                     <td th:text="${student.getEmail()}"> </td>
-                                    <td> <a class="btn btn-secondary" th:href="@{/students/{id}(id=${student.getId()})}" role="button">Go to</a> </td>
+                                    <td> <a class="btn btn-secondary" th:href="@{/student/{id}(id=${student.getId()})}" role="button">Go to</a> </td>
                                 </tr>
                             </div>
                             </tbody>
@@ -53,10 +53,11 @@
                     </div>
                 </div>
             </li>
-            <li class="list-group-item"><a class="btn btn-info" th:href="@{/groups/{id}/edit(id=${group.getId()})}" role="button">Edit</a></li>
+            <li class="list-group-item"><a class="btn btn-info" th:href="@{/group/{id}/edit(id=${group.getId()})}" role="button">Edit</a></li>
             <li class="list-group-item">
-                <form th:method="DELETE" th:action="@{/groups/{id}(id=${group.getId()})}">
+                <form th:method="DELETE" th:action="@{/group/{id}(id=${group.getId()})}">
                     <input class="btn btn-danger" type="submit" value="Delete"/>
+                    <text>Be careful, all students will be remove from group, and lessons of this group will lose group</text>
                 </form>
             </li>
         </ul>

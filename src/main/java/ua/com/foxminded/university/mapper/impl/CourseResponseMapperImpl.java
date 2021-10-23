@@ -30,16 +30,20 @@ public class CourseResponseMapperImpl implements CourseResponseMapper {
 
     @Override
     public CourseResponse mapEntityToDto(Course entity) {
+        CourseResponse courseResponse = new CourseResponse();
         if (entity == null) {
-            return null;
+            courseResponse = null;
+        }  else if (entity.getId() == 0L) {
+            courseResponse.setId(0L);
+            courseResponse.setName("not chosen");
+            courseResponse.setDepartmentResponse(departmentResponseMapper.mapEntityToDto(entity.getDepartment()));
         } else {
-            CourseResponse courseResponse = new CourseResponse();
             courseResponse.setId(entity.getId());
             courseResponse.setName(entity.getName());
             courseResponse.setDepartmentResponse(departmentResponseMapper.mapEntityToDto(entity.getDepartment()));
-
-            return courseResponse;
         }
+
+        return courseResponse;
     }
 
 }

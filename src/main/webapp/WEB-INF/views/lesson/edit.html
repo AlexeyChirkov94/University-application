@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{templates/layout.html}"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Update lesson</title>
+</head>
+
+<body>
+
+<section layout:fragment="header"> <div th:replace="templates/fragments/header.html"></div> </section>
+<section layout:fragment="footer"> <div th:replace="templates/fragments/footer.html"></div> </section>
+<section layout:fragment="sidebar"> <div th:replace="templates/fragments/sidebar.html"></div> </section>
+
+<section layout:fragment="page-content">
+
+    <h4 th:text="${'Update of lesson with ID: ' + lessonResponse.getId()}" >ID</h4>
+    <br>
+
+    <h4>Lesson Updating</h4>
+
+    <form th:method="PATCH" th:action="@{/lesson/{id}(id=${lessonResponse.getId()})}" th:object="${lessonRequest}">
+        <h6>Date and time of start lesson</h6>
+        <div class="form-floating mb-2">
+            <input type="datetime-local" th:field="*{timeOfStartLesson}" class="form-control" id="dateTime">
+            <label for="dateTime">Change date and time of start lesson:</label>
+        </div>
+
+        <h6>Course of lesson</h6>
+        <select class="form-select  mb-2"  th:field="*{courseId}" >
+            <option selected=""  th:value="${lessonResponse.getCourseResponse().getId()}"
+                    th:text="${'Currsent course: ' + lessonResponse.getCourseResponse.getName()}">current course</option>
+            <div th:each="course : ${availableCourses}">
+                <option th:value="${course.getId()}" th:text="${course.getName()}"> course </option>
+            </div>
+        </select>
+
+        <h6>Group of lesson</h6>
+        <select class="form-select  mb-2" th:field="*{groupId}">
+            <option selected="" th:value="${lessonResponse.getGroupResponse().getId()}"
+                    th:text="${'Current group: ' + lessonResponse.getGroupResponse().getName()}">current group</option>
+            <div th:each="group : ${allGroups}">
+                <option th:value="${group.getId()}" th:text="${group.getName()}"> course </option>
+            </div>
+        </select>
+
+        <h6>Teacher of lesson</h6>
+        <select class="form-select  mb-2" th:field="*{teacherId}">
+            <option selected="" th:value="${lessonResponse.getTeacher().getId()}"
+                    th:text="${'Curesnt teacher: ' + lessonResponse.getTeacher().getScienceDegreeResponse() + ', '
+                            + lessonResponse.getTeacher().getLastName() + ' ' + lessonResponse.getTeacher().getFirstName() +
+                                            ' (ID: ' + lessonResponse.getTeacher().getId() + ')'}">current group</option>
+            <div th:each="teacher : ${availableTeachers}">
+                                <option th:value="${teacher.getId()}" th:text="${teacher.getScienceDegreeResponse() + ', '
+                            + teacher.getLastName() + ' ' + teacher.getFirstName() +
+                                            ' (ID: ' + teacher.getId() + ')'}"> course </option>
+            </div>
+        </select>
+
+        <h6>From of lesson</h6>
+        <select class="form-select  mb-2" th:field="*{formOfLessonId}">
+            <option selected="" th:value="${lessonResponse.getFormOfLessonResponse().getId()}"
+                    th:text="${'Current form of lesson : ' + lessonResponse.getFormOfLessonResponse().getName()}">current group</option>
+            <div th:each="formOfLesson : ${allFormsOfLesson}">
+                <option th:value="${formOfLesson.getId()}" th:text="${formOfLesson.getName()}"> course </option>
+            </div>
+        </select>
+
+        <input class="btn btn-success" type="submit" role="button" value="Update lesson"/>
+    </form>
+
+    <br>
+
+</section>
+
+</body>
+</html>

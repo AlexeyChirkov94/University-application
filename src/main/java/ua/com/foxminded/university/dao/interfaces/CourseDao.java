@@ -14,4 +14,8 @@ public interface CourseDao extends CrudPageableDao<Course>{
 
     List<Course> findByProfessorId(long professorId);
 
+    void changeDepartment(long courseId, long newDepartmentId);
+
+    void removeDepartmentFromCourse(long courseId);
+
 }

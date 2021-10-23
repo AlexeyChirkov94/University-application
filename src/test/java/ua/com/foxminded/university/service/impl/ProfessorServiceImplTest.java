@@ -6,10 +6,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import ua.com.foxminded.university.dao.interfaces.CourseDao;
 import ua.com.foxminded.university.dao.interfaces.GroupDao;
+import ua.com.foxminded.university.dao.interfaces.LessonDao;
 import ua.com.foxminded.university.dao.interfaces.ProfessorDao;
 import ua.com.foxminded.university.dto.ProfessorRequest;
 import ua.com.foxminded.university.dto.ProfessorResponse;
+import ua.com.foxminded.university.entity.Course;
 import ua.com.foxminded.university.entity.Lesson;
 import ua.com.foxminded.university.entity.Professor;
 import ua.com.foxminded.university.entity.ScienceDegree;
@@ -31,6 +34,12 @@ class ProfessorServiceImplTest {
 
     @Mock
     ProfessorDao professorDao;
+
+    @Mock
+    CourseDao courseDao;
+
+    @Mock
+    LessonDao lessonDao;
 
     @Mock
     GroupDao groupDao;
@@ -182,14 +191,32 @@ class ProfessorServiceImplTest {
     @Test
     void deleteShouldDeleteDataOfProfessorIfArgumentIsProfessorId() {
         long professorId = 1;
+        Course course1 = Course.builder().withId(1L).build();
+        Course course2 = Course.builder().withId(2L).build();
+        List<Course> professorCourses = Arrays.asList(course1, course2);
+        Lesson lesson1 = Lesson.builder().withId(1L).build();
+        Lesson lesson2 = Lesson.builder().withId(2L).build();
+        List<Lesson> professorLessons = Arrays.asList(lesson1, lesson2);
 
         when(professorDao.findById(professorId)).thenReturn(Optional.of(Professor.builder().withId(professorId).build()));
         when(professorDao.deleteById(professorId)).thenReturn(true);
+        when(courseDao.findByProfessorId(1L)).thenReturn(professorCourses);
+        doNothing().when(courseDao).removeCourseFromProfessorCourseList(1L, 1L);
+        doNothing().when(courseDao).removeCourseFromProfessorCourseList(2L, 1L);
+        when(lessonDao.findByProfessorId(1L)).thenReturn(professorLessons);
+        doNothing().when(lessonDao).removeTeacherFromLesson(1L);
+        doNothing().when(lessonDao).removeTeacherFromLesson(2L);
 
         professorService.deleteById(professorId);
 
         verify(professorDao).findById(professorId);
         verify(professorDao).deleteById(professorId);
+        verify(courseDao).findByProfessorId(1L);
+        verify(courseDao).removeCourseFromProfessorCourseList(1L, 1L);
+        verify(courseDao).removeCourseFromProfessorCourseList(2L, 1L);
+        verify(lessonDao).findByProfessorId(1L);
+        verify(lessonDao).removeTeacherFromLesson(1L);
+        verify(lessonDao).removeTeacherFromLesson(2L);
     }
 
     @Test

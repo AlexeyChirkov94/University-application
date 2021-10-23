@@ -23,7 +23,6 @@ public class CourseRequestMapperImpl implements CourseRequestMapper {
             return Course.builder()
                     .withId(dto.getId())
                     .withName(dto.getName())
-                    .withDepartment(departmentRequestMapper.mapDtoToEntity(dto.getDepartmentRequest()))
                     .build();
         }
     }
@@ -36,7 +35,7 @@ public class CourseRequestMapperImpl implements CourseRequestMapper {
             CourseRequest courseRequest = new CourseRequest();
             courseRequest.setId(entity.getId());
             courseRequest.setName(entity.getName());
-            courseRequest.setDepartmentRequest(departmentRequestMapper.mapEntityToDto(entity.getDepartment()));
+            courseRequest.setDepartmentId(departmentRequestMapper.mapEntityToDto(entity.getDepartment()).getId());
 
             return courseRequest;
         }

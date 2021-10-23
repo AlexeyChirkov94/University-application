@@ -73,7 +73,7 @@ public class ProfessorsControllerTest {
     }
 
     @Test
-    void indexShouldAddProfessorsToModelAndRenderIndexViewWherePreviousPageIsDisable() throws Exception {
+    void showAllShouldAddProfessorsToModelAndRenderIndexView() throws Exception {
 
         ProfessorResponse first = new ProfessorResponse();
         ProfessorResponse second = new ProfessorResponse();
@@ -83,11 +83,10 @@ public class ProfessorsControllerTest {
         second.setLastName("Stivenson");
         when(professorService.findAll(null)).thenReturn(Arrays.asList(first, second));
 
-        mockMvc.perform(get("/professors"))
+        mockMvc.perform(get("/professor"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/professors/index"))
-                .andExpect(forwardedUrl("/professors/index"))
-                .andExpect(model().attribute("previousPageStatus", is("page-item disabled")))
+                .andExpect(view().name("/professor/all"))
+                .andExpect(forwardedUrl("/professor/all"))
                 .andExpect(model().attribute("professors", hasSize(2)))
                 .andExpect(model().attribute("professors", hasItem(
                         allOf(
@@ -107,30 +106,6 @@ public class ProfessorsControllerTest {
     }
 
     @Test
-    void indexShouldAddProfessorsToModelAndRenderIndexViewWherePreviousPageIsActive() throws Exception {
-
-        ProfessorResponse first = new ProfessorResponse();
-        ProfessorResponse second = new ProfessorResponse();
-        first.setFirstName("Alexey");
-        first.setLastName("Chirkov");
-        second.setFirstName("Bob");
-        second.setLastName("Stivenson");
-        List<ProfessorResponse> professors = Arrays.asList(first, second);
-        when(professorService.findAll("2")).thenReturn(professors);
-
-        mockMvc.perform(get("/professors/?page=2"))
-                .andExpect(status().is(200))
-                .andExpect(view().name("/professors/index"))
-                .andExpect(forwardedUrl("/professors/index"))
-                .andExpect(model().attribute("previousPageStatus", is("page-item")))
-                .andExpect(model().attribute("professors", hasSize(2)))
-                .andExpect(model().attribute("professors", is(professors)));
-
-        verify(professorService).findAll("2");
-        verifyNoMoreInteractions(professorService);
-    }
-
-    @Test
     void showShouldAddProfessorToModelAndRenderShowView() throws Exception {
 
         ProfessorResponse professor = new ProfessorResponse();
@@ -141,10 +116,10 @@ public class ProfessorsControllerTest {
         professor.setPassword("1234");
         when(professorService.findById(1L)).thenReturn(Optional.of(professor));
 
-        mockMvc.perform(get("/professors/1"))
+        mockMvc.perform(get("/professor/1"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/professors/show"))
-                .andExpect(forwardedUrl("/professors/show"))
+                .andExpect(view().name("/professor/show"))
+                .andExpect(forwardedUrl("/professor/show"))
                 .andExpect(model().attribute("professor", is(professor)));
 
 
@@ -155,10 +130,10 @@ public class ProfessorsControllerTest {
     @Test
     void newShouldGetProfessorFromModelAndRenderNewView() throws Exception {
 
-        mockMvc.perform(get("/professors/new"))
+        mockMvc.perform(get("/professor/new"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/professors/add"))
-                .andExpect(forwardedUrl("/professors/add"));
+                .andExpect(view().name("/professor/add"))
+                .andExpect(forwardedUrl("/professor/add"));
     }
 
     @Test
@@ -196,10 +171,10 @@ public class ProfessorsControllerTest {
         when(courseService.findByProfessorId(1L)).thenReturn(professorCourses);
         when(courseService.findAll()).thenReturn(allCourses);
 
-        mockMvc.perform(get("/professors/1/edit"))
+        mockMvc.perform(get("/professor/1/edit"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/professors/edit"))
-                .andExpect(forwardedUrl("/professors/edit"))
+                .andExpect(view().name("/professor/edit"))
+                .andExpect(forwardedUrl("/professor/edit"))
                 .andExpect(model().attribute("professor", is(professor)))
                 .andExpect(model().attribute("professorsCourses", is(professorCourses)))
                 .andExpect(model().attribute("anotherCourses", is(anotherCourses)))
@@ -226,15 +201,15 @@ public class ProfessorsControllerTest {
 
         when(professorService.register(professorRequest)).thenReturn(professorResponse);
 
-        mockMvc.perform(post("/professors")
+        mockMvc.perform(post("/professor")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("id", professorResponse.getId().toString())
                 .param("firstName", professorResponse.getFirstName())
                 .param("lastName", professorResponse.getLastName())
         )
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/professors"))
-                .andExpect(redirectedUrl("/professors"))
+                .andExpect(view().name("redirect:/professor"))
+                .andExpect(redirectedUrl("/professor"))
                 .andExpect(model().attribute("professor", hasProperty("id", is(professorResponse.getId()))))
                 .andExpect(model().attribute("professor", hasProperty("firstName",is(professorResponse.getFirstName()))))
                 .andExpect(model().attribute("professor", hasProperty("lastName",is(professorResponse.getLastName()))));
@@ -252,15 +227,15 @@ public class ProfessorsControllerTest {
 
         doNothing().when(professorService).edit(professorRequest);
 
-        mockMvc.perform(patch("/professors/1")
+        mockMvc.perform(patch("/professor/1")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("id", professorRequest.getId().toString())
                 .param("firstName", professorRequest.getFirstName())
                 .param("lastName", professorRequest.getLastName())
         )
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/professors"))
-                .andExpect(redirectedUrl("/professors"))
+                .andExpect(view().name("redirect:/professor"))
+                .andExpect(redirectedUrl("/professor"))
                 .andExpect(model().attribute("professor", hasProperty("id", is(professorRequest.getId()))))
                 .andExpect(model().attribute("professor", hasProperty("firstName",is(professorRequest.getFirstName()))))
                 .andExpect(model().attribute("professor", hasProperty("lastName",is(professorRequest.getLastName()))));
@@ -275,13 +250,13 @@ public class ProfessorsControllerTest {
 
         doNothing().when(professorService).changeScienceDegree(1L, 2);
 
-        mockMvc.perform(post("/professors/1/changeScienceDegree")
+        mockMvc.perform(post("/professor/1/changeScienceDegree")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("idNewScienceDegree", "2")
         )
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/professors/1/edit"))
-                .andExpect(redirectedUrl("/professors/1/edit?idNewScienceDegree=2"))
+                .andExpect(view().name("redirect:/professor/1/edit"))
+                .andExpect(redirectedUrl("/professor/1/edit?idNewScienceDegree=2"))
                 .andExpect(model().attribute("idNewScienceDegree", is(2)));
 
         verify(professorService).changeScienceDegree(1L, 2);
@@ -293,13 +268,13 @@ public class ProfessorsControllerTest {
 
         doNothing().when(courseService).addCourseToProfessorCourseList(2, 1L);
 
-        mockMvc.perform(post("/professors/1/addCourse")
+        mockMvc.perform(post("/professor/1/addCourse")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("idOfAddingCourse", "2")
         )
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/professors/1/edit"))
-                .andExpect(redirectedUrl("/professors/1/edit?idOfAddingCourse=2"))
+                .andExpect(view().name("redirect:/professor/1/edit"))
+                .andExpect(redirectedUrl("/professor/1/edit?idOfAddingCourse=2"))
                 .andExpect(model().attribute("idOfAddingCourse", is(2)));
 
         verify(courseService).addCourseToProfessorCourseList(2, 1L);
@@ -311,13 +286,13 @@ public class ProfessorsControllerTest {
 
         doNothing().when(courseService).removeCourseFromProfessorCourseList(2, 1L);
 
-        mockMvc.perform(post("/professors/1/removeCourse")
+        mockMvc.perform(post("/professor/1/removeCourse")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("idOfRemovingCourse", "2")
         )
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/professors/1/edit"))
-                .andExpect(redirectedUrl("/professors/1/edit?idOfRemovingCourse=2"))
+                .andExpect(view().name("redirect:/professor/1/edit"))
+                .andExpect(redirectedUrl("/professor/1/edit?idOfRemovingCourse=2"))
                 .andExpect(model().attribute("idOfRemovingCourse", is(2)));
 
         verify(courseService).removeCourseFromProfessorCourseList(2, 1L);
@@ -329,12 +304,12 @@ public class ProfessorsControllerTest {
 
         when(professorService.deleteById(1L)).thenReturn(true);
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/professors/1")
+        mockMvc.perform(MockMvcRequestBuilders.delete("/professor/1")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
         )
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/professors"))
-                .andExpect(redirectedUrl("/professors"));
+                .andExpect(view().name("redirect:/professor"))
+                .andExpect(redirectedUrl("/professor"));
 
         verify(professorService).deleteById(1L);
         verifyNoMoreInteractions(professorService);
@@ -348,12 +323,12 @@ public class ProfessorsControllerTest {
 
         when(professorService.register(notValidProfessor)).thenThrow(exception);
 
-        mockMvc.perform(post("/professors")
+        mockMvc.perform(post("/professor")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("firstName", notValidProfessor.getFirstName())
         )
                 .andExpect(status().isOk())
-                .andExpect(view().name("errors handling/creating user error"))
+                .andExpect(view().name("errors handling/common creating error"))
                 .andExpect(model().attribute("exception", is(exception)));
 
         verify(professorService).register(notValidProfessor);
@@ -368,12 +343,12 @@ public class ProfessorsControllerTest {
 
         when(professorService.register(repeatableProfessor)).thenThrow(exception);
 
-        mockMvc.perform(post("/professors")
+        mockMvc.perform(post("/professor")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("firstName", repeatableProfessor.getFirstName())
         )
                 .andExpect(status().isOk())
-                .andExpect(view().name("errors handling/creating user error"))
+                .andExpect(view().name("errors handling/common creating error"))
                 .andExpect(model().attribute("exception", is(exception)));
 
         verify(professorService).register(repeatableProfessor);

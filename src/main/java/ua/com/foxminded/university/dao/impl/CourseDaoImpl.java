@@ -30,12 +30,13 @@ public class CourseDaoImpl extends AbstractPageableCrudDaoImpl<Course> implement
     private static final String UPDATE_QUERY = "UPDATE courses SET name = ? WHERE id = ?";
     private static final String DELETE_QUERY = "DELETE FROM courses WHERE id = ?";
     private static final String COUNT_QUERY = "SELECT COUNT(*) as count from courses";
-    private static final String FIND_BY_COURSE_ID = FIND_QUERY + "left join professor_course pc on c.id = pc.course_id " +
+    private static final String FIND_BY_PROFESSOR_ID = FIND_QUERY + "left join professor_course pc on c.id = pc.course_id " +
             "where pc.professor_id = ?";
     private static final String REMOVE_COURSE_FROM_PROFESSOR_COURSE_LIST_QUERY =
             "DELETE FROM professor_course WHERE professor_id = ? AND course_id = ?";
     private static final String ADD_COURSE_FROM_PROFESSOR_COURSE_LIST_QUERY =
             "INSERT INTO professor_course (professor_id, course_id) VALUES(?, ?)";
+    private static final String CHANGE_DEPARTMENT_QUERY = "UPDATE courses SET department_id = ? where id = ?";
     private static final RowMapper<Course> ROW_MAPPER = (rs, rowNum) ->
          Course.builder()
                 .withId(rs.getLong("id"))
@@ -56,7 +57,7 @@ public class CourseDaoImpl extends AbstractPageableCrudDaoImpl<Course> implement
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(FIND_BY_NAME_QUERY, ROW_MAPPER, name));
         } catch (DataAccessException e) {
-            log.info("Department with this name not registered, Name: " + name);
+            log.info("Course with this name not registered, Name: " + name);
             return Optional.empty();
         }
     }
@@ -72,8 +73,18 @@ public class CourseDaoImpl extends AbstractPageableCrudDaoImpl<Course> implement
     }
 
     @Override
+    public void changeDepartment(long courseId, long departmentId) {
+        jdbcTemplate.update(CHANGE_DEPARTMENT_QUERY, departmentId, courseId);
+    }
+
+    @Override
+    public void removeDepartmentFromCourse(long courseId) {
+        jdbcTemplate.update(CHANGE_DEPARTMENT_QUERY, null, courseId);
+    }
+
+    @Override
     public List<Course> findByProfessorId(long professorId){
-        return jdbcTemplate.query(FIND_BY_COURSE_ID, ROW_MAPPER, professorId);
+        return jdbcTemplate.query(FIND_BY_PROFESSOR_ID, ROW_MAPPER, professorId);
     }
 
     @Override

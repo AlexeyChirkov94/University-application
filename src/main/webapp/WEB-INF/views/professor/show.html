@@ -36,10 +36,11 @@
                     </div>
                 </div>
             </li>
-            <li class="list-group-item"><a class="btn btn-info" th:href="@{/professors/{id}/edit(id=${professor.getId()})}" role="button">Edit</a></li>
+            <li class="list-group-item"><a class="btn btn-info" th:href="@{/professor/{id}/edit(id=${professor.getId()})}" role="button">Edit</a></li>
             <li class="list-group-item">
-                <form th:method="DELETE" th:action="@{/professors/{id}(id=${professor.getId()})}">
+                <form th:method="DELETE" th:action="@{/professor/{id}(id=${professor.getId()})}">
                     <input class="btn btn-danger" type="submit" value="Delete"/>
+                    <text>Be careful, all lessons taught by this professor will be left without a teacher</text>
                 </form>
             </li>
         </ul>

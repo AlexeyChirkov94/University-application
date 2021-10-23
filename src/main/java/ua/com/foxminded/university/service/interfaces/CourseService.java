@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface CourseService {
 
-    CourseResponse register(CourseRequest requestDto);
+    CourseResponse create(CourseRequest requestDto);
 
     Optional<CourseResponse> findById(long id);
 
@@ -24,5 +24,7 @@ public interface CourseService {
     void removeCourseFromProfessorCourseList(long courseId, long professorId);
 
     List<CourseResponse> findByProfessorId(long professorId);
+
+    void removeDepartmentFromCourse(long courseId);
 
 }

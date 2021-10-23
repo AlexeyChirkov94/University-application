@@ -82,7 +82,7 @@ public class GroupsControllerTest {
     }
 
     @Test
-    void indexShouldAddGroupsToModelAndRenderIndexViewWherePreviousPageIsDisable() throws Exception {
+    void showAllShouldAddGroupsToModelAndRenderIndexView() throws Exception {
 
         GroupResponse first = new GroupResponse();
         GroupResponse second = new GroupResponse();
@@ -90,11 +90,10 @@ public class GroupsControllerTest {
         second.setName("Group 2");;
         when(groupService.findAll(null)).thenReturn(Arrays.asList(first, second));
 
-        mockMvc.perform(get("/groups"))
+        mockMvc.perform(get("/group"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/groups/index"))
-                .andExpect(forwardedUrl("/groups/index"))
-                .andExpect(model().attribute("previousPageStatus", is("page-item disabled")))
+                .andExpect(view().name("/group/all"))
+                .andExpect(forwardedUrl("/group/all"))
                 .andExpect(model().attribute("groups", hasSize(2)))
                 .andExpect(model().attribute("groups", hasItem(
                         allOf(
@@ -112,28 +111,6 @@ public class GroupsControllerTest {
     }
 
     @Test
-    void indexShouldAddGroupsToModelAndRenderIndexViewWherePreviousPageIsActive() throws Exception {
-
-        GroupResponse first = new GroupResponse();
-        GroupResponse second = new GroupResponse();
-        first.setName("Group 1");
-        second.setName("Group 2");;
-        List<GroupResponse> groups = Arrays.asList(first, second);
-        when(groupService.findAll("2")).thenReturn(groups);
-
-        mockMvc.perform(get("/groups/?page=2"))
-                .andExpect(status().is(200))
-                .andExpect(view().name("/groups/index"))
-                .andExpect(forwardedUrl("/groups/index"))
-                .andExpect(model().attribute("previousPageStatus", is("page-item")))
-                .andExpect(model().attribute("groups", hasSize(2)))
-                .andExpect(model().attribute("groups", is(groups)));
-
-        verify(groupService).findAll("2");
-        verifyNoMoreInteractions(groupService);
-    }
-
-    @Test
     void showShouldAddGroupToModelAndRenderShowView() throws Exception {
 
         GroupResponse group = new GroupResponse();
@@ -141,10 +118,10 @@ public class GroupsControllerTest {
 
         when(groupService.findById(1L)).thenReturn(Optional.of(group));
 
-        mockMvc.perform(get("/groups/1"))
+        mockMvc.perform(get("/group/1"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/groups/show"))
-                .andExpect(forwardedUrl("/groups/show"))
+                .andExpect(view().name("/group/show"))
+                .andExpect(forwardedUrl("/group/show"))
                 .andExpect(model().attribute("group", is(group)));
 
 
@@ -155,10 +132,10 @@ public class GroupsControllerTest {
     @Test
     void newShouldGetGroupFromModelAndRenderNewView() throws Exception {
 
-        mockMvc.perform(get("/groups/new"))
+        mockMvc.perform(get("/group/new"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/groups/add"))
-                .andExpect(forwardedUrl("/groups/add"));
+                .andExpect(view().name("/group/add"))
+                .andExpect(forwardedUrl("/group/add"));
     }
 
     @Test
@@ -207,10 +184,10 @@ public class GroupsControllerTest {
         when(studentService.findAll()).thenReturn(allStudents);
         when(studentService.findByGroupId(1L)).thenReturn(studentsCurrentGroup);
 
-        mockMvc.perform(get("/groups/1/edit"))
+        mockMvc.perform(get("/group/1/edit"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/groups/edit"))
-                .andExpect(forwardedUrl("/groups/edit"))
+                .andExpect(view().name("/group/edit"))
+                .andExpect(forwardedUrl("/group/edit"))
                 .andExpect(model().attribute("group", is(group)))
                 .andExpect(model().attribute("anotherDepartments", is(anotherDepartments)))
                 .andExpect(model().attribute("anotherFormsOfEducation", is(anotherFormsOfEducation)))
@@ -239,7 +216,7 @@ public class GroupsControllerTest {
 
         when(groupService.register(groupRequest)).thenReturn(groupResponse);
 
-        mockMvc.perform(post("/groups")
+        mockMvc.perform(post("/group")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("id", groupResponse.getId().toString())
                 .param("name", groupResponse.getName())
@@ -247,8 +224,8 @@ public class GroupsControllerTest {
                 .param("departmentId", "0")
         )
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/groups"))
-                .andExpect(redirectedUrl("/groups?formOfEducationId=0&departmentId=0"))
+                .andExpect(view().name("redirect:/group"))
+                .andExpect(redirectedUrl("/group?formOfEducationId=0&departmentId=0"))
                 .andExpect(model().attribute("group", hasProperty("id", is(groupResponse.getId()))))
                 .andExpect(model().attribute("group", hasProperty("name",is(groupResponse.getName()))))
                 .andExpect(model().attribute("formOfEducationId", is(0L)))
@@ -271,7 +248,7 @@ public class GroupsControllerTest {
         doNothing().when(groupService).changeFormOfEducation(1L, 1);
         doNothing().when(groupService).changeDepartment(1L, 1);
 
-        mockMvc.perform(post("/groups")
+        mockMvc.perform(post("/group")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("id", groupResponse.getId().toString())
                 .param("name", groupResponse.getName())
@@ -279,8 +256,8 @@ public class GroupsControllerTest {
                 .param("departmentId", "1")
         )
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/groups"))
-                .andExpect(redirectedUrl("/groups?formOfEducationId=1&departmentId=1"))
+                .andExpect(view().name("redirect:/group"))
+                .andExpect(redirectedUrl("/group?formOfEducationId=1&departmentId=1"))
                 .andExpect(model().attribute("group", hasProperty("id", is(groupResponse.getId()))))
                 .andExpect(model().attribute("group", hasProperty("name",is(groupResponse.getName()))))
                 .andExpect(model().attribute("formOfEducationId", is(1L)))
@@ -299,14 +276,14 @@ public class GroupsControllerTest {
         groupRequest.setName("Group 1");
         doNothing().when(groupService).edit(groupRequest);
 
-        mockMvc.perform(patch("/groups/1")
+        mockMvc.perform(patch("/group/1")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("id", groupRequest.getId().toString())
                 .param("name", groupRequest.getName())
         )
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/groups"))
-                .andExpect(redirectedUrl("/groups"))
+                .andExpect(view().name("redirect:/group"))
+                .andExpect(redirectedUrl("/group"))
                 .andExpect(model().attribute("group", hasProperty("id", is(groupRequest.getId()))))
                 .andExpect(model().attribute("group", hasProperty("name",is(groupRequest.getName()))));
 
@@ -319,13 +296,13 @@ public class GroupsControllerTest {
 
         doNothing().when(groupService).changeDepartment(1L, 2);
 
-        mockMvc.perform(post("/groups/1/changeDepartment")
+        mockMvc.perform(post("/group/1/changeDepartment")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("idNewDepartment", "2")
         )
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/groups/1/edit"))
-                .andExpect(redirectedUrl("/groups/1/edit?idNewDepartment=2"))
+                .andExpect(view().name("redirect:/group/1/edit"))
+                .andExpect(redirectedUrl("/group/1/edit?idNewDepartment=2"))
                 .andExpect(model().attribute("idNewDepartment", is(2L)));
 
         verify(groupService).changeDepartment(1L, 2);
@@ -337,13 +314,13 @@ public class GroupsControllerTest {
 
         doNothing().when(groupService).changeFormOfEducation(1L, 2);
 
-        mockMvc.perform(post("/groups/1/changeFormOfEducation")
+        mockMvc.perform(post("/group/1/changeFormOfEducation")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("idNewFormOfEducation", "2")
         )
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/groups/1/edit"))
-                .andExpect(redirectedUrl("/groups/1/edit?idNewFormOfEducation=2"))
+                .andExpect(view().name("redirect:/group/1/edit"))
+                .andExpect(redirectedUrl("/group/1/edit?idNewFormOfEducation=2"))
                 .andExpect(model().attribute("idNewFormOfEducation", is(2L)));
 
         verify(groupService).changeFormOfEducation(1L, 2);
@@ -355,13 +332,13 @@ public class GroupsControllerTest {
 
         when(studentService.enterGroup(2, 1)).thenReturn(true);
 
-        mockMvc.perform(post("/groups/1/addStudentToGroup")
+        mockMvc.perform(post("/group/1/addStudentToGroup")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("idNewStudent", "2")
         )
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/groups/1/edit"))
-                .andExpect(redirectedUrl("/groups/1/edit?idNewStudent=2"))
+                .andExpect(view().name("redirect:/group/1/edit"))
+                .andExpect(redirectedUrl("/group/1/edit?idNewStudent=2"))
                 .andExpect(model().attribute("idNewStudent", is(2L)));
 
         verify(studentService).enterGroup(2, 1);
@@ -373,13 +350,13 @@ public class GroupsControllerTest {
 
         when(studentService.leaveGroup(2)).thenReturn(true);
 
-        mockMvc.perform(post("/groups/1/removeStudentFromGroup")
+        mockMvc.perform(post("/group/1/removeStudentFromGroup")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("idRemovingStudent", "2")
         )
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/groups/1/edit"))
-                .andExpect(redirectedUrl("/groups/1/edit?idRemovingStudent=2"))
+                .andExpect(view().name("redirect:/group/1/edit"))
+                .andExpect(redirectedUrl("/group/1/edit?idRemovingStudent=2"))
                 .andExpect(model().attribute("idRemovingStudent", is(2L)));
 
         verify(studentService).leaveGroup(2);
@@ -391,12 +368,12 @@ public class GroupsControllerTest {
 
         when(groupService.deleteById(1L)).thenReturn(true);
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/groups/1")
+        mockMvc.perform(MockMvcRequestBuilders.delete("/group/1")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
         )
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/groups"))
-                .andExpect(redirectedUrl("/groups"));
+                .andExpect(view().name("redirect:/group"))
+                .andExpect(redirectedUrl("/group"));
 
         verify(groupService).deleteById(1L);
         verifyNoMoreInteractions(groupService);

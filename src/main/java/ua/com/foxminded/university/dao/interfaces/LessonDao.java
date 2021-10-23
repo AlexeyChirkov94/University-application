@@ -6,14 +6,26 @@ import java.util.List;
 
 public interface LessonDao extends CrudPageableDao<Lesson> {
 
-    List<Lesson> formTimeTableForGroup(long groupId);
+    List<Lesson> findByGroupId(long groupId);
 
-    List<Lesson> formTimeTableForProfessor(long professorId);
+    List<Lesson> findByProfessorId(long professorId);
+
+    List<Lesson> findByCourseId(long courseId);
 
     void changeFormOfLesson(long lessonId, long newFormOfLessonId);
 
+    void removeFormOfLessonFromLesson(long lessonId);
+
     void changeTeacher(long lessonId, long newProfessorId);
 
+    void removeTeacherFromLesson(long lessonId);
+
     void changeCourse(long lessonId, long newCourseId);
+
+    void removeCourseFromLesson(long lessonId);
+
+    void changeGroup(long lessonId, long newGroupId);
+
+    void removeGroupFromLesson(long lessonId);
 
 }

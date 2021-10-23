@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import static org.mockito.Mockito.times;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
@@ -72,7 +73,7 @@ class StudentsControllerTest {
     }
 
     @Test
-    void indexShouldAddStudentsToModelAndRenderIndexViewWherePreviousPageIsDisable() throws Exception {
+    void showAllShouldAddStudentsToModelAndRenderIndexView() throws Exception {
 
         StudentResponse first = new StudentResponse();
         StudentResponse second = new StudentResponse();
@@ -82,11 +83,10 @@ class StudentsControllerTest {
         second.setLastName("Stivenson");
         when(studentService.findAll(null)).thenReturn(Arrays.asList(first, second));
 
-        mockMvc.perform(get("/students"))
+        mockMvc.perform(get("/student"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/students/index"))
-                .andExpect(forwardedUrl("/students/index"))
-                .andExpect(model().attribute("previousPageStatus", is("page-item disabled")))
+                .andExpect(view().name("/student/all"))
+                .andExpect(forwardedUrl("/student/all"))
                 .andExpect(model().attribute("students", hasSize(2)))
                 .andExpect(model().attribute("students", hasItem(
                         allOf(
@@ -106,30 +106,6 @@ class StudentsControllerTest {
     }
 
     @Test
-    void indexShouldAddStudentsToModelAndRenderIndexViewWherePreviousPageIsActive() throws Exception {
-
-        StudentResponse first = new StudentResponse();
-        StudentResponse second = new StudentResponse();
-        first.setFirstName("Alexey");
-        first.setLastName("Chirkov");
-        second.setFirstName("Bob");
-        second.setLastName("Stivenson");
-        List<StudentResponse> students = Arrays.asList(first, second);
-        when(studentService.findAll("2")).thenReturn(students);
-
-        mockMvc.perform(get("/students/?page=2"))
-                .andExpect(status().is(200))
-                .andExpect(view().name("/students/index"))
-                .andExpect(forwardedUrl("/students/index"))
-                .andExpect(model().attribute("previousPageStatus", is("page-item")))
-                .andExpect(model().attribute("students", hasSize(2)))
-                .andExpect(model().attribute("students", is(students)));
-
-        verify(studentService).findAll("2");
-        verifyNoMoreInteractions(studentService);
-    }
-
-    @Test
     void showShouldAddStudentToModelAndRenderShowView() throws Exception {
         GroupResponse group = new GroupResponse();
         group.setId(1L);
@@ -144,10 +120,10 @@ class StudentsControllerTest {
         student.setGroupResponse(group);
         when(studentService.findById(1L)).thenReturn(Optional.of(student));
 
-        mockMvc.perform(get("/students/1"))
+        mockMvc.perform(get("/student/1"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/students/show"))
-                .andExpect(forwardedUrl("/students/show"))
+                .andExpect(view().name("/student/show"))
+                .andExpect(forwardedUrl("/student/show"))
                 .andExpect(model().attribute("student", is(student)));
 
 
@@ -158,14 +134,14 @@ class StudentsControllerTest {
     @Test
     void newShouldGetStudentFromModelAndRenderNewView() throws Exception {
 
-        mockMvc.perform(get("/students/new"))
+        mockMvc.perform(get("/student/new"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/students/add"))
-                .andExpect(forwardedUrl("/students/add"));
+                .andExpect(view().name("/student/add"))
+                .andExpect(forwardedUrl("/student/add"));
     }
 
     @Test
-    void editShouldAddStudentToModelAndRenderShowEdit() throws Exception {
+    void editIfStudentHaveAGroupShouldAddStudentToModelAndRenderShowEdit() throws Exception {
         GroupResponse group1 = new GroupResponse();
         group1.setId(1L);
         group1.setName("Group 1");
@@ -190,16 +166,58 @@ class StudentsControllerTest {
         when(groupService.findById(1L)).thenReturn(Optional.of(group1));
         when(groupService.findAll()).thenReturn(allGroups);
 
-        mockMvc.perform(get("/students/1/edit"))
+        mockMvc.perform(get("/student/1/edit"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/students/edit"))
-                .andExpect(forwardedUrl("/students/edit"))
+                .andExpect(view().name("/student/edit"))
+                .andExpect(forwardedUrl("/student/edit"))
                 .andExpect(model().attribute("student", is(student)))
                 .andExpect(model().attribute("studentGroup", is(group1)))
                 .andExpect(model().attribute("anotherGroups", is(anotherGroups)));
 
         verify(studentService).findById(1L);
         verify(groupService).findById(1L);
+        verify(groupService).findAll();
+        verifyNoMoreInteractions(studentService);
+        verifyNoMoreInteractions(groupService);
+    }
+
+    @Test
+    void editIfStudentHaveNoGroupShouldAddStudentToModelAndRenderShowEdit() throws Exception {
+        GroupResponse studentGroup = new GroupResponse();
+        studentGroup = new GroupResponse();
+        studentGroup.setId(0L);
+        studentGroup.setName("not appointed");
+        GroupResponse group1 = new GroupResponse();
+        group1.setId(1L);
+        group1.setName("Group 1");
+        GroupResponse group2 = new GroupResponse();
+        group2.setId(2L);
+        group2.setName("Group 2");
+        List<GroupResponse> allGroups = new ArrayList<>();
+        allGroups.add(group1);
+        allGroups.add(group2);
+        StudentResponse student = new StudentResponse();
+        student.setId(1L);
+        student.setFirstName("Alexey");
+        student.setLastName("Chirkov");
+        student.setEmail("chirkov@gamil.com");
+        student.setPassword("1234");
+        student.setGroupResponse(studentGroup);
+
+
+        when(studentService.findById(1L)).thenReturn(Optional.of(student));
+        when(groupService.findById(1L)).thenReturn(Optional.of(group1));
+        when(groupService.findAll()).thenReturn(allGroups);
+
+        mockMvc.perform(get("/student/1/edit"))
+                .andExpect(status().is(200))
+                .andExpect(view().name("/student/edit"))
+                .andExpect(forwardedUrl("/student/edit"))
+                .andExpect(model().attribute("student", is(student)))
+                .andExpect(model().attribute("studentGroup", is(studentGroup)))
+                .andExpect(model().attribute("anotherGroups", is(allGroups)));
+
+        verify(studentService).findById(1L);
         verify(groupService).findAll();
         verifyNoMoreInteractions(studentService);
         verifyNoMoreInteractions(groupService);
@@ -218,15 +236,15 @@ class StudentsControllerTest {
 
         when(studentService.register(studentRequest)).thenReturn(studentResponse);
 
-        mockMvc.perform(post("/students")
+        mockMvc.perform(post("/student")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("id", studentResponse.getId().toString())
                 .param("firstName", studentResponse.getFirstName())
                 .param("lastName", studentResponse.getLastName())
         )
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/students"))
-                .andExpect(redirectedUrl("/students"))
+                .andExpect(view().name("redirect:/student"))
+                .andExpect(redirectedUrl("/student"))
                 .andExpect(model().attribute("student", hasProperty("id", is(studentResponse.getId()))))
                 .andExpect(model().attribute("student", hasProperty("firstName",is(studentResponse.getFirstName()))))
                 .andExpect(model().attribute("student", hasProperty("lastName",is(studentResponse.getLastName()))));
@@ -244,15 +262,15 @@ class StudentsControllerTest {
 
         doNothing().when(studentService).edit(studentRequest);
 
-        mockMvc.perform(patch("/students/1")
+        mockMvc.perform(patch("/student/1")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("id", studentRequest.getId().toString())
                 .param("firstName", studentRequest.getFirstName())
                 .param("lastName", studentRequest.getLastName())
         )
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/students"))
-                .andExpect(redirectedUrl("/students"))
+                .andExpect(view().name("redirect:/student"))
+                .andExpect(redirectedUrl("/student"))
                 .andExpect(model().attribute("student", hasProperty("id", is(studentRequest.getId()))))
                 .andExpect(model().attribute("student", hasProperty("firstName",is(studentRequest.getFirstName()))))
                 .andExpect(model().attribute("student", hasProperty("lastName",is(studentRequest.getLastName()))));
@@ -266,13 +284,13 @@ class StudentsControllerTest {
 
         when(studentService.leaveGroup(1L)).thenReturn(true);
 
-        mockMvc.perform(patch("/students/1/leaveGroup")
+        mockMvc.perform(patch("/student/1/leaveGroup")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("id", "1")
         )
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/students/1/edit"))
-                .andExpect(redirectedUrl("/students/1/edit"));
+                .andExpect(view().name("redirect:/student/1/edit"))
+                .andExpect(redirectedUrl("/student/1/edit"));
 
         verify(studentService).leaveGroup(1L);
         verifyNoMoreInteractions(studentService);
@@ -283,13 +301,13 @@ class StudentsControllerTest {
 
         when(studentService.enterGroup(1L, 2L)).thenReturn(true);
 
-        mockMvc.perform(post("/students/1/enterGroup")
+        mockMvc.perform(post("/student/1/enterGroup")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("idNewGroup", "2")
         )
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/students/1/edit"))
-                .andExpect(redirectedUrl("/students/1/edit?idNewGroup=2"))
+                .andExpect(view().name("redirect:/student/1/edit"))
+                .andExpect(redirectedUrl("/student/1/edit?idNewGroup=2"))
                 .andExpect(model().attribute("idNewGroup", is(2)));
 
         verify(studentService).enterGroup(1L, 2L);
@@ -301,12 +319,12 @@ class StudentsControllerTest {
 
         when(studentService.deleteById(1L)).thenReturn(true);
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/students/1")
+        mockMvc.perform(MockMvcRequestBuilders.delete("/student/1")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
         )
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/students"))
-                .andExpect(redirectedUrl("/students"));
+                .andExpect(view().name("redirect:/student"))
+                .andExpect(redirectedUrl("/student"));
 
         verify(studentService).deleteById(1L);
         verifyNoMoreInteractions(studentService);
@@ -320,12 +338,12 @@ class StudentsControllerTest {
 
         when(studentService.register(notValidStudent)).thenThrow(exception);
 
-        mockMvc.perform(post("/students")
+        mockMvc.perform(post("/student")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("firstName", notValidStudent.getFirstName())
         )
                 .andExpect(status().isOk())
-                .andExpect(view().name("errors handling/creating user error"))
+                .andExpect(view().name("errors handling/common creating error"))
                 .andExpect(model().attribute("exception", is(exception)));
 
         verify(studentService).register(notValidStudent);
@@ -340,12 +358,12 @@ class StudentsControllerTest {
 
         when(studentService.register(repeatableStudent)).thenThrow(exception);
 
-        mockMvc.perform(post("/students")
+        mockMvc.perform(post("/student")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("firstName", repeatableStudent.getFirstName())
         )
                 .andExpect(status().isOk())
-                .andExpect(view().name("errors handling/creating user error"))
+                .andExpect(view().name("errors handling/common creating error"))
                 .andExpect(model().attribute("exception", is(exception)));
 
         verify(studentService).register(repeatableStudent);

@@ -35,17 +35,22 @@ public class GroupResponseMapperImpl implements GroupResponseMapper {
 
     @Override
     public GroupResponse mapEntityToDto(Group entity) {
+        GroupResponse groupResponse = new GroupResponse();
         if (entity == null) {
             return null;
+        } else if (entity.getId() == 0L){
+            groupResponse.setId(0L);
+            groupResponse.setName("not chosen");
+            groupResponse.setDepartmentResponse(departmentResponseMapper.mapEntityToDto(entity.getDepartment()));
+            groupResponse.setFormOfEducationResponse(formOfEducationResponseMapper.mapEntityToDto(entity.getFormOfEducation()));
         } else {
-            GroupResponse groupResponse = new GroupResponse();
             groupResponse.setId(entity.getId());
             groupResponse.setName(entity.getName());
             groupResponse.setDepartmentResponse(departmentResponseMapper.mapEntityToDto(entity.getDepartment()));
             groupResponse.setFormOfEducationResponse(formOfEducationResponseMapper.mapEntityToDto(entity.getFormOfEducation()));
-
-            return groupResponse;
         }
+
+        return groupResponse;
     }
 
 }

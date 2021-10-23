@@ -43,19 +43,26 @@ public class LessonResponseMapperImpl implements LessonResponseMapper {
 
     @Override
     public LessonResponse mapEntityToDto(Lesson entity) {
+        LessonResponse lessonResponse = new LessonResponse();
         if (entity == null) {
             return null;
+        } else if (entity.getId() == 0L){
+            lessonResponse.setId(0L);
+            lessonResponse.setCourseResponse(courseResponseMapper.mapEntityToDto(entity.getCourse()));
+            lessonResponse.setTimeOfStartLesson(entity.getTimeOfStartLesson());
+            lessonResponse.setGroupResponse(groupResponseMapper.mapEntityToDto(entity.getGroup()));
+            lessonResponse.setTeacher(professorResponseMapper.mapEntityToDto(entity.getTeacher()));
+            lessonResponse.setFormOfLessonResponse(formOfLessonResponseMapper.mapEntityToDto(entity.getFormOfLesson()));
         } else {
-            LessonResponse lessonResponse = new LessonResponse();
             lessonResponse.setId(entity.getId());
             lessonResponse.setCourseResponse(courseResponseMapper.mapEntityToDto(entity.getCourse()));
             lessonResponse.setTimeOfStartLesson(entity.getTimeOfStartLesson());
             lessonResponse.setGroupResponse(groupResponseMapper.mapEntityToDto(entity.getGroup()));
             lessonResponse.setTeacher(professorResponseMapper.mapEntityToDto(entity.getTeacher()));
             lessonResponse.setFormOfLessonResponse(formOfLessonResponseMapper.mapEntityToDto(entity.getFormOfLesson()));
-
-            return lessonResponse;
         }
+
+        return lessonResponse;
     }
 
 }
