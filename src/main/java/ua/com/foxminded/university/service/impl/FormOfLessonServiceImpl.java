@@ -2,11 +2,14 @@ package ua.com.foxminded.university.service.impl;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.interfaces.FormOfLessonDao;
+import ua.com.foxminded.university.dao.interfaces.LessonDao;
 import ua.com.foxminded.university.dto.FormOfEducationResponse;
 import ua.com.foxminded.university.dto.FormOfLessonRequest;
 import ua.com.foxminded.university.dto.FormOfLessonResponse;
 import ua.com.foxminded.university.entity.FormOfLesson;
+import ua.com.foxminded.university.entity.Lesson;
 import ua.com.foxminded.university.mapper.interfaces.FormOfLessonRequestMapper;
 import ua.com.foxminded.university.mapper.interfaces.FormOfLessonResponseMapper;
 import ua.com.foxminded.university.service.exception.EntityAlreadyExistException;
@@ -20,11 +23,12 @@ import java.util.stream.Collectors;
 public class FormOfLessonServiceImpl extends AbstractPageableCrudService implements FormOfLessonService {
 
     private final FormOfLessonDao formOfLessonDao;
+    private final LessonDao lessonDao;
     private final FormOfLessonRequestMapper formOfLessonRequestMapper;
     private final FormOfLessonResponseMapper formOfLessonResponseMapper;
 
     @Override
-    public FormOfLessonResponse register(FormOfLessonRequest formOfLessonRequest) {
+    public FormOfLessonResponse create(FormOfLessonRequest formOfLessonRequest) {
         if (formOfLessonDao.findByName(formOfLessonRequest.getName()).isPresent()){
             throw new EntityAlreadyExistException("FormOfLesson with same name already exist");
         } else{
@@ -64,10 +68,18 @@ public class FormOfLessonServiceImpl extends AbstractPageableCrudService impleme
     }
 
     @Override
+    @Transactional(transactionManager = "txManager")
     public boolean deleteById(long id) {
         if(formOfLessonDao.findById(id).isPresent()){
+
+            List<Lesson> formOfLessonLessons = lessonDao.findByFormOfLessonId(id);
+            for(Lesson lesson : formOfLessonLessons){
+                lessonDao.removeFormOfLessonFromLesson(lesson.getId());
+            }
+
             return formOfLessonDao.deleteById(id);
         }
         return false;
     }
+
 }

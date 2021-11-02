@@ -140,7 +140,7 @@ class LessonDaoImplTest {
     }
 
     @Test
-    void formTimeTableForGroupShouldReturnListOfLessonForGroupIfArgumentIsIdOfGroup(){
+    void findByGroupIdShouldReturnListOfLessonForGroupIfArgumentIsIdOfGroup(){
         List<Lesson> expected = Arrays.asList(lessonDao.findById(1L).get(),
                 lessonDao.findById(2L).get(),
                 lessonDao.findById(3L).get());
@@ -150,10 +150,28 @@ class LessonDaoImplTest {
     }
 
     @Test
-    void formTimeTableForProfessorShouldReturnListOfLessonForProfessorIfArgumentIsIdOfProfessor(){
+    void findByProfessorIdShouldReturnListOfLessonForProfessorIfArgumentIsIdOfProfessor(){
         List<Lesson> expected = Arrays.asList(lessonDao.findById(1L).get(),
                 lessonDao.findById(2L).get());
         List<Lesson> actual = lessonDao.findByProfessorId(7);
+
+        assertThat(expected).isEqualTo(actual);
+    }
+
+    @Test
+    void findByCourseIdIdShouldReturnListOfLessonForProfessorIfArgumentIsIdOfProfessor(){
+        List<Lesson> expected = Arrays.asList(lessonDao.findById(1L).get(),
+                lessonDao.findById(2L).get());
+        List<Lesson> actual = lessonDao.findByCourseId(1);
+
+        assertThat(expected).isEqualTo(actual);
+    }
+
+    @Test
+    void findByFormOfLessonIdIdShouldReturnListOfLessonForProfessorIfArgumentIsIdOfProfessor(){
+        List<Lesson> expected = Arrays.asList(lessonDao.findById(2L).get(),
+                lessonDao.findById(5L).get());
+        List<Lesson> actual = lessonDao.findByFormOfLessonId(2);
 
         assertThat(expected).isEqualTo(actual);
     }

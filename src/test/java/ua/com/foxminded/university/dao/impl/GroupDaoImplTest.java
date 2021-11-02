@@ -124,6 +124,29 @@ class GroupDaoImplTest {
     }
 
     @Test
+    void removeFormOfEducationShouldChangeFormOfEducationOfGroupsIfArgumentIsIdOfGroupAndIdOfNewFormOfEducation(){
+        Group expectedBeforeChange = Group.builder()
+                .withId(1L)
+                .withName("History Group №1")
+                .withDepartment(departmentDao.findById(1L).get())
+                .withFormOfEducation(formOfEducationDao.findById(1L).get())
+                .build();
+        Group actualBeforeChange = groupDao.findById(1L).get();
+        assertGroups(actualBeforeChange, expectedBeforeChange);
+
+        groupDao.removeFormOfEducationFromGroup(1);
+
+        Group expectedAfterChange = Group.builder()
+                .withId(1L)
+                .withName("History Group №1")
+                .withDepartment(departmentDao.findById(1L).get())
+                .withFormOfEducation(FormOfEducation.builder().withId(0L).build())
+                .build();
+        Group actualAfterChange = groupDao.findById(1L).get();
+        assertGroups(actualAfterChange, expectedAfterChange);
+    }
+
+    @Test
     void changeDepartmentShouldChangeDepartmentOfGroupIfArgumentIsIdOfGroupAndIdOfNewDepartment(){
         Group expectedBeforeChange = Group.builder()
                 .withId(1L)
@@ -140,6 +163,29 @@ class GroupDaoImplTest {
                 .withId(1L)
                 .withName("History Group №1")
                 .withDepartment(departmentDao.findById(2L).get())
+                .withFormOfEducation(formOfEducationDao.findById(1L).get())
+                .build();
+        Group actualAfterChange = groupDao.findById(1L).get();
+        assertGroups(actualAfterChange, expectedAfterChange);
+    }
+
+    @Test
+    void removeDepartmentShouldChangeDepartmentOfGroupIfArgumentIsIdOfGroupAndIdOfNewDepartment(){
+        Group expectedBeforeChange = Group.builder()
+                .withId(1L)
+                .withName("History Group №1")
+                .withDepartment(departmentDao.findById(1L).get())
+                .withFormOfEducation(formOfEducationDao.findById(1L).get())
+                .build();
+        Group actualBeforeChange = groupDao.findById(1L).get();
+        assertGroups(actualBeforeChange, expectedBeforeChange);
+
+        groupDao.removeDepartmentFromGroup(1);
+
+        Group expectedAfterChange = Group.builder()
+                .withId(1L)
+                .withName("History Group №1")
+                .withDepartment(Department.builder().withId(0L).build())
                 .withFormOfEducation(formOfEducationDao.findById(1L).get())
                 .build();
         Group actualAfterChange = groupDao.findById(1L).get();
@@ -179,6 +225,23 @@ class GroupDaoImplTest {
                 .withFormOfEducation(formOfEducationDao.findById(1L).get())
                 .build();
         Group actual = groupDao.findByName("History Group №1").get();
+
+        assertGroups(actual, expected);
+    }
+
+    @Test
+    void findByFromOfEducationIdShouldReturnOptionalOfFormOfLessonIfArgumentIsName(){
+        List<Group> expected = Arrays.asList(groupDao.findById(1L).get());
+        List<Group> actual = groupDao.findByFormOfEducation(1L);
+
+        assertGroups(actual, expected);
+    }
+
+    @Test
+    void findByDepartmentIdShouldReturnOptionalOfFormOfLessonIfArgumentIsName(){
+        List<Group> expected = Arrays.asList(groupDao.findById(1L).get(), groupDao.findById(2L).get(),
+                groupDao.findById(3L).get());
+        List<Group> actual = groupDao.findByDepartmentId(1L);
 
         assertGroups(actual, expected);
     }

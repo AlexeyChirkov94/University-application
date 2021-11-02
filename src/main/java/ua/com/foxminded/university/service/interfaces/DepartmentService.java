@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface DepartmentService {
 
-    DepartmentResponse register(DepartmentRequest requestDto);
+    DepartmentResponse create(DepartmentRequest requestDto);
 
     Optional<DepartmentResponse> findById(long id);
 

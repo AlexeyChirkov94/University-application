@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{templates/layout.html}"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Update course</title>
+</head>
+
+<body>
+
+<section layout:fragment="header"> <div th:replace="templates/fragments/header.html"></div> </section>
+<section layout:fragment="footer"> <div th:replace="templates/fragments/footer.html"></div> </section>
+<section layout:fragment="sidebar"> <div th:replace="templates/fragments/sidebar.html"></div> </section>
+
+<section layout:fragment="page-content">
+
+    <h4 th:text="${'Update course ' + courseResponse.getName() +' with ID: ' + courseResponse.getId()}" >ID</h4>
+    <br>
+
+    <h4>Course updating</h4>
+
+    <form th:method="PATCH" th:action="@{/course/{id}(id=${courseResponse.getId()})}" th:object="${courseRequest}">
+        <h6>Date and time of start lesson</h6>
+        <div class="form-floating mb-2">
+            <input type="text" th:field="*{name}" class="form-control" id="dateTime">
+            <label for="dateTime">Change name of course:</label>
+        </div>
+
+        <h6>Department of course</h6>
+        <select class="form-select  mb-2"  th:field="*{departmentId}" >
+            <option selected=""  th:value="${courseResponse.getDepartmentResponse().getId()}"
+                    th:text="${'Currsent department: ' + courseResponse.getDepartmentResponse().getName()}">current department</option>
+            <div th:each="department : ${departments}">
+                <option th:value="${department.getId()}" th:text="${department.getName()}"> department </option>
+            </div>
+        </select>
+
+        <input class="btn btn-success" type="submit" role="button" value="Update course"/>
+    </form>
+
+    <br>
+    <hr>
+
+    <h4>Course teachers</h4>
+    <h6>Current teachers:</h6>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">First name</th>
+            <th scope="col">Last name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Remove from group</th>
+        </tr>
+        </thead>
+        <tbody>
+        <div th:each="teacher : ${teachersOfCourse}">
+            <tr>
+                <th scope="row" th:text="${teacher.getId()}"></th>
+                <td th:text="${teacher.getFirstName()}"> </td>
+                <td th:text="${teacher.getLastName()}"></td>
+                <td th:text="${teacher.getEmail()}"> </td>
+                <td>
+                    <form method="post" th:action="@{/course/{id}/removeProfessorFromCourse/(id=${courseResponse.getId()})}">
+                        <input type="hidden" name="idRemovingProfessor" th:value="${teacher.getId()}">
+                        <button class="btn btn-danger" type="submit">Remove professor from course</button>
+                    </form>
+                </td>
+            </tr>
+        </div>
+        </tbody>
+    </table>
+    <br>
+
+    <h6>Management:</h6>
+    <form method="post" th:action="@{/course/{id}/addProfessorToCourse/(id=${courseResponse.getId()})}" class="mb-2">
+        <select class="form-select  mb-2" name="idNewProfessor">
+            <option selected="" disabled="" value="">Choose professor for adding to course:</option>
+            <div th:each="professor : ${notTeachersOfCourse}">
+                <option th:value="${professor.getId()}"
+                        th:text="${professor.getScienceDegreeResponse() + ', '
+            + professor.getLastName() + ' ' + professor.getFirstName() +
+                            ' (ID: ' + professor.getId() + ')'}"> adding students </option>
+            </div>
+        </select>
+        <button class="btn btn-success" type="submit">Add professor to course</button>
+    </form>
+    <form method="post" th:action="@{/course/{id}/removeProfessorFromCourse/(id=${courseResponse.getId()})}" class="mb-2">
+        <select class="form-select  mb-2" name="idRemovingProfessor">
+            <option selected="" disabled="" value="">Choose professor for removing from course:</option>
+            <div th:each="professor : ${teachersOfCourse}">
+                <option th:value="${professor.getId()}"
+                        th:text="${professor.getScienceDegreeResponse() + ', '
+            + professor.getLastName() + ' ' + professor.getFirstName() +
+                            ' (ID: ' + professor.getId() + ')'}"> adding students </option>
+            </div>
+        </select>
+        <button class="btn btn-danger" type="submit">Remove professor from course</button>
+    </form>
+
+</section>
+
+</body>
+</html>
