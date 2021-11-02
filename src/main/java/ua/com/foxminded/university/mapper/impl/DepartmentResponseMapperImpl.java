@@ -22,15 +22,18 @@ public class DepartmentResponseMapperImpl implements DepartmentResponseMapper {
 
     @Override
     public DepartmentResponse mapEntityToDto(Department entity) {
+        DepartmentResponse departmentResponse = new DepartmentResponse();
         if (entity == null) {
             return null;
+        } else if (entity.getId() == 0L){
+            departmentResponse.setId(0L);
+            departmentResponse.setName("not chosen");
         } else {
-            DepartmentResponse departmentResponse = new DepartmentResponse();
             departmentResponse.setId(entity.getId());
             departmentResponse.setName(entity.getName());
-
-            return departmentResponse;
         }
+
+        return departmentResponse;
     }
 
 }

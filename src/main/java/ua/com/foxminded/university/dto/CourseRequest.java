@@ -7,6 +7,6 @@ public class CourseRequest {
 
     private Long id;
     private String name;
-    private DepartmentRequest departmentRequest;
+    private Long departmentId;
 
 }

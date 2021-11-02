@@ -25,27 +25,27 @@ import static ua.com.foxminded.university.controllers.ControllersUtility.setPage
 
 @AllArgsConstructor
 @Controller
-@RequestMapping("/groups")
+@RequestMapping("/group")
 public class GroupsController {
 
-    GroupService groupService;
-    FormOfEducationService formOfEducationService;
-    DepartmentService departmentService;
-    StudentService studentService;
+    private final GroupService groupService;
+    private final FormOfEducationService formOfEducationService;
+    private final DepartmentService departmentService;
+    private final StudentService studentService;
 
     @GetMapping()
-    public String index(Model model, @RequestParam(value="page", required = false) String page){
+    public String showAll(Model model, @RequestParam(value="page", required = false) String page){
         setPagesValueAndStatus(page, model);
         model.addAttribute("groups", groupService.findAll(page));
 
-        return "/groups/index";
+        return "/group/all";
     }
 
     @GetMapping("/{id}")
     public String show(@PathVariable("id") long id, Model model){
         model.addAttribute("group", groupService.findById(id).get());
         model.addAttribute("studentsOfGroup", studentService.findByGroupId(id));
-        return "/groups/show";
+        return "/group/show";
     }
 
     @GetMapping("/new")
@@ -53,7 +53,7 @@ public class GroupsController {
 
         model.addAttribute("formsOfEducation", formOfEducationService.findAll());
         model.addAttribute("departments", departmentService.findAll());
-        return "/groups/add";
+        return "/group/add";
     }
 
     @PostMapping()
@@ -71,7 +71,7 @@ public class GroupsController {
             groupService.changeDepartment(groupResponse.getId(), departmentId);
         }
 
-        return "redirect:/groups";
+        return "redirect:/group";
     }
 
     @GetMapping("/{id}/edit")
@@ -93,47 +93,47 @@ public class GroupsController {
         model.addAttribute("anotherDepartments", anotherDepartments);
         model.addAttribute("group", group);
 
-        return "/groups/edit";
+        return "/group/edit";
     }
 
     @PatchMapping("/{id}")
     public String update(@ModelAttribute("group") GroupRequest groupRequest) {
         groupService.edit(groupRequest);
-        return "redirect:/groups";
+        return "redirect:/group";
     }
 
     @PostMapping("/{id}/changeDepartment")
     public String changeDepartment(Model model, @PathVariable("id") long groupId, @RequestParam long idNewDepartment) {
         model.addAttribute("idNewDepartment", idNewDepartment);
         groupService.changeDepartment(groupId, idNewDepartment);
-        return "redirect:/groups/" + groupId + "/edit";
+        return "redirect:/group/" + groupId + "/edit";
     }
 
     @PostMapping("/{id}/changeFormOfEducation")
     public String changeFormOfEducation(Model model, @PathVariable("id") long groupId, @RequestParam long idNewFormOfEducation) {
         model.addAttribute("idNewFormOfEducation", idNewFormOfEducation);
         groupService.changeFormOfEducation(groupId, idNewFormOfEducation);
-        return "redirect:/groups/" + groupId + "/edit";
+        return "redirect:/group/" + groupId + "/edit";
     }
 
     @PostMapping("/{id}/addStudentToGroup")
     public String addStudentToGroup(Model model, @PathVariable("id") long groupId, @RequestParam long idNewStudent) {
         model.addAttribute("idNewStudent", idNewStudent);
         studentService.enterGroup(idNewStudent, groupId);
-        return "redirect:/groups/" + groupId + "/edit";
+        return "redirect:/group/" + groupId + "/edit";
     }
 
     @PostMapping("/{id}/removeStudentFromGroup")
     public String removeStudentFromGroup(Model model, @PathVariable("id") long groupId, @RequestParam long idRemovingStudent) {
         model.addAttribute("idRemovingStudent", idRemovingStudent);
         studentService.leaveGroup(idRemovingStudent);
-        return "redirect:/groups/" + groupId + "/edit";
+        return "redirect:/group/" + groupId + "/edit";
     }
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable("id") long id) {
         groupService.deleteById(id);
-        return "redirect:/groups";
+        return "redirect:/group";
     }
 
 }

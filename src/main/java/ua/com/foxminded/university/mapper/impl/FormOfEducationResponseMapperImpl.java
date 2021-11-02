@@ -22,15 +22,18 @@ public class FormOfEducationResponseMapperImpl implements FormOfEducationRespons
 
     @Override
     public FormOfEducationResponse mapEntityToDto(FormOfEducation entity) {
+        FormOfEducationResponse formOfEducationResponse = new FormOfEducationResponse();
         if (entity == null) {
             return null;
+        } else if (entity.getId() == 0L){
+            formOfEducationResponse.setId(0L);
+            formOfEducationResponse.setName("not chosen");
         } else {
-            FormOfEducationResponse formOfEducationResponse = new FormOfEducationResponse();
             formOfEducationResponse.setId(entity.getId());
             formOfEducationResponse.setName(entity.getName());
-
-            return formOfEducationResponse;
         }
+
+        return formOfEducationResponse;
     }
 
 }

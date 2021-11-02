@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface LessonService {
 
-    LessonResponse register(LessonRequest requestDto);
+    LessonResponse create(LessonRequest requestDto);
 
     Optional<LessonResponse> findById(long id);
 
@@ -22,11 +22,5 @@ public interface LessonService {
     List<LessonResponse> formTimeTableForGroup(long groupId);
 
     List<LessonResponse> formTimeTableForProfessor(long professorId);
-
-    void changeFormOfLesson(long lessonId, long newFormOfLessonId);
-
-    void changeTeacher(long lessonId, long newProfessorId);
-
-    void changeCourse(long lessonId, long newCourseId);
 
 }

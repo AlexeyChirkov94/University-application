@@ -18,7 +18,7 @@
     <br>
 
     <h4>Common info</h4>
-    <form th:method="PATCH" th:action="@{/professors/{id}(id=${professor.getId()})}" th:object="${professor}">
+    <form th:method="PATCH" th:action="@{/professor/{id}(id=${professor.getId()})}" th:object="${professor}">
         <div class="form-floating mb-2">
             <input type="text" th:field="*{firstName}" class="form-control" id="firstName1" placeholder="First name">
             <label for="firstName1">Change first name:</label>
@@ -46,7 +46,7 @@
     <br>
 
     <h6>Management:</h6>
-    <form method="post" th:action="@{/professors/{id}/changeScienceDegree/(id=${professor.getId()})}">
+    <form method="post" th:action="@{/professor/{id}/changeScienceDegree/(id=${professor.getId()})}">
         <select class="form-select  mb-2" name="idNewScienceDegree">
             <option selected="" disabled="" value="">Choose new Science Degree:</option>
             <div th:each="scienceDegree : ${ScienceDegrees}">
@@ -67,7 +67,7 @@
     <br>
 
     <h6>Management:</h6>
-    <form method="post" th:action="@{/professors/{id}/addCourse/(id=${professor.getId()})}" class="mb-2">
+    <form method="post" th:action="@{/professor/{id}/addCourse/(id=${professor.getId()})}" class="mb-2">
         <select class="form-select  mb-2" name="idOfAddingCourse">
             <option selected="" disabled="" value="">Choose adding course:</option>
             <div th:each="course : ${anotherCourses}">
@@ -76,7 +76,7 @@
         </select>
         <button class="btn btn-success" type="submit">Add course</button>
     </form>
-    <form method="post" th:action="@{/professors/{id}/removeCourse/(id=${professor.getId()})}">
+    <form method="post" th:action="@{/professor/{id}/removeCourse/(id=${professor.getId()})}">
         <select class="form-select  mb-2" name="idOfRemovingCourse">
             <option selected="" disabled="" value="">Choose removing course:</option>
             <div th:each="professorsCourse : ${professorsCourses}">

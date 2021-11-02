@@ -18,7 +18,7 @@
     <br>
 
     <h4>Common info</h4>
-    <form th:method="PATCH" th:action="@{/groups/{id}(id=${group.getId()})}" th:object="${group}">
+    <form th:method="PATCH" th:action="@{/group/{id}(id=${group.getId()})}" th:object="${group}">
         <div class="form-floating mb-2">
             <input type="text" th:field="*{name}" class="form-control" id="name" placeholder="Group name">
             <label for="name">Change group name:</label>
@@ -35,7 +35,7 @@
     <br>
 
     <h6>Management:</h6>
-    <form method="post" th:action="@{/groups/{id}/changeDepartment/(id=${group.getId()})}">
+    <form method="post" th:action="@{/group/{id}/changeDepartment/(id=${group.getId()})}">
         <select class="form-select  mb-2" name="idNewDepartment">
             <option selected="" disabled="" value="">Choose new Department:</option>
             <div th:each="department : ${anotherDepartments}">
@@ -54,7 +54,7 @@
     <br>
 
     <h6>Management:</h6>
-    <form method="post" th:action="@{/groups/{id}/changeFormOfEducation/(id=${group.getId()})}">
+    <form method="post" th:action="@{/group/{id}/changeFormOfEducation/(id=${group.getId()})}">
         <select class="form-select  mb-2" name="idNewFormOfEducation">
             <option selected="" disabled="" value="">Choose new form of education:</option>
             <div th:each="formOfEducation : ${anotherFormsOfEducation}">
@@ -86,7 +86,7 @@
                 <td th:text="${student.getLastName()}"></td>
                 <td th:text="${student.getEmail()}"> </td>
                 <td>
-                    <form method="post" th:action="@{/groups/{id}/removeStudentFromGroup/(id=${group.getId()})}">
+                    <form method="post" th:action="@{/group/{id}/removeStudentFromGroup/(id=${group.getId()})}">
                         <input type="hidden" name="idRemovingStudent" th:value="${student.getId()}">
                         <button class="btn btn-danger" type="submit">Remove student from group</button>
                     </form>
@@ -98,7 +98,7 @@
     <br>
 
     <h6>Management:</h6>
-    <form method="post" th:action="@{/groups/{id}/addStudentToGroup/(id=${group.getId()})}" class="mb-2">
+    <form method="post" th:action="@{/group/{id}/addStudentToGroup/(id=${group.getId()})}" class="mb-2">
         <select class="form-select  mb-2" name="idNewStudent">
             <option selected="" disabled="" value="">Choose student for adding to group:</option>
             <div th:each="student : ${studentsAnotherGroups}">
@@ -112,7 +112,7 @@
         </select>
         <button class="btn btn-success" type="submit">Add student to group</button>
     </form>
-    <form method="post" th:action="@{/groups/{id}/removeStudentFromGroup/(id=${group.getId()})}">
+    <form method="post" th:action="@{/group/{id}/removeStudentFromGroup/(id=${group.getId()})}">
         <select class="form-select  mb-2" name="idRemovingStudent">
             <option selected="" disabled="" value="">Choose student for removing from group:</option>
             <div th:each="student : ${studentsCurrentGroup}">

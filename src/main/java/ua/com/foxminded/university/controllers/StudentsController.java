@@ -26,43 +26,51 @@ import static ua.com.foxminded.university.controllers.ControllersUtility.setPage
 
 @AllArgsConstructor
 @Controller
-@RequestMapping("/students")
+@RequestMapping("/student")
 public class StudentsController {
 
-    StudentService studentService;
-    GroupService groupService;
+    private final StudentService studentService;
+    private final GroupService groupService;
 
     @GetMapping()
-    public String index(Model model, @RequestParam(value="page", required = false) String page){
+    public String showAll(Model model, @RequestParam(value="page", required = false) String page){
         setPagesValueAndStatus(page, model);
         model.addAttribute("students", studentService.findAll(page));
 
-        return "/students/index";
+        return "/student/all";
     }
 
     @GetMapping("/{id}")
     public String show(@PathVariable("id") long id, Model model){
         model.addAttribute("student", studentService.findById(id).get());
-        return "/students/show";
+        return "/student/show";
     }
 
     @GetMapping("/new")
     public String newStudent(@ModelAttribute("student") StudentRequest studentRequest) {
-        return "/students/add";
+        return "/student/add";
     }
 
     @PostMapping()
     public String create(@ModelAttribute("student") StudentRequest studentRequest) {
 
         studentService.register(studentRequest);
-        return "redirect:/students";
+        return "redirect:/student";
     }
 
     @GetMapping("/{id}/edit")
     public String edit(Model model, @PathVariable("id") long id) {
         StudentResponse student = studentService.findById(id).get();
         long studentGroupId = student.getGroupResponse().getId();
-        GroupResponse studentGroup = groupService.findById(studentGroupId).get();
+        GroupResponse studentGroup;
+
+        if(studentGroupId == 0){
+            studentGroup = new GroupResponse();
+            studentGroup.setId(0L);
+            studentGroup.setName("not appointed");
+        } else {
+            studentGroup = groupService.findById(studentGroupId).get(); //was like
+        }
 
         List<GroupResponse> anotherGroups = groupService.findAll();
         anotherGroups.remove(studentGroup);
@@ -70,39 +78,39 @@ public class StudentsController {
         model.addAttribute("student", student);
         model.addAttribute("studentGroup", studentGroup);
         model.addAttribute("anotherGroups", anotherGroups);
-        return "/students/edit";
+        return "/student/edit";
     }
 
     @PatchMapping("/{id}")
     public String update(@ModelAttribute("student") StudentRequest studentRequest) {
                 studentService.edit(studentRequest);
-        return "redirect:/students";
+        return "redirect:/student";
     }
 
     @PatchMapping("/{id}/leaveGroup")
     public String leaveGroup(@PathVariable("id") long studentId) {
         studentService.leaveGroup(studentId);
-        return "redirect:/students/" + studentId + "/edit";
+        return "redirect:/student/" + studentId + "/edit";
     }
 
     @PostMapping("/{id}/enterGroup")
     public String enterGroup(Model model, @PathVariable("id") long studentId, @RequestParam Integer idNewGroup) {
         model.addAttribute("idNewGroup", idNewGroup);
         studentService.enterGroup(studentId, idNewGroup);
-        return "redirect:/students/" + studentId + "/edit";
+        return "redirect:/student/" + studentId + "/edit";
     }
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable("id") long id) {
         studentService.deleteById(id);
-        return "redirect:/students";
+        return "redirect:/student";
     }
 
     @ExceptionHandler(ValidateException.class)
     public ModelAndView validateStudentException(HttpServletRequest request, Exception ex) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject("exception", ex);
-        modelAndView.setViewName("errors handling/creating user error");
+        modelAndView.setViewName("errors handling/common creating error");
 
         return modelAndView;
     }
@@ -111,7 +119,7 @@ public class StudentsController {
     public ModelAndView entityAlreadyExistException(HttpServletRequest request, Exception ex) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject("exception", ex);
-        modelAndView.setViewName("errors handling/creating user error");
+        modelAndView.setViewName("errors handling/common creating error");
 
         return modelAndView;
     }

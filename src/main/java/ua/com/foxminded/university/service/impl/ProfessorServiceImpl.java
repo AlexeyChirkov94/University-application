@@ -2,10 +2,14 @@ package ua.com.foxminded.university.service.impl;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ua.com.foxminded.university.dao.interfaces.CourseDao;
+import ua.com.foxminded.university.dao.interfaces.LessonDao;
 import ua.com.foxminded.university.dao.interfaces.ProfessorDao;
-import ua.com.foxminded.university.dto.LessonResponse;
 import ua.com.foxminded.university.dto.ProfessorRequest;
 import ua.com.foxminded.university.dto.ProfessorResponse;
+import ua.com.foxminded.university.entity.Course;
+import ua.com.foxminded.university.entity.Lesson;
 import ua.com.foxminded.university.entity.Professor;
 import ua.com.foxminded.university.entity.ScienceDegree;
 import ua.com.foxminded.university.mapper.interfaces.ProfessorRequestMapper;
@@ -23,15 +27,19 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
 
     private final ScienceDegreeValidator scienceDegreeValidator;
     private final ProfessorDao professorDao;
+    private final LessonDao lessonDao;
+    private final CourseDao courseDao;
     private final ProfessorRequestMapper professorRequestMapper;
     private final ProfessorResponseMapper professorResponseMapper;
     private final UserValidator userValidator;
 
-    public ProfessorServiceImpl(ProfessorDao professorDao, PasswordEncoder passwordEncoder, UserValidator userValidator,
-                                ScienceDegreeValidator scienceDegreeValidator, ProfessorRequestMapper professorRequestMapper,
-                                ProfessorResponseMapper professorResponseMapper) {
+    public ProfessorServiceImpl(ProfessorDao professorDao, LessonDao lessonDao, CourseDao courseDao, PasswordEncoder passwordEncoder,
+                                UserValidator userValidator, ScienceDegreeValidator scienceDegreeValidator,
+                                ProfessorRequestMapper professorRequestMapper, ProfessorResponseMapper professorResponseMapper) {
         super(passwordEncoder, professorDao, userValidator);
         this.professorDao = professorDao;
+        this.lessonDao = lessonDao;
+        this.courseDao = courseDao;
         this.scienceDegreeValidator = scienceDegreeValidator;
         this.professorRequestMapper = professorRequestMapper;
         this.professorResponseMapper = professorResponseMapper;
@@ -69,8 +77,20 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
     }
 
     @Override
+    @Transactional(transactionManager = "txManager")
     public boolean deleteById(long id) {
         if(professorDao.findById(id).isPresent()){
+
+            List<Course> professorCourses = courseDao.findByProfessorId(id);
+            for(Course course : professorCourses) {
+                courseDao.removeCourseFromProfessorCourseList(course.getId(), id);
+            }
+
+            List<Lesson> professorsLessons = lessonDao.findByProfessorId(id);
+            for(Lesson lesson : professorsLessons){
+                lessonDao.removeTeacherFromLesson(lesson.getId());
+            }
+
             return professorDao.deleteById(id);
         }
         return false;

@@ -47,10 +47,19 @@ public class ProfessorResponseMapperImpl implements ProfessorResponseMapper {
 
     @Override
     public ProfessorResponse mapEntityToDto(Professor entity) {
+        ProfessorResponse professorResponse = new ProfessorResponse();
         if (entity == null) {
             return null;
+        } else if (entity.getId() == 0L) {
+            professorResponse.setId(0L);
+            professorResponse.setFirstName("");
+            professorResponse.setLastName("not chosen");
+            professorResponse.setEmail("");
+            professorResponse.setPassword("");
+            professorResponse.setDepartmentResponse(departmentResponseMapper.mapEntityToDto(entity.getDepartment()));
+            professorResponse.setScienceDegreeResponse(scienceDegreeResponseMapper.mapEntityToDto(entity.getScienceDegree()));
+            professorResponse.setCoursesResponse(getCoursesResponse(entity));
         } else {
-            ProfessorResponse professorResponse = new ProfessorResponse();
             professorResponse.setId(entity.getId());
             professorResponse.setFirstName(entity.getFirstName());
             professorResponse.setLastName(entity.getLastName());
@@ -59,9 +68,9 @@ public class ProfessorResponseMapperImpl implements ProfessorResponseMapper {
             professorResponse.setDepartmentResponse(departmentResponseMapper.mapEntityToDto(entity.getDepartment()));
             professorResponse.setScienceDegreeResponse(scienceDegreeResponseMapper.mapEntityToDto(entity.getScienceDegree()));
             professorResponse.setCoursesResponse(getCoursesResponse(entity));
-
-            return professorResponse;
         }
+
+        return professorResponse;
     }
 
     private List<Course> getCourses(ProfessorResponse dto){

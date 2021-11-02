@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{templates/layout.html}"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Error of creating</title>
+</head>
+
+<body>
+
+<section layout:fragment="header"> <div th:replace="templates/fragments/header.html"></div> </section>
+<section layout:fragment="footer"> <div th:replace="templates/fragments/footer.html"></div> </section>
+<section layout:fragment="sidebar"> <div th:replace="templates/fragments/sidebar.html"></div> </section>
+
+<section layout:fragment="page-content">
+
+    <h4>Creating error</h4>
+
+    <p th:text="${exception.getMessage()}">VALUE</p>
+    <text>You can appoint only teacher or only course, after that in lesson update menu,
+        you will find only those courses or professors witch can be appoint together.</text>
+    <br>
+    <a class="btn btn-info" href="javascript:history.back()" role="button">Try again</a>
+
+</section>
+
+</body>
+</html>

@@ -9,14 +9,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ua.com.foxminded.university.dao.interfaces.DepartmentDao;
 import ua.com.foxminded.university.dao.interfaces.FormOfEducationDao;
 import ua.com.foxminded.university.dao.interfaces.GroupDao;
+import ua.com.foxminded.university.dao.interfaces.LessonDao;
+import ua.com.foxminded.university.dao.interfaces.StudentDao;
 import ua.com.foxminded.university.dto.GroupRequest;
 import ua.com.foxminded.university.entity.Department;
 import ua.com.foxminded.university.entity.FormOfEducation;
-import ua.com.foxminded.university.entity.FormOfLesson;
 import ua.com.foxminded.university.entity.Group;
+import ua.com.foxminded.university.entity.Lesson;
+import ua.com.foxminded.university.entity.Student;
 import ua.com.foxminded.university.mapper.interfaces.GroupRequestMapper;
 import ua.com.foxminded.university.mapper.interfaces.GroupResponseMapper;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.doNothing;
@@ -28,6 +32,12 @@ class GroupServiceImplTest {
 
     @Mock
     GroupDao groupDao;
+
+    @Mock
+    StudentDao studentDao;
+
+    @Mock
+    LessonDao lessonDao;
 
     @Mock
     DepartmentDao departmentDao;
@@ -206,14 +216,32 @@ class GroupServiceImplTest {
     @Test
     void deleteShouldDeleteDataOfGroupIfArgumentIsGroupId() {
         long groupId = 1;
+        Student student1 = Student.builder().withId(1L).build();
+        Student student2 = Student.builder().withId(2L).build();
+        List<Student> groupsStudents = Arrays.asList(student1, student2);
+        Lesson lesson1 = Lesson.builder().withId(1L).build();
+        Lesson lesson2 = Lesson.builder().withId(2L).build();
+        List<Lesson> groupLessons = Arrays.asList(lesson1, lesson2);
 
         when(groupDao.findById(groupId)).thenReturn(Optional.of(Group.builder().withId(groupId).build()));
         when(groupDao.deleteById(groupId)).thenReturn(true);
+        when(studentDao.findByGroupId(1L)).thenReturn(groupsStudents);
+        doNothing().when(studentDao).leaveGroup(1L);
+        doNothing().when(studentDao).leaveGroup(2L);
+        when(lessonDao.findByGroupId(1L)).thenReturn(groupLessons);
+        doNothing().when(lessonDao).removeGroupFromLesson(1L);
+        doNothing().when(lessonDao).removeGroupFromLesson(2L);
 
         groupService.deleteById(groupId);
 
         verify(groupDao).findById(groupId);
         verify(groupDao).deleteById(groupId);
+        verify(studentDao).findByGroupId(groupId);
+        verify(studentDao).leaveGroup(1L);
+        verify(studentDao).leaveGroup(2L);
+        verify(lessonDao).findByGroupId(groupId);
+        verify(lessonDao).removeGroupFromLesson(1L);
+        verify(lessonDao).removeGroupFromLesson(2L);
     }
 
     @Test

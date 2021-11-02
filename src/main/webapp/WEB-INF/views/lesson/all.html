@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{templates/layout.html}"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Lessons</title>
+</head>
+
+<body>
+
+<section layout:fragment="header"> <div th:replace="templates/fragments/header.html"></div> </section>
+<section layout:fragment="footer"> <div th:replace="templates/fragments/footer.html"></div> </section>
+<section layout:fragment="sidebar"> <div th:replace="templates/fragments/sidebar.html"></div> </section>
+
+<section layout:fragment="page-content">
+
+    <p class="h1">All lessons</p>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Date & Time</th>
+            <th scope="col">Course</th>
+            <th scope="col">Form of lesson</th>
+            <th scope="col">Group</th>
+            <th scope="col">Teacher</th>
+            <th scope="col">More</th>
+        </tr>
+        </thead>
+        <tbody>
+        <div th:each="lesson : ${lessons}">
+            <tr>
+                <th scope="row" th:text="${lesson.getId()}"></th>
+                <td th:text="${stringDateTimes.get(lesson.getId())}"></td>
+                <td th:text="${lesson.getCourseResponse().getName()}"></td>
+                <td th:text="${lesson.getFormOfLessonResponse().getName()}"> </td>
+                <td th:text="${lesson.getGroupResponse().getName()}"> </td>
+                <td th:text="${lesson.getTeacher().getLastName() + ', ' + lesson.getTeacher().getFirstName()}"> </td>
+                <td> <a class="btn btn-secondary" th:href="@{/lesson/{id}(id=${lesson.getId()})}" role="button">Go to</a> </td>
+            </tr>
+        </div>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <ul class="pagination pagination-lg flex-wrap justify-content-center">
+        <li th:class="${liPreviousPageLabelStatus}">
+            <a th:class="${aPreviousPageLabelStatus}" th:href="@{/lesson/?page={page}(page=${previousPage})}">Previous</a>
+        </li>
+        <li th:class="${liPreviousPageNumberStatus}">
+            <a th:class="${aPreviousPageNumberStatus}" th:href="@{/lesson/?page={page}(page=${previousPage})}" th:text="${previousPage}">Previous</a>
+        </li>
+        <li class="page-item active" aria-current="page">
+            <text class="page-link" th:text="${currentPage}" >currentPage</text>
+        </li>
+        <li class="page-item">
+            <a class="page-link" th:href="@{/lesson/?page={page}(page=${nextPage})}" th:text="${nextPage}">Previous</a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" th:href="@{/lesson/?page={page}(page=${nextPage})}">Next</a>
+        </li>
+    </ul>
+
+</section>
+
+</body>
+</html>

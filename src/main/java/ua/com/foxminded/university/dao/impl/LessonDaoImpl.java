@@ -37,8 +37,10 @@ public class LessonDaoImpl extends AbstractPageableCrudDaoImpl<Lesson> implement
     private static final String CHANGE_FORM_OF_LESSON_QUERY = "UPDATE lessons SET formoflesson_id = ? WHERE id = ?";
     private static final String CHANGE_TEACHER_QUERY = "UPDATE lessons SET professor_id = ? WHERE id = ?";
     private static final String CHANGE_COURSE_QUERY = "UPDATE lessons SET course_id = ? WHERE id = ?";
+    private static final String CHANGE_GROUP_QUERY = "UPDATE lessons SET group_id = ? WHERE id = ?";
     private static final String FIND_BY_GROUP_ID = FIND_QUERY + "WHERE l.group_id=? ORDER BY timeOfStart";
     private static final String FIND_BY_PROFESSOR_ID = FIND_QUERY + "WHERE l.professor_id=? ORDER BY timeOfStart";
+    private static final String FIND_BY_COURSE_ID = FIND_QUERY + "WHERE l.course_id=? ORDER BY timeOfStart";
     private static final RowMapper<Lesson> ROW_MAPPER = (rs, rowNum) ->
         Lesson.builder()
                 .withId(rs.getLong("id"))
@@ -68,13 +70,18 @@ public class LessonDaoImpl extends AbstractPageableCrudDaoImpl<Lesson> implement
     }
 
     @Override
-    public List<Lesson> formTimeTableForGroup(long groupId) {
+    public List<Lesson> findByGroupId(long groupId) {
         return jdbcTemplate.query(FIND_BY_GROUP_ID, ROW_MAPPER, groupId);
     }
 
     @Override
-    public List<Lesson> formTimeTableForProfessor(long professorId) {
+    public List<Lesson> findByProfessorId(long professorId) {
         return jdbcTemplate.query(FIND_BY_PROFESSOR_ID, ROW_MAPPER, professorId);
+    }
+
+    @Override
+    public List<Lesson> findByCourseId(long courseId){
+        return jdbcTemplate.query(FIND_BY_COURSE_ID, ROW_MAPPER, courseId);
     }
 
     @Override
@@ -90,6 +97,31 @@ public class LessonDaoImpl extends AbstractPageableCrudDaoImpl<Lesson> implement
     @Override
     public void changeCourse(long lessonId, long newCourseId) {
         jdbcTemplate.update(CHANGE_COURSE_QUERY, newCourseId, lessonId);
+    }
+
+    @Override
+    public void changeGroup(long lessonId, long newGroupId) {
+        jdbcTemplate.update(CHANGE_GROUP_QUERY, newGroupId, lessonId);
+    }
+
+    @Override
+    public void removeFormOfLessonFromLesson(long lessonId) {
+        jdbcTemplate.update(CHANGE_FORM_OF_LESSON_QUERY, null, lessonId);
+    }
+
+    @Override
+    public void removeTeacherFromLesson(long lessonId) {
+        jdbcTemplate.update(CHANGE_TEACHER_QUERY, null, lessonId);
+    }
+
+    @Override
+    public void removeCourseFromLesson(long lessonId) {
+        jdbcTemplate.update(CHANGE_COURSE_QUERY, null, lessonId);
+    }
+
+    @Override
+    public void removeGroupFromLesson(long lessonId) {
+        jdbcTemplate.update(CHANGE_GROUP_QUERY, null, lessonId);
     }
 
     @Override

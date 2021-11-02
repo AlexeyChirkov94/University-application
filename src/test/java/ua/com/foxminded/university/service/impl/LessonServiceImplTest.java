@@ -11,7 +11,6 @@ import ua.com.foxminded.university.dao.interfaces.GroupDao;
 import ua.com.foxminded.university.dao.interfaces.LessonDao;
 import ua.com.foxminded.university.dao.interfaces.ProfessorDao;
 import ua.com.foxminded.university.dto.LessonRequest;
-import ua.com.foxminded.university.dto.LessonResponse;
 import ua.com.foxminded.university.entity.Course;
 import ua.com.foxminded.university.entity.FormOfLesson;
 import ua.com.foxminded.university.entity.Group;
@@ -19,9 +18,9 @@ import ua.com.foxminded.university.entity.Lesson;
 import ua.com.foxminded.university.entity.Professor;
 import ua.com.foxminded.university.mapper.interfaces.LessonRequestMapper;
 import ua.com.foxminded.university.mapper.interfaces.LessonResponseMapper;
+import ua.com.foxminded.university.service.validator.LessonValidator;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -54,91 +53,46 @@ class LessonServiceImplTest {
     @Mock
     LessonResponseMapper lessonResponseMapper;
 
+    @Mock
+    LessonValidator lessonValidator;
+
     @InjectMocks
     LessonServiceImpl lessonService;
 
     @Test
-    void formTimeTableForGroupShouldReturnListOfLessonResponsesIfArgumentsIsGroupId() {
+    void findByGroupIdShouldReturnListOfLessonResponsesIfArgumentsIsGroupId() {
         long groupId = 2;
         Lesson lesson1 = Lesson.builder().withId(1L).build();
         Lesson lesson2 = Lesson.builder().withId(2L).build();
         List<Lesson> lessons = Arrays.asList(lesson1, lesson2);
 
         when(groupDao.findById(groupId)).thenReturn(Optional.of(Group.builder().withId(2L).build()));
-        when(lessonDao.formTimeTableForGroup(groupId)).thenReturn(lessons);
+        when(lessonDao.findByGroupId(groupId)).thenReturn(lessons);
 
         lessonService.formTimeTableForGroup(groupId);
 
         verify(groupDao).findById(groupId);
-        verify(lessonDao).formTimeTableForGroup(groupId);
+        verify(lessonDao).findByGroupId(groupId);
     }
 
     @Test
-    void formTimeTableForProfessorShouldReturnListOfLessonResponsesIfArgumentsIsProfessorId() {
+    void findByProfessorIdShouldReturnListOfLessonResponsesIfArgumentsIsProfessorId() {
         long professorId = 2;
         Lesson lesson1 = Lesson.builder().withId(1L).build();
         Lesson lesson2 = Lesson.builder().withId(2L).build();
         List<Lesson> lessons = Arrays.asList(lesson1, lesson2);
 
         when(professorDao.findById(professorId)).thenReturn(Optional.of(Professor.builder().withId(2L).build()));
-        when(lessonDao.formTimeTableForProfessor(professorId)).thenReturn(lessons);
+        when(lessonDao.findByProfessorId(professorId)).thenReturn(lessons);
 
         lessonService.formTimeTableForProfessor(professorId);
 
         verify(professorDao).findById(professorId);
-        verify(lessonDao).formTimeTableForProfessor(professorId);
+        verify(lessonDao).findByProfessorId(professorId);
     }
 
     @Test
-    void changeFormOfLessonShouldChangeFormOfLessonIfArgumentsIsLessonIdAndFormOfLessonId() {
-        long lessonId = 1;
-        long formOfLessonId = 2;
-
-        when(lessonDao.findById(lessonId)).thenReturn(Optional.of(Lesson.builder().withId(1L).build()));
-        when(formOfLessonDao.findById(formOfLessonId)).thenReturn(Optional.of(FormOfLesson.builder().withId(2L).build()));
-        doNothing().when(lessonDao).changeFormOfLesson(lessonId, formOfLessonId);
-
-        lessonService.changeFormOfLesson(lessonId, formOfLessonId);
-
-        verify(lessonDao).findById(lessonId);
-        verify(formOfLessonDao).findById(formOfLessonId);
-        verify(lessonDao).changeFormOfLesson(lessonId, formOfLessonId);
-    }
-
-    @Test
-    void changeTeacherShouldChangeTeacherIfArgumentsIsLessonIdAndProfessorId() {
-        long lessonId = 1;
-        long professorId = 2;
-
-        when(lessonDao.findById(lessonId)).thenReturn(Optional.of(Lesson.builder().withId(1L).build()));
-        when(professorDao.findById(professorId)).thenReturn(Optional.of(Professor.builder().withId(2L).build()));
-        doNothing().when(lessonDao).changeTeacher(lessonId, professorId);
-
-        lessonService.changeTeacher(lessonId, professorId);
-
-        verify(lessonDao).findById(lessonId);
-        verify(professorDao).findById(professorId);
-        verify(lessonDao).changeTeacher(lessonId, professorId);
-    }
-
-    @Test
-    void changeCourseShouldChangeCourseIfArgumentsIsLessonIdAndCourseId() {
-        long lessonId = 1;
-        long courseId = 2;
-
-        when(lessonDao.findById(lessonId)).thenReturn(Optional.of(Lesson.builder().withId(1L).build()));
-        when(courseDao.findById(courseId)).thenReturn(Optional.of(Course.builder().withId(2L).build()));
-        doNothing().when(lessonDao).changeCourse(lessonId, courseId);
-
-        lessonService.changeCourse(lessonId, courseId);
-
-        verify(lessonDao).findById(lessonId);
-        verify(courseDao).findById(courseId);
-        verify(lessonDao).changeCourse(lessonId, courseId);
-    }
-
-    @Test
-    void registerShouldAddLessonToDBIfArgumentsIsLessonRequest() {
+    void createShouldAddLessonToDBIfArgumentsIsLessonRequest() {
         Lesson lesson = Lesson.builder()
                 .withTeacher(Professor.builder().withId(1L).build())
                 .withGroup(Group.builder().withId(1L).build())
@@ -146,24 +100,51 @@ class LessonServiceImplTest {
                 .build();
         LessonRequest lessonRequest = new LessonRequest();
         lessonRequest.setId(1L);
-        LessonResponse lessonResponse = new LessonResponse();
-        lessonResponse.setId(1L);
-        List<Lesson> lessonsOfGroup = Collections.emptyList();
-        List<Lesson> lessonsOfProfessor = Collections.emptyList();
+        lessonRequest.setTeacherId(0L);
+        lessonRequest.setCourseId(0L);
+        lessonRequest.setGroupId(0L);
+        lessonRequest.setFormOfLessonId(0L);
 
-        when(lessonDao.formTimeTableForGroup(lesson.getGroup().getId())).thenReturn(lessonsOfGroup);
-        when(lessonDao.formTimeTableForProfessor(lesson.getTeacher().getId())).thenReturn(lessonsOfProfessor);
         when(lessonRequestMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
         when(lessonDao.save(lesson)).thenReturn(lesson);
-        when(lessonResponseMapper.mapEntityToDto(lesson)).thenReturn(lessonResponse);
 
-        lessonService.register(lessonRequest);
+        lessonService.create(lessonRequest);
 
-        verify(lessonDao).formTimeTableForGroup(lesson.getGroup().getId());
-        verify(lessonDao).formTimeTableForProfessor(lesson.getTeacher().getId());
-        verify(lessonRequestMapper, times(2)).mapDtoToEntity(lessonRequest);
+        verify(lessonRequestMapper).mapDtoToEntity(lessonRequest);
         verify(lessonDao).save(lesson);
-        verify(lessonResponseMapper).mapEntityToDto(lesson);
+    }
+
+    @Test
+    void createShouldAddLessonToDBIfArgumentsIsLessonRequestWithManyAdditionalParams() {
+        Lesson lesson = Lesson.builder().withId(1L).build();
+        Course course = Course.builder().withId(1L).build();
+        Group group = Group.builder().withId(1L).build();
+        Professor professor = Professor.builder().withId(1L).build();
+        FormOfLesson formOfLesson = FormOfLesson.builder().withId(1L).build();
+        LessonRequest lessonRequest = new LessonRequest();
+        lessonRequest.setId(1L);
+        lessonRequest.setTeacherId(1L);
+        lessonRequest.setCourseId(1L);
+        lessonRequest.setGroupId(1L);
+        lessonRequest.setFormOfLessonId(1L);
+
+        when(lessonRequestMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
+        when(lessonDao.save(lesson)).thenReturn(lesson);
+        when(lessonDao.findById(1L)).thenReturn(Optional.of(lesson));
+        when(courseDao.findById(1L)).thenReturn(Optional.of(course));
+        when(groupDao.findById(1L)).thenReturn(Optional.of(group));
+        when(professorDao.findById(1L)).thenReturn(Optional.of(professor));
+        when(formOfLessonDao.findById(1L)).thenReturn(Optional.of(formOfLesson));
+
+        lessonService.create(lessonRequest);
+
+        verify(lessonRequestMapper).mapDtoToEntity(lessonRequest);
+        verify(lessonDao).save(lesson);
+        verify(lessonDao, times(6)).findById(1L);
+        verify(courseDao).findById(1L);
+        verify(groupDao).findById(1L);
+        verify(professorDao).findById(1L);
+        verify(formOfLessonDao).findById(1L);
     }
 
     @Test
@@ -204,6 +185,10 @@ class LessonServiceImplTest {
         Lesson lesson = Lesson.builder().withId(1L).build();
         LessonRequest lessonRequest = new LessonRequest();
         lessonRequest.setId(1L);
+        lessonRequest.setTeacherId(0L);
+        lessonRequest.setCourseId(0L);
+        lessonRequest.setGroupId(0L);
+        lessonRequest.setFormOfLessonId(0L);
 
         when(lessonRequestMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
         doNothing().when(lessonDao).update(lesson);
@@ -212,6 +197,222 @@ class LessonServiceImplTest {
 
         verify(lessonRequestMapper).mapDtoToEntity(lessonRequest);
         verify(lessonDao).update(lesson);
+    }
+
+    @Test
+    void editShouldEditDataOfLessonAndOverLessonParamsIfArgumentNewLessonRequest() {
+        Lesson lesson = Lesson.builder().withId(1L).build();
+        Course course = Course.builder().withId(1L).build();
+        Group group = Group.builder().withId(1L).build();
+        Professor professor = Professor.builder().withId(1L).build();
+        FormOfLesson formOfLesson = FormOfLesson.builder().withId(1L).build();
+        LessonRequest lessonRequest = new LessonRequest();
+        lessonRequest.setId(1L);
+        lessonRequest.setTeacherId(1L);
+        lessonRequest.setCourseId(1L);
+        lessonRequest.setGroupId(1L);
+        lessonRequest.setFormOfLessonId(1L);
+
+        when(lessonRequestMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
+        doNothing().when(lessonDao).update(lesson);
+        when(lessonDao.findById(1L)).thenReturn(Optional.of(lesson));
+        when(courseDao.findById(1L)).thenReturn(Optional.of(course));
+        when(groupDao.findById(1L)).thenReturn(Optional.of(group));
+        when(professorDao.findById(1L)).thenReturn(Optional.of(professor));
+        when(formOfLessonDao.findById(1L)).thenReturn(Optional.of(formOfLesson));
+
+        lessonService.edit(lessonRequest);
+
+        verify(lessonRequestMapper).mapDtoToEntity(lessonRequest);
+        verify(lessonDao).update(lesson);
+        verify(lessonDao, times(6)).findById(1L);
+        verify(courseDao).findById(1L);
+        verify(groupDao).findById(1L);
+        verify(professorDao).findById(1L);
+        verify(formOfLessonDao).findById(1L);
+    }
+
+    @Test
+    void editShouldThrowExceptionIfLessonWithAppointedIdNotExistArgumentNewLessonRequest() {
+        Lesson lesson = Lesson.builder().withId(1L).build();
+        LessonRequest lessonRequest = new LessonRequest();
+        lessonRequest.setId(1L);
+        lessonRequest.setTeacherId(1L);
+        lessonRequest.setCourseId(1L);
+        lessonRequest.setGroupId(1L);
+        lessonRequest.setFormOfLessonId(1L);
+
+        when(lessonRequestMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
+        doNothing().when(lessonDao).update(lesson);
+        when(lessonDao.findById(1L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> lessonService.edit(lessonRequest)).hasMessage("There no lesson with id: 1");
+
+        verify(lessonRequestMapper).mapDtoToEntity(lessonRequest);
+        verify(lessonDao).update(lesson);
+        verify(lessonDao).findById(1L);
+    }
+
+    @Test
+    void editShouldThrowExceptionIfCourseWithAppointedIdNotExistArgumentNewLessonRequest() {
+        Lesson lesson = Lesson.builder().withId(1L).build();
+        LessonRequest lessonRequest = new LessonRequest();
+        lessonRequest.setId(1L);
+        lessonRequest.setTeacherId(1L);
+        lessonRequest.setCourseId(1L);
+        lessonRequest.setGroupId(1L);
+        lessonRequest.setFormOfLessonId(1L);
+
+        when(lessonRequestMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
+        doNothing().when(lessonDao).update(lesson);
+        when(lessonDao.findById(1L)).thenReturn(Optional.of(lesson));
+        when(courseDao.findById(1L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> lessonService.edit(lessonRequest)).hasMessage("There no course with id: 1");
+
+        verify(lessonRequestMapper).mapDtoToEntity(lessonRequest);
+        verify(lessonDao).update(lesson);
+        verify(lessonDao).findById(1L);
+        verify(courseDao).findById(1L);
+    }
+
+    @Test
+    void editShouldThrowExceptionIfGroupWithAppointedIdNotExistArgumentNewLessonRequest() {
+        Lesson lesson = Lesson.builder().withId(1L).build();
+        Course course = Course.builder().withId(1L).build();
+        LessonRequest lessonRequest = new LessonRequest();
+        lessonRequest.setId(1L);
+        lessonRequest.setTeacherId(1L);
+        lessonRequest.setCourseId(1L);
+        lessonRequest.setGroupId(1L);
+        lessonRequest.setFormOfLessonId(1L);
+
+        when(lessonRequestMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
+        doNothing().when(lessonDao).update(lesson);
+        when(lessonDao.findById(1L)).thenReturn(Optional.of(lesson));
+        when(courseDao.findById(1L)).thenReturn(Optional.of(course));
+        when(groupDao.findById(1L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> lessonService.edit(lessonRequest)).hasMessage("There no group with id: 1");
+
+        verify(lessonRequestMapper).mapDtoToEntity(lessonRequest);
+        verify(lessonDao).update(lesson);
+        verify(lessonDao, times(3)).findById(1L);
+        verify(courseDao).findById(1L);
+        verify(groupDao).findById(1L);
+    }
+
+    @Test
+    void editShouldThrowExceptionIfProfessorWithAppointedIdNotExistArgumentNewLessonRequest() {
+        Lesson lesson = Lesson.builder().withId(1L).build();
+        Course course = Course.builder().withId(1L).build();
+        Group group = Group.builder().withId(1L).build();
+        Professor professor = Professor.builder().withId(1L).build();
+        LessonRequest lessonRequest = new LessonRequest();
+        lessonRequest.setId(1L);
+        lessonRequest.setTeacherId(1L);
+        lessonRequest.setCourseId(1L);
+        lessonRequest.setGroupId(1L);
+        lessonRequest.setFormOfLessonId(1L);
+
+        when(lessonRequestMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
+        doNothing().when(lessonDao).update(lesson);
+        when(lessonDao.findById(1L)).thenReturn(Optional.of(lesson));
+        when(courseDao.findById(1L)).thenReturn(Optional.of(course));
+        when(groupDao.findById(1L)).thenReturn(Optional.of(group));
+        when(professorDao.findById(1L)).thenReturn(Optional.of(professor));
+        when(formOfLessonDao.findById(1L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> lessonService.edit(lessonRequest)).hasMessage("There no form of lesson with id: 1");
+
+        verify(lessonRequestMapper).mapDtoToEntity(lessonRequest);
+        verify(lessonDao).update(lesson);
+        verify(lessonDao, times(6)).findById(1L);
+        verify(courseDao).findById(1L);
+        verify(groupDao).findById(1L);
+        verify(professorDao).findById(1L);
+        verify(formOfLessonDao).findById(1L);
+    }
+
+    @Test
+    void editShouldThrowExceptionIfFormOfLessonWithAppointedIdNotExistArgumentNewLessonRequest() {
+        Lesson lesson = Lesson.builder().withId(1L).build();
+        Course course = Course.builder().withId(1L).build();
+        Group group = Group.builder().withId(1L).build();
+        LessonRequest lessonRequest = new LessonRequest();
+        lessonRequest.setId(1L);
+        lessonRequest.setTeacherId(1L);
+        lessonRequest.setCourseId(1L);
+        lessonRequest.setGroupId(1L);
+        lessonRequest.setFormOfLessonId(1L);
+
+        when(lessonRequestMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
+        doNothing().when(lessonDao).update(lesson);
+        when(lessonDao.findById(1L)).thenReturn(Optional.of(lesson));
+        when(courseDao.findById(1L)).thenReturn(Optional.of(course));
+        when(groupDao.findById(1L)).thenReturn(Optional.of(group));
+        when(professorDao.findById(1L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> lessonService.edit(lessonRequest)).hasMessage("There no professor with id: 1");
+
+        verify(lessonRequestMapper).mapDtoToEntity(lessonRequest);
+        verify(lessonDao).update(lesson);
+        verify(lessonDao, times(4)).findById(1L);
+        verify(courseDao).findById(1L);
+        verify(groupDao).findById(1L);
+        verify(professorDao).findById(1L);
+    }
+
+    @Test
+    void editShouldValidateCompatibilityCourseAndProfessorWhenChangeTeacherIfArgumentNewLessonRequest() {
+        Course course = Course.builder().withId(1L).build();
+        Professor professor = Professor.builder().withId(1L).build();
+        Lesson lesson = Lesson.builder().withId(1L).withCourse(course).build();
+        LessonRequest lessonRequest = new LessonRequest();
+        lessonRequest.setId(1L);
+        lessonRequest.setTeacherId(1L);
+        lessonRequest.setCourseId(0L);
+        lessonRequest.setGroupId(0L);
+        lessonRequest.setFormOfLessonId(0L);
+
+        when(lessonRequestMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
+        doNothing().when(lessonDao).update(lesson);
+        when(lessonDao.findById(1L)).thenReturn(Optional.of(lesson));
+        when(professorDao.findById(1L)).thenReturn(Optional.of(professor));
+
+        lessonService.edit(lessonRequest);
+
+        verify(lessonRequestMapper).mapDtoToEntity(lessonRequest);
+        verify(lessonDao).update(lesson);
+        verify(lessonDao, times(2)).findById(1L);
+        verify(professorDao).findById(1L);
+    }
+
+    @Test
+    void editShouldValidateCompatibilityCourseAndProfessorWhenChangeCourseIfArgumentNewLessonRequest() {
+        Course course = Course.builder().withId(1L).build();
+        Professor professor = Professor.builder().withId(1L).build();
+        Lesson lesson = Lesson.builder().withId(1L).withTeacher(professor).build();
+        LessonRequest lessonRequest = new LessonRequest();
+        lessonRequest.setId(1L);
+        lessonRequest.setTeacherId(1L);
+        lessonRequest.setCourseId(1L);
+        lessonRequest.setGroupId(0L);
+        lessonRequest.setFormOfLessonId(0L);
+
+        when(lessonRequestMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
+        doNothing().when(lessonDao).update(lesson);
+        when(lessonDao.findById(1L)).thenReturn(Optional.of(lesson));
+        when(courseDao.findById(1L)).thenReturn(Optional.of(course));
+        when(professorDao.findById(1L)).thenReturn(Optional.of(professor));
+
+        lessonService.edit(lessonRequest);
+
+        verify(lessonRequestMapper).mapDtoToEntity(lessonRequest);
+        verify(lessonDao).update(lesson);
+        verify(lessonDao, times(4)).findById(1L);
+        verify(courseDao).findById(1L);
+        verify(professorDao).findById(1L);
     }
 
     @Test
@@ -228,60 +429,6 @@ class LessonServiceImplTest {
     }
 
     @Test
-    void changeFormOfLessonShouldThrowExceptionIfLessonDontExist() {
-        long lessonId = 100;
-        long formOfLessonId = 2;
-
-        when(lessonDao.findById(lessonId)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> lessonService.changeFormOfLesson(lessonId, formOfLessonId)).hasMessage("There no lesson with id: 100");
-
-        verify(lessonDao).findById(lessonId);
-    }
-
-    @Test
-    void changeFormOfLessonShouldThrowExceptionIfFormOfLessonDontExist() {
-        long lessonId = 1;
-        long formOfLessonId = 200;
-
-        when(lessonDao.findById(lessonId)).thenReturn(Optional.of(Lesson.builder().withId(1L).build()));
-        when(formOfLessonDao.findById(formOfLessonId)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> lessonService.changeFormOfLesson(lessonId, formOfLessonId)).hasMessage("There no form of lesson with id: 200");
-
-        verify(lessonDao).findById(lessonId);
-        verify(formOfLessonDao).findById(formOfLessonId);
-    }
-
-    @Test
-    void changeTeacherShouldThrowExceptionIfProfessorDontExist() {
-        long lessonId = 1;
-        long professorId = 100;
-
-        when(lessonDao.findById(lessonId)).thenReturn(Optional.of(Lesson.builder().withId(1L).build()));
-        when(professorDao.findById(professorId)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> lessonService.changeTeacher(lessonId, professorId)).hasMessage("There no professor with id: 100");
-
-        verify(lessonDao).findById(lessonId);
-        verify(professorDao).findById(professorId);
-    }
-
-    @Test
-    void changeCourseShouldThrowExceptionIfCourseDontExist() {
-        long lessonId = 1;
-        long courseId = 200;
-
-        when(lessonDao.findById(lessonId)).thenReturn(Optional.of(Lesson.builder().withId(1L).build()));
-        when(courseDao.findById(courseId)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> lessonService.changeCourse(lessonId, courseId)).hasMessage("There no course with id: 200");
-
-        verify(lessonDao).findById(lessonId);
-        verify(courseDao).findById(courseId);
-    }
-
-    @Test
     void formTimeTableForGroupShouldThrowExceptionIfGroupDontExist() {
         long groupId = 200;
 
@@ -290,56 +437,6 @@ class LessonServiceImplTest {
         assertThatThrownBy(() -> lessonService.formTimeTableForGroup(groupId)).hasMessage("There no group with id: 200");
 
         verify(groupDao).findById(groupId);
-    }
-
-    @Test
-    void registerShouldThrowExceptionIfLessonCantBeCreatedBecauseGroupAlreadyHaveLessonOnThisTime() {
-        Lesson lesson = Lesson.builder()
-                .withTeacher(Professor.builder().withId(1L).build())
-                .withGroup(Group.builder().withId(1L).build())
-                .withTimeOfStartLesson(LocalDateTime.of(2020, 1, 10, 10, 00, 00))
-                .build();
-        LessonRequest lessonRequest = new LessonRequest();
-        lessonRequest.setId(1L);
-        LessonResponse lessonResponse = new LessonResponse();
-        lessonResponse.setId(1L);
-        List<Lesson> lessonsOfGroup = Arrays.asList(Lesson.builder().withTimeOfStartLesson(lesson.getTimeOfStartLesson()).build());
-        List<Lesson> lessonsOfProfessor = Collections.emptyList();
-
-        when(lessonDao.formTimeTableForGroup(lesson.getGroup().getId())).thenReturn(lessonsOfGroup);
-        when(lessonDao.formTimeTableForProfessor(lesson.getTeacher().getId())).thenReturn(lessonsOfProfessor);
-        when(lessonRequestMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
-
-        assertThatThrownBy(() -> lessonService.register(lessonRequest)).hasMessage("Lesson can`t be appointed on this time");
-
-        verify(lessonDao).formTimeTableForGroup(lesson.getGroup().getId());
-        verify(lessonDao).formTimeTableForProfessor(lesson.getTeacher().getId());
-        verify(lessonRequestMapper).mapDtoToEntity(lessonRequest);
-    }
-
-    @Test
-    void registerShouldThrowExceptionIfLessonCantBeCreatedBecauseProfessorAlreadyHaveLessonOnThisTime() {
-        Lesson lesson = Lesson.builder()
-                .withTeacher(Professor.builder().withId(1L).build())
-                .withGroup(Group.builder().withId(1L).build())
-                .withTimeOfStartLesson(LocalDateTime.of(2020, 1, 10, 10, 00, 00))
-                .build();
-        LessonRequest lessonRequest = new LessonRequest();
-        lessonRequest.setId(1L);
-        LessonResponse lessonResponse = new LessonResponse();
-        lessonResponse.setId(1L);
-        List<Lesson> lessonsOfGroup = Collections.emptyList();
-        List<Lesson> lessonsOfProfessor = Arrays.asList(Lesson.builder().withTimeOfStartLesson(lesson.getTimeOfStartLesson()).build());
-
-        when(lessonDao.formTimeTableForGroup(lesson.getGroup().getId())).thenReturn(lessonsOfGroup);
-        when(lessonDao.formTimeTableForProfessor(lesson.getTeacher().getId())).thenReturn(lessonsOfProfessor);
-        when(lessonRequestMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
-
-        assertThatThrownBy(() -> lessonService.register(lessonRequest)).hasMessage("Lesson can`t be appointed on this time");
-
-        verify(lessonDao).formTimeTableForGroup(lesson.getGroup().getId());
-        verify(lessonDao).formTimeTableForProfessor(lesson.getTeacher().getId());
-        verify(lessonRequestMapper).mapDtoToEntity(lessonRequest);
     }
 
     @Test

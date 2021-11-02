@@ -18,7 +18,7 @@
 
     <br>
 
-    <form th:method="POST" th:action="@{/groups}" th:object="${group}">
+    <form th:method="POST" th:action="@{/group}" th:object="${group}">
 
         <div class="form-floating mb-3">
             <input type="text" th:field="*{name}" class="form-control" id="groupName" placeholder="groupName">

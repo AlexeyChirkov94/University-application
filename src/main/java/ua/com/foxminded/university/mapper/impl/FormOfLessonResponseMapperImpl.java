@@ -23,16 +23,20 @@ public class FormOfLessonResponseMapperImpl implements FormOfLessonResponseMappe
 
     @Override
     public FormOfLessonResponse mapEntityToDto(FormOfLesson entity) {
+        FormOfLessonResponse formOfLessonResponse = new FormOfLessonResponse();
         if (entity == null) {
             return null;
+        } else if (entity.getId() == 0L){
+            formOfLessonResponse.setId(0L);
+            formOfLessonResponse.setName("not chosen");
+            formOfLessonResponse.setDuration(0);
         } else {
-            FormOfLessonResponse formOfLessonResponse = new FormOfLessonResponse();
             formOfLessonResponse.setId(entity.getId());
             formOfLessonResponse.setName(entity.getName());
             formOfLessonResponse.setDuration(entity.getDuration());
-
-            return formOfLessonResponse;
         }
+
+        return formOfLessonResponse;
     }
 
 }

@@ -3,7 +3,7 @@
       layout:decorate="~{templates/layout.html}"
       xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>New student</title>
+    <title>New professor</title>
 </head>
 
 <body>
@@ -14,11 +14,11 @@
 
 <section layout:fragment="page-content">
 
-    <h4>Registration of a new student</h4>
+    <h4>Registration of a new professor</h4>
 
     <br>
 
-    <form th:method="POST" th:action="@{/students}" th:object="${student}">
+    <form th:method="POST" th:action="@{/professor}" th:object="${professor}">
 
         <div class="form-floating mb-3">
             <input type="text" th:field="*{firstName}" class="form-control" id="firstName" placeholder="First name">

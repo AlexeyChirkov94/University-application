@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{templates/layout.html}"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Lesson</title>
+</head>
+
+<body>
+
+<section layout:fragment="header"> <div th:replace="templates/fragments/header.html"></div> </section>
+<section layout:fragment="footer"> <div th:replace="templates/fragments/footer.html"></div> </section>
+<section layout:fragment="sidebar"> <div th:replace="templates/fragments/sidebar.html"></div> </section>
+
+<section layout:fragment="page-content">
+
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title" th:text="${'Lesson with ID: ' + lesson.getId()}">Card title</h4>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item" th:text="${'Course: ' + lesson.getCourseResponse().getName() +
+             ' (ID: ' + lesson.getCourseResponse().getId() + ')'}">course</li>
+            <li class="list-group-item" th:text="${'Form of lesson: ' + lesson.getFormOfLessonResponse().getName() +
+                            ' (ID: ' + lesson.getFormOfLessonResponse().getId() + ')'}">Form of lesson</li>
+            <li class="list-group-item" th:text="${'Date and time: ' + stringDateTimes}">Date and time</li>
+            <li class="list-group-item" th:text="${'Group: ' + lesson.getGroupResponse().getName() +
+                            ' (ID: ' + lesson.getGroupResponse().getId() + ')'}">Group</li>
+            <li class="list-group-item" th:text="${'Teacher: ' + lesson.getTeacher().getScienceDegreeResponse() + ', '
+            + lesson.getTeacher().getLastName() + ' ' + lesson.getTeacher().getFirstName() +
+                            ' (ID: ' + lesson.getTeacher().getId() + ')'}">Group</li>
+            <li class="list-group-item"><a class="btn btn-info" th:href="@{/lesson/{id}/edit(id=${lesson.getId()})}" role="button">Edit</a></li>
+            <li class="list-group-item">
+                <form th:method="DELETE" th:action="@{/lesson/{id}(id=${lesson.getId()})}">
+                    <input class="btn btn-danger" type="submit" value="Delete"/>
+                </form>
+            </li>
+        </ul>
+    </div>
+
+</section>
+
+</body>
+</html>
