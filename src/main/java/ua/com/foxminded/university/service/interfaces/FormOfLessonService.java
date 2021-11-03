@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface FormOfLessonService {
 
-    FormOfLessonResponse register(FormOfLessonRequest requestDto);
+    FormOfLessonResponse create(FormOfLessonRequest requestDto);
 
     Optional<FormOfLessonResponse> findById(long id);
 

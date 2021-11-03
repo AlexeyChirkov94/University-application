@@ -41,6 +41,7 @@ public class LessonDaoImpl extends AbstractPageableCrudDaoImpl<Lesson> implement
     private static final String FIND_BY_GROUP_ID = FIND_QUERY + "WHERE l.group_id=? ORDER BY timeOfStart";
     private static final String FIND_BY_PROFESSOR_ID = FIND_QUERY + "WHERE l.professor_id=? ORDER BY timeOfStart";
     private static final String FIND_BY_COURSE_ID = FIND_QUERY + "WHERE l.course_id=? ORDER BY timeOfStart";
+    private static final String FIND_BY_FORM_OF_LESSON_ID = FIND_QUERY + "WHERE l.formoflesson_id=? ORDER BY timeOfStart";
     private static final RowMapper<Lesson> ROW_MAPPER = (rs, rowNum) ->
         Lesson.builder()
                 .withId(rs.getLong("id"))
@@ -82,6 +83,11 @@ public class LessonDaoImpl extends AbstractPageableCrudDaoImpl<Lesson> implement
     @Override
     public List<Lesson> findByCourseId(long courseId){
         return jdbcTemplate.query(FIND_BY_COURSE_ID, ROW_MAPPER, courseId);
+    }
+
+    @Override
+    public List<Lesson> findByFormOfLessonId(long formOfLessonId){
+        return jdbcTemplate.query(FIND_BY_FORM_OF_LESSON_ID, ROW_MAPPER, formOfLessonId);
     }
 
     @Override

@@ -24,7 +24,7 @@ public class DepartmentServiceImpl extends AbstractPageableCrudService implement
     private final DepartmentResponseMapper departmentResponseMapper;
 
     @Override
-    public DepartmentResponse register(DepartmentRequest departmentRequest) {
+    public DepartmentResponse create(DepartmentRequest departmentRequest) {
         if (departmentDao.findByName(departmentRequest.getName()).isPresent()){
             throw new EntityAlreadyExistException("Department with same name already exist");
         } else {

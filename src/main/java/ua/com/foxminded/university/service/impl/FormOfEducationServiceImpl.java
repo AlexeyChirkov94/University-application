@@ -2,11 +2,14 @@ package ua.com.foxminded.university.service.impl;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.interfaces.FormOfEducationDao;
+import ua.com.foxminded.university.dao.interfaces.GroupDao;
 import ua.com.foxminded.university.dto.DepartmentResponse;
 import ua.com.foxminded.university.dto.FormOfEducationRequest;
 import ua.com.foxminded.university.dto.FormOfEducationResponse;
 import ua.com.foxminded.university.entity.FormOfEducation;
+import ua.com.foxminded.university.entity.Group;
 import ua.com.foxminded.university.mapper.interfaces.FormOfEducationRequestMapper;
 import ua.com.foxminded.university.mapper.interfaces.FormOfEducationResponseMapper;
 import ua.com.foxminded.university.service.exception.EntityAlreadyExistException;
@@ -20,11 +23,12 @@ import java.util.stream.Collectors;
 public class FormOfEducationServiceImpl extends AbstractPageableCrudService implements FormOfEducationService {
 
     private final FormOfEducationDao formOfEducationDao;
+    private final GroupDao groupDao;
     private final FormOfEducationRequestMapper formOfEducationRequestMapper;
     private final FormOfEducationResponseMapper formOfEducationResponseMapper;
 
     @Override
-    public FormOfEducationResponse register(FormOfEducationRequest formOfEducationRequest) {
+    public FormOfEducationResponse create(FormOfEducationRequest formOfEducationRequest) {
         if (formOfEducationDao.findByName(formOfEducationRequest.getName()).isPresent()){
             throw new EntityAlreadyExistException("FormOfEducation with same name already exist");
         } else{
@@ -64,8 +68,15 @@ public class FormOfEducationServiceImpl extends AbstractPageableCrudService impl
     }
 
     @Override
+    @Transactional(transactionManager = "txManager")
     public boolean deleteById(long id) {
         if(formOfEducationDao.findById(id).isPresent()){
+
+            List<Group> formOfEducationGroups = groupDao.findByFormOfEducation(id);
+            for(Group group : formOfEducationGroups){
+                groupDao.removeFormOfEducationFromGroup(group.getId());
+            }
+
             return formOfEducationDao.deleteById(id);
         }
         return false;

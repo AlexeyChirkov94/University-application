@@ -12,6 +12,8 @@ public interface LessonDao extends CrudPageableDao<Lesson> {
 
     List<Lesson> findByCourseId(long courseId);
 
+    List<Lesson> findByFormOfLessonId(long formOfLessonId);
+
     void changeFormOfLesson(long lessonId, long newFormOfLessonId);
 
     void removeFormOfLessonFromLesson(long lessonId);

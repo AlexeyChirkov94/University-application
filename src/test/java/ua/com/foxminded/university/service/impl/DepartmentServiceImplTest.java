@@ -40,7 +40,7 @@ class DepartmentServiceImplTest {
 
         when(departmentDao.findByName(departmentName)).thenReturn(Optional.empty());
 
-        departmentService.register(departmentRequest);
+        departmentService.create(departmentRequest);
 
         verify(departmentDao).findByName(departmentName);
     }
@@ -53,7 +53,7 @@ class DepartmentServiceImplTest {
 
         when(departmentDao.findByName(departmentName)).thenReturn(Optional.of(Department.builder().withName(departmentName).build()));
 
-        assertThatThrownBy(() -> departmentService.register(departmentRequest)).hasMessage("Department with same name already exist");
+        assertThatThrownBy(() -> departmentService.create(departmentRequest)).hasMessage("Department with same name already exist");
 
         verify(departmentDao).findByName(departmentName);
     }

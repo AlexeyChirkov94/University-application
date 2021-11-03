@@ -107,6 +107,7 @@ public class CourseServiceImpl extends AbstractPageableCrudService implements Co
     }
 
     @Override
+    @Transactional(transactionManager = "txManager")
     public void edit(CourseRequest courseRequest) {
 
         courseDao.update(courseRequestMapper.mapDtoToEntity(courseRequest));
@@ -121,6 +122,7 @@ public class CourseServiceImpl extends AbstractPageableCrudService implements Co
     }
 
     @Override
+    @Transactional(transactionManager = "txManager")
     public boolean deleteById(long id) {
         if(courseDao.findById(id).isPresent()){
 

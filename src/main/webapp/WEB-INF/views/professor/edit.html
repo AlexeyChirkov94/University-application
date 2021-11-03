@@ -14,7 +14,8 @@
 
 <section layout:fragment="page-content">
 
-    <h4 th:text="${'Update of professor with ID: ' + professor.getId()}" >ID</h4>
+    <h4 th:text="${'Update professor ' + professor.getScienceDegreeResponse() +', ' +
+     professor.getLastName() + ' ' + professor.getFirstName() + ' with ID: ' + professor.getId()}" >ID</h4>
     <br>
 
     <h4>Common info</h4>

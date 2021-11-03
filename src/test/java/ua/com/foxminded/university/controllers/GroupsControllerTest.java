@@ -214,7 +214,7 @@ public class GroupsControllerTest {
         groupResponse.setId(1L);
         groupResponse.setName("Group 1");
 
-        when(groupService.register(groupRequest)).thenReturn(groupResponse);
+        when(groupService.create(groupRequest)).thenReturn(groupResponse);
 
         mockMvc.perform(post("/group")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -231,7 +231,7 @@ public class GroupsControllerTest {
                 .andExpect(model().attribute("formOfEducationId", is(0L)))
                 .andExpect(model().attribute("departmentId", is(0L)));
 
-        verify(groupService).register(groupRequest);
+        verify(groupService).create(groupRequest);
         verifyNoMoreInteractions(groupService);
     }
 
@@ -244,7 +244,7 @@ public class GroupsControllerTest {
         groupResponse.setId(1L);
         groupResponse.setName("Group 1");
 
-        when(groupService.register(groupRequest)).thenReturn(groupResponse);
+        when(groupService.create(groupRequest)).thenReturn(groupResponse);
         doNothing().when(groupService).changeFormOfEducation(1L, 1);
         doNothing().when(groupService).changeDepartment(1L, 1);
 
@@ -263,7 +263,7 @@ public class GroupsControllerTest {
                 .andExpect(model().attribute("formOfEducationId", is(1L)))
                 .andExpect(model().attribute("departmentId", is(1L)));
 
-        verify(groupService).register(groupRequest);
+        verify(groupService).create(groupRequest);
         verify(groupService).changeFormOfEducation(1L, 1);
         verify(groupService).changeDepartment(1L, 1);
         verifyNoMoreInteractions(groupService);

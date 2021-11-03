@@ -130,6 +130,7 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
         return false;
     }
 
+    @Transactional(transactionManager = "txManager")
     private void changeGroup(long lessonId, long newGroupId) {
         checkThatLessonExist(lessonId);
         checkThatGroupExist(newGroupId);
@@ -140,13 +141,13 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
 
     }
 
+    @Transactional(transactionManager = "txManager")
     private void changeFormOfLesson(long lessonId, long newFormOfLessonId) {
         checkThatLessonExist(lessonId);
         checkThatFormOfLessonExist(newFormOfLessonId);
 
         lessonDao.changeFormOfLesson(lessonId, newFormOfLessonId);
     }
-
 
     private void changeTeacher(long lessonId, long newProfessorId) {
         checkThatLessonExist(lessonId);

@@ -5,17 +5,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.interfaces.FormOfLessonDao;
+import ua.com.foxminded.university.dao.interfaces.LessonDao;
 import ua.com.foxminded.university.dto.FormOfLessonRequest;
-import ua.com.foxminded.university.entity.FormOfEducation;
 import ua.com.foxminded.university.entity.FormOfLesson;
+import ua.com.foxminded.university.entity.Lesson;
 import ua.com.foxminded.university.mapper.interfaces.FormOfLessonRequestMapper;
 import ua.com.foxminded.university.mapper.interfaces.FormOfLessonResponseMapper;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith( MockitoExtension.class)
@@ -23,6 +27,9 @@ class FormOfLessonServiceImplTest {
 
     @Mock
     FormOfLessonDao formOfLessonDao;
+
+    @Mock
+    LessonDao lessonDao;
 
     @Mock
     FormOfLessonRequestMapper formOfLessonRequestMapper;
@@ -41,7 +48,7 @@ class FormOfLessonServiceImplTest {
 
         when(formOfLessonDao.findByName(formOfLessonName)).thenReturn(Optional.empty());
 
-        formOfLessonService.register(formOfLessonRequest);
+        formOfLessonService.create(formOfLessonRequest);
 
         verify(formOfLessonDao).findByName(formOfLessonName);
     }
@@ -54,7 +61,7 @@ class FormOfLessonServiceImplTest {
 
         when(formOfLessonDao.findByName(formOfLessonName)).thenReturn(Optional.of(FormOfLesson.builder().withName(formOfLessonName).build()));
 
-        assertThatThrownBy(() -> formOfLessonService.register(formOfLessonRequest)).hasMessage("FormOfLesson with same name already exist");
+        assertThatThrownBy(() -> formOfLessonService.create(formOfLessonRequest)).hasMessage("FormOfLesson with same name already exist");
 
         verify(formOfLessonDao).findByName(formOfLessonName);
     }
@@ -110,14 +117,25 @@ class FormOfLessonServiceImplTest {
     @Test
     void deleteShouldDeleteDataOfFormOfLessonIfArgumentIsFormOfLessonId() {
         long formOfLessonId = 1;
+        Lesson lesson1 = Lesson.builder().withId(1L).build();
+        Lesson lesson2 = Lesson.builder().withId(2L).build();
+        List<Lesson> formOfLessonLessons = Arrays.asList(lesson1, lesson2);
 
         when(formOfLessonDao.findById(formOfLessonId)).thenReturn(Optional.of(FormOfLesson.builder().withId(formOfLessonId).build()));
+        when(lessonDao.findByFormOfLessonId(1L)).thenReturn(formOfLessonLessons);
+        doNothing().when(lessonDao).removeFormOfLessonFromLesson(1L);
+        doNothing().when(lessonDao).removeFormOfLessonFromLesson(2L);
         when(formOfLessonDao.deleteById(formOfLessonId)).thenReturn(true);
 
         formOfLessonService.deleteById(formOfLessonId);
 
         verify(formOfLessonDao).findById(formOfLessonId);
+        verify(lessonDao).findByFormOfLessonId(1L);
+        verify(lessonDao).removeFormOfLessonFromLesson(1L);
+        verify(lessonDao).removeFormOfLessonFromLesson(2L);
         verify(formOfLessonDao).deleteById(formOfLessonId);
+        verifyNoMoreInteractions(formOfLessonDao);
+        verifyNoMoreInteractions(lessonDao);
     }
 
     @Test

@@ -62,7 +62,7 @@ public class GroupsController {
         model.addAttribute("formOfEducationId", formOfEducationId);
         model.addAttribute("departmentId", departmentId);
 
-        GroupResponse groupResponse = groupService.register(groupRequest);
+        GroupResponse groupResponse = groupService.create(groupRequest);
 
         if(formOfEducationId != 0L){
             groupService.changeFormOfEducation(groupResponse.getId(), formOfEducationId);

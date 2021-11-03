@@ -121,7 +121,6 @@ class LessonsControllerTest {
                 .andExpect(forwardedUrl("/lesson/show"))
                 .andExpect(model().attribute("lesson", is(lessonResponse)));
 
-
         verify(lessonService).findById(1L);
         verifyNoMoreInteractions(lessonService);
     }

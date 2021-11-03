@@ -104,6 +104,22 @@ class CourseDaoImplTest {
     }
 
     @Test
+    void changeDepartmentShouldChangeDepartmentIfArgumentIsIdOfCourseAndIDOfDepartment(){
+        Course expectedBeforeChanging = Course.builder().withName("Russia History")
+                .withDepartment(Department.builder().withId(1L).withName("Department of History").build()).build();
+        Course actualBeforeChanging = courseDao.findById(1L).get();
+        assertCourses (actualBeforeChanging, expectedBeforeChanging);
+
+        courseDao.changeDepartment(1, 2);
+
+        Course expectedAfterChanging = Course.builder().withName("Russia History")
+                .withDepartment(Department.builder().withId(2L).withName("Department of Math").build()).build();
+        Course actualAfterChanging = courseDao.findById(1L).get();
+        assertCourses (actualBeforeChanging, expectedBeforeChanging);
+        assertCourses(expectedAfterChanging, actualAfterChanging);
+    }
+
+    @Test
     void removeCourseToProfessorCourseListShouldRemoveCourseToProfessorCourseListIfArgumentIsIdOfProfessorAndIdOfCourse(){
         List<Course> expectedBeforeRemoving = Arrays.asList (courseDao.findById(1L).get(),
                 courseDao.findById(2L).get());
@@ -114,6 +130,22 @@ class CourseDaoImplTest {
 
         List<Course> expectedAfterRemoving = Arrays.asList (courseDao.findById(1L).get());
         List<Course> actualAfterRemoving = courseDao.findByProfessorId(7);
+        assertCourses(actualAfterRemoving, expectedAfterRemoving);
+    }
+
+    @Test
+    void removeDepartmentShouldChangeDepartmentIfArgumentIsIdOfCourseAndIDOfDepartment(){
+        Course expectedBeforeRemoving = Course.builder().withName("Russia History")
+                .withDepartment(Department.builder().withId(1L).withName("Department of History").build()).build();
+        Course actualBeforeRemoving = courseDao.findById(1L).get();
+        assertCourses (expectedBeforeRemoving, actualBeforeRemoving);
+
+        courseDao.removeDepartmentFromCourse(1);
+
+        Course expectedAfterRemoving = Course.builder().withName("Russia History")
+                .withDepartment(Department.builder().withId(0L).build()).build();
+        Course actualAfterRemoving = courseDao.findById(1L).get();
+
         assertCourses(actualAfterRemoving, expectedAfterRemoving);
     }
 

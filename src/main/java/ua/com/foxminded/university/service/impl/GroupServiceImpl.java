@@ -37,19 +37,35 @@ public class GroupServiceImpl extends AbstractPageableCrudService implements Gro
     @Override
     @Transactional(transactionManager = "txManager")
     public void changeFormOfEducation(long groupId, long newFormOfEducationId) {
-        checkThatGroupAndFormOfLessonExist(groupId, newFormOfEducationId);
+        checkThatGroupExist(groupId);
+        checkThatFormOfEducationExist(newFormOfEducationId);
         groupDao.changeFormOfEducation(groupId, newFormOfEducationId);
     }
 
     @Override
     @Transactional(transactionManager = "txManager")
+    public void removeFormOfEducationFromGroup(long groupId) {
+        checkThatGroupExist(groupId);
+        groupDao.removeFormOfEducationFromGroup(groupId);
+    }
+
+    @Override
+    @Transactional(transactionManager = "txManager")
     public void changeDepartment(long groupId, long newDepartmentId) {
-        checkThatGroupAndDepartmentExist(groupId, newDepartmentId);
+        checkThatGroupExist(groupId);
+        checkThatDepartmentExist(newDepartmentId);
         groupDao.changeDepartment(groupId, newDepartmentId);
     }
 
     @Override
-    public GroupResponse register(GroupRequest groupRequest) {
+    @Transactional(transactionManager = "txManager")
+    public void removeDepartmentFromGroup(long groupId) {
+        checkThatGroupExist(groupId);
+        groupDao.removeDepartmentFromGroup(groupId);
+    }
+
+    @Override
+    public GroupResponse create(GroupRequest groupRequest) {
         if (groupDao.findByName(groupRequest.getName()).isPresent()){
             throw new EntityAlreadyExistException("Group with same name already exist");
         } else {
@@ -63,6 +79,22 @@ public class GroupServiceImpl extends AbstractPageableCrudService implements Gro
     @Override
     public Optional<GroupResponse> findById(long id) {
         return groupDao.findById(id).map(groupResponseMapper::mapEntityToDto);
+    }
+
+    @Override
+    public List<GroupResponse> findByFormOfEducation(long formOfEducationId) {
+        checkThatFormOfEducationExist(formOfEducationId);
+
+        return groupDao.findByFormOfEducation(formOfEducationId).stream().map(groupResponseMapper::mapEntityToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<GroupResponse> findByDepartmentId(long departmentId) {
+        checkThatDepartmentExist(departmentId);
+
+        return groupDao.findByDepartmentId(departmentId).stream().map(groupResponseMapper::mapEntityToDto)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -108,15 +140,21 @@ public class GroupServiceImpl extends AbstractPageableCrudService implements Gro
         return false;
     }
 
-    private void checkThatGroupAndFormOfLessonExist(long groupId, long newFormOfEducationId){
-        if (!groupDao.findById(groupId).isPresent() || !formOfEducationDao.findById(newFormOfEducationId).isPresent()) {
-            throw new EntityDontExistException("There no group or formOfEducation with this ids");
+    private void checkThatGroupExist(long groupId){
+        if (!groupDao.findById(groupId).isPresent()) {
+            throw new EntityDontExistException("There no group with this id:" + groupId);
         }
     }
 
-    private void checkThatGroupAndDepartmentExist(long groupId, long newDepartmentId){
-        if (!groupDao.findById(groupId).isPresent() || !departmentDao.findById(newDepartmentId).isPresent()) {
-            throw new EntityDontExistException("There no group or department with this ids");
+    private void checkThatFormOfEducationExist(long formOfEducationId){
+        if (!formOfEducationDao.findById(formOfEducationId).isPresent()) {
+            throw new EntityDontExistException("There no formOfEducation with this id:" + formOfEducationId);
+        }
+    }
+
+    private void checkThatDepartmentExist(long departmentId){
+        if (!departmentDao.findById(departmentId).isPresent()) {
+            throw new EntityDontExistException("There no department with this id:" + departmentId);
         }
     }
 

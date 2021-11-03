@@ -11,10 +11,12 @@ import ua.com.foxminded.university.dao.interfaces.GroupDao;
 import ua.com.foxminded.university.entity.Department;
 import ua.com.foxminded.university.entity.FormOfEducation;
 import ua.com.foxminded.university.entity.Group;
+import ua.com.foxminded.university.entity.Lesson;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -35,6 +37,8 @@ public class GroupDaoImpl extends AbstractPageableCrudDaoImpl<Group> implements 
     private static final String COUNT_QUERY = "SELECT COUNT(*) as count from groups";
     private static final String CHANGE_FORM_OF_EDUCATION_QUERY = "UPDATE groups SET formOfEducation_id = ? WHERE id = ?";
     private static final String CHANGE_DEPARTMENT_QUERY = "UPDATE groups SET department_id = ? WHERE id = ?";
+    private static final String FIND_BY_FROM_OF_EDUCATION_ID = FIND_QUERY + "WHERE g.formOfEducation_id=? ORDER BY g.id";
+    private static final String FIND_BY_DEPARTMENT_ID = FIND_QUERY + "WHERE g.department_id=? ORDER BY g.id";
     private static final RowMapper<Group> ROW_MAPPER = (rs, rowNum) ->
         Group.builder()
                 .withId(rs.getLong("id"))
@@ -65,13 +69,33 @@ public class GroupDaoImpl extends AbstractPageableCrudDaoImpl<Group> implements 
     }
 
     @Override
+    public List<Group> findByFormOfEducation(long courseId){
+        return jdbcTemplate.query(FIND_BY_FROM_OF_EDUCATION_ID, ROW_MAPPER, courseId);
+    }
+
+    @Override
+    public List<Group> findByDepartmentId(long courseId){
+        return jdbcTemplate.query(FIND_BY_DEPARTMENT_ID, ROW_MAPPER, courseId);
+    }
+
+    @Override
     public void changeFormOfEducation(long groupId, long newFormOfEducationId) {
         jdbcTemplate.update(CHANGE_FORM_OF_EDUCATION_QUERY, newFormOfEducationId, groupId);
     }
 
     @Override
+    public void removeFormOfEducationFromGroup(long groupId) {
+        jdbcTemplate.update(CHANGE_FORM_OF_EDUCATION_QUERY, null, groupId);
+    }
+
+    @Override
     public void changeDepartment(long groupId, long newDepartmentId) {
         jdbcTemplate.update(CHANGE_DEPARTMENT_QUERY, newDepartmentId, groupId);
+    }
+
+    @Override
+    public void removeDepartmentFromGroup(long groupId) {
+        jdbcTemplate.update(CHANGE_DEPARTMENT_QUERY, null, groupId);
     }
 
     @Override

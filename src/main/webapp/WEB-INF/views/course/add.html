@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{templates/layout.html}"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>New course</title>
+</head>
+
+<body>
+
+<section layout:fragment="header"> <div th:replace="templates/fragments/header.html"></div> </section>
+<section layout:fragment="footer"> <div th:replace="templates/fragments/footer.html"></div> </section>
+<section layout:fragment="sidebar"> <div th:replace="templates/fragments/sidebar.html"></div> </section>
+
+<section layout:fragment="page-content">
+
+    <h4>Registration of a new course</h4>
+
+    <br>
+
+    <form th:method="POST" th:action="@{/course}" th:object="${course}">
+
+        <div class="form-floating mb-3">
+            <input type="text" th:field="*{name}" class="form-control" id="name of course" placeholder="Choose name of course:">
+            <label for="name of course">Choose name of new course:</label>
+        </div>
+        <select class="form-select  mb-2" th:field="*{departmentId}">
+            <option selected="" value="0">Choose department of new course:</option>
+            <div th:each="department : ${departments}">
+                <option th:value="${department.getId()}" th:text="${department.getName()}"> department </option>
+            </div>
+        </select>
+
+        <input class="btn btn-success" type="submit" role="button" value="Add new lesson"/>
+
+    </form>
+
+</section>
+
+</body>
+</html>

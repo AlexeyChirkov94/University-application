@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{templates/layout.html}"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Students</title>
+</head>
+
+<body>
+
+<section layout:fragment="header"> <div th:replace="templates/fragments/header.html"></div> </section>
+<section layout:fragment="footer"> <div th:replace="templates/fragments/footer.html"></div> </section>
+<section layout:fragment="sidebar"> <div th:replace="templates/fragments/sidebar.html"></div> </section>
+
+<section layout:fragment="page-content">
+
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title" th:text="${'Course: ' + course.getName()}">Card title</h4>
+            <p class="card-text" th:text="${'ID: ' + course.getId()}" >ID</p>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item" th:text="${'Departemnt: ' + course.getDepartmentResponse().getName()}">email</li>
+
+            <li class="list-group-item">
+                <div class="row justify-content-left">
+                    <div class="col-2"> Teachers of course: </div>
+                    <div class="col-10">
+
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th scope="col">Id</th>
+                                <th scope="col">First name</th>
+                                <th scope="col">Last name</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">More</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <div th:each="professor : ${teachersOfCourse}">
+                                <tr>
+                                    <th scope="row" th:text="${professor.getId()}"></th>
+                                    <td th:text="${professor.getFirstName()}"> </td>
+                                    <td th:text="${professor.getLastName()}"></td>
+                                    <td th:text="${professor.getEmail()}"> </td>
+                                    <td> <a class="btn btn-secondary" th:href="@{/professor/{id}(id=${professor.getId()})}" role="button">Go to</a> </td>
+                                </tr>
+                            </div>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </li>
+
+            <li class="list-group-item"><a class="btn btn-info" th:href="@{/course/{id}/edit(id=${course.getId()})}" role="button">Edit</a></li>
+            <li class="list-group-item">
+                <form th:method="DELETE" th:action="@{/course/{id}(id=${course.getId()})}">
+                    <input class="btn btn-danger" type="submit" value="Delete"/>
+                    <text>Be careful, all lessons of this course will lose course</text>
+                </form>
+            </li>
+        </ul>
+    </div>
+
+</section>
+
+</body>
+</html>
