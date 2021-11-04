@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.interfaces.FormOfLessonDao;
 import ua.com.foxminded.university.dao.interfaces.LessonDao;
-import ua.com.foxminded.university.dto.FormOfEducationResponse;
 import ua.com.foxminded.university.dto.FormOfLessonRequest;
 import ua.com.foxminded.university.dto.FormOfLessonResponse;
 import ua.com.foxminded.university.entity.FormOfLesson;
@@ -13,9 +12,9 @@ import ua.com.foxminded.university.entity.Lesson;
 import ua.com.foxminded.university.mapper.interfaces.FormOfLessonRequestMapper;
 import ua.com.foxminded.university.mapper.interfaces.FormOfLessonResponseMapper;
 import ua.com.foxminded.university.service.exception.EntityAlreadyExistException;
+import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.interfaces.FormOfLessonService;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,7 +29,7 @@ public class FormOfLessonServiceImpl extends AbstractPageableCrudService impleme
     @Override
     public FormOfLessonResponse create(FormOfLessonRequest formOfLessonRequest) {
         if (formOfLessonDao.findByName(formOfLessonRequest.getName()).isPresent()){
-            throw new EntityAlreadyExistException("FormOfLesson with same name already exist");
+            throw new EntityAlreadyExistException("Form of lesson with same name already exist");
         } else{
             FormOfLesson formOfLessonBeforeSave = formOfLessonRequestMapper.mapDtoToEntity(formOfLessonRequest);
             FormOfLesson formOfLessonAfterSave = formOfLessonDao.save(formOfLessonBeforeSave);
@@ -40,8 +39,11 @@ public class FormOfLessonServiceImpl extends AbstractPageableCrudService impleme
     }
 
     @Override
-    public Optional<FormOfLessonResponse> findById(long id) {
-        return formOfLessonDao.findById(id).map(formOfLessonResponseMapper::mapEntityToDto);
+    public FormOfLessonResponse findById(long id) {
+        FormOfLesson formOfLesson = formOfLessonDao.findById(id)
+                .orElseThrow(() -> new EntityDontExistException("There no form of lesson with id: " + id));
+
+        return formOfLessonResponseMapper.mapEntityToDto(formOfLesson);
     }
 
     @Override

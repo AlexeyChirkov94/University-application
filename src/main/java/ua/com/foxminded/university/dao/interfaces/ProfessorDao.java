@@ -9,4 +9,10 @@ public interface ProfessorDao extends UserDao<Professor> {
 
     List<Professor> findByCourseId(long courseId);
 
+    List<Professor> findByDepartmentId(long departmentId);
+
+    void changeDepartment(long professorId, long departmentId);
+
+    void removeDepartmentFromProfessor(long professorId);
+
 }

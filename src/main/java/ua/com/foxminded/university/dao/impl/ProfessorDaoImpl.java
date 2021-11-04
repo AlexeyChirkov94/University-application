@@ -37,7 +37,9 @@ public class ProfessorDaoImpl extends AbstractPageableCrudDaoImpl<Professor> imp
     private static final String FIND_BY_EMAIL_QUERY = FIND_QUERY + "WHERE u.email= ? and type = 'professor'";
     private static final String FIND_BY_COURSE_ID = FIND_QUERY + "left join professor_course pc on u.id = pc.professor_id " +
         "where pc.course_id = ?";
+    private static final String FIND_BY_DEPARTMENT_ID = FIND_QUERY + "where u.department_id = ? order by u.id";
     private static final String CHANGE_SCIENCE_DEGREE_QUERY = "UPDATE users SET sciencedegree_id = ? WHERE id = ?";
+    private static final String CHANGE_DEPARTMENT_QUERY = "UPDATE users SET department_id = ? WHERE id = ?";
 
     private static final RowMapper<Professor> ROW_MAPPER = (rs, rowNum) ->
         Professor.builder()
@@ -76,6 +78,21 @@ public class ProfessorDaoImpl extends AbstractPageableCrudDaoImpl<Professor> imp
     @Override
     public List<Professor> findByCourseId(long courseId) {
         return jdbcTemplate.query(FIND_BY_COURSE_ID, ROW_MAPPER, courseId);
+    }
+
+    @Override
+    public List<Professor> findByDepartmentId(long departmentId) {
+        return jdbcTemplate.query(FIND_BY_DEPARTMENT_ID, ROW_MAPPER, departmentId);
+    }
+
+    @Override
+    public void changeDepartment(long professorId, long departmentId) {
+        jdbcTemplate.update(CHANGE_DEPARTMENT_QUERY, departmentId, professorId);
+    }
+
+    @Override
+    public void removeDepartmentFromProfessor(long professorId) {
+        jdbcTemplate.update(CHANGE_DEPARTMENT_QUERY, null, professorId);
     }
 
     @Override

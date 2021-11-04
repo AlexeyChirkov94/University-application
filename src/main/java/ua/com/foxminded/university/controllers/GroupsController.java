@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -11,15 +12,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 import ua.com.foxminded.university.dto.DepartmentResponse;
 import ua.com.foxminded.university.dto.FormOfEducationResponse;
 import ua.com.foxminded.university.dto.GroupRequest;
 import ua.com.foxminded.university.dto.GroupResponse;
 import ua.com.foxminded.university.dto.StudentResponse;
+import ua.com.foxminded.university.service.exception.EntityAlreadyExistException;
+import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.interfaces.DepartmentService;
 import ua.com.foxminded.university.service.interfaces.FormOfEducationService;
 import ua.com.foxminded.university.service.interfaces.GroupService;
 import ua.com.foxminded.university.service.interfaces.StudentService;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import static ua.com.foxminded.university.controllers.ControllersUtility.setPagesValueAndStatus;
 
@@ -43,7 +48,7 @@ public class GroupsController {
 
     @GetMapping("/{id}")
     public String show(@PathVariable("id") long id, Model model){
-        model.addAttribute("group", groupService.findById(id).get());
+        model.addAttribute("group", groupService.findById(id));
         model.addAttribute("studentsOfGroup", studentService.findByGroupId(id));
         return "/group/show";
     }
@@ -76,7 +81,7 @@ public class GroupsController {
 
     @GetMapping("/{id}/edit")
     public String edit(Model model, @PathVariable("id") long id) {
-        GroupResponse group = groupService.findById(id).get();
+        GroupResponse group = groupService.findById(id);
         List<DepartmentResponse> anotherDepartments = departmentService.findAll();
         anotherDepartments.remove(group.getDepartmentResponse());
 
@@ -134,6 +139,24 @@ public class GroupsController {
     public String delete(@PathVariable("id") long id) {
         groupService.deleteById(id);
         return "redirect:/group";
+    }
+
+    @ExceptionHandler(EntityDontExistException.class)
+    public ModelAndView entityDontExistException(HttpServletRequest request, Exception ex) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("exception", ex);
+        modelAndView.setViewName("errors handling/entity not exist");
+
+        return modelAndView;
+    }
+
+    @ExceptionHandler(EntityAlreadyExistException.class)
+    public ModelAndView entityAlreadyExistExceptionLesson(HttpServletRequest request, Exception ex) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("exception", ex);
+        modelAndView.setViewName("errors handling/entity already exist");
+
+        return modelAndView;
     }
 
 }

@@ -88,7 +88,7 @@ public class FrontControllerImpl implements FrontController {
     private void timeTableForStudent(){
         viewProvider.printMessage("Input student Id");
         long studentId = viewProvider.readLong();
-        long groupId = studentService.findById(studentId).get().getGroupResponse().getId();
+        long groupId = studentService.findById(studentId).getGroupResponse().getId();
         List<LessonResponse> LessonResponses = lessonService.formTimeTableForGroup(groupId);
 
         viewProvider.printMessage("Time table for group with id: " + groupId + ": \n");

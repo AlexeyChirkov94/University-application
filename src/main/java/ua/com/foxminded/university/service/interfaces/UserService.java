@@ -2,7 +2,6 @@ package ua.com.foxminded.university.service.interfaces;
 
 import ua.com.foxminded.university.dto.UserRequest;
 import ua.com.foxminded.university.dto.UserResponse;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -10,7 +9,7 @@ public interface UserService<REQUEST extends UserRequest, RESPONSE extends UserR
 
     RESPONSE register(REQUEST requestDto);
 
-    Optional<RESPONSE> findById(long id);
+    RESPONSE findById(long id);
 
     List<RESPONSE> findAll(String page);
 

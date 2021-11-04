@@ -1,5 +1,6 @@
 package ua.com.foxminded.university.service.impl;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -7,12 +8,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ua.com.foxminded.university.dao.interfaces.CourseDao;
+import ua.com.foxminded.university.dao.interfaces.DepartmentDao;
 import ua.com.foxminded.university.dao.interfaces.GroupDao;
 import ua.com.foxminded.university.dao.interfaces.LessonDao;
 import ua.com.foxminded.university.dao.interfaces.ProfessorDao;
 import ua.com.foxminded.university.dto.ProfessorRequest;
 import ua.com.foxminded.university.dto.ProfessorResponse;
 import ua.com.foxminded.university.entity.Course;
+import ua.com.foxminded.university.entity.Department;
 import ua.com.foxminded.university.entity.Lesson;
 import ua.com.foxminded.university.entity.Professor;
 import ua.com.foxminded.university.entity.ScienceDegree;
@@ -29,6 +32,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+
 @ExtendWith( MockitoExtension.class)
 class ProfessorServiceImplTest {
 
@@ -43,6 +47,9 @@ class ProfessorServiceImplTest {
 
     @Mock
     GroupDao groupDao;
+
+    @Mock
+    DepartmentDao departmentDao;
 
     @Mock
     UserValidator userValidator;
@@ -77,6 +84,47 @@ class ProfessorServiceImplTest {
     }
 
     @Test
+    void changeDepartmentShouldChangeDepartmentOfProfessorIfArgumentIsProfessorIdAndDepartmentId() {
+        long professorId = 1;
+        long newDepartmentId = 2;
+
+        doNothing().when(professorDao).changeDepartment(professorId, newDepartmentId);
+        when(professorDao.findById(professorId)).thenReturn(Optional.of(Professor.builder().build()));
+        when(departmentDao.findById(newDepartmentId)).thenReturn(Optional.of(Department.builder().build()));
+
+        professorService.changeDepartment(professorId, newDepartmentId);
+
+        verify(professorDao).changeDepartment(professorId, newDepartmentId);
+        verify(professorDao).findById(professorId);
+        verify(departmentDao).findById(newDepartmentId);
+    }
+
+    @Test
+    void removeDepartmentShouldRemoveDepartmentOfProfessorIfArgumentIsProfessorId() {
+        long professorId = 1;
+
+        doNothing().when(professorDao).removeDepartmentFromProfessor(professorId);
+        when(professorDao.findById(professorId)).thenReturn(Optional.of(Professor.builder().build()));
+
+        professorService.removeDepartmentFromProfessor(professorId);
+
+        verify(professorDao).removeDepartmentFromProfessor(professorId);
+        verify(professorDao).findById(professorId);
+    }
+
+    @Test
+    void removeDepartmentShouldThrowExceptionIfProfessorNotExist() {
+        long professorId = 1;
+
+        when(professorDao.findById(professorId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> professorService.removeDepartmentFromProfessor(professorId))
+                .hasMessage("There no professor with id: 1");
+
+        verify(professorDao).findById(professorId);
+    }
+
+    @Test
     void findByCourseIdShouldReturnListOfProfessorIfArgumentIsCourseId() {
         long courseId = 1;
         List<Professor> professors = Arrays.asList(Professor.builder().withId(1L).build());
@@ -91,6 +139,31 @@ class ProfessorServiceImplTest {
 
         verify(professorResponseMapper).mapEntityToDto(professors.get(0));
         verify(professorDao).findByCourseId(courseId);
+    }
+
+    @Test
+    void findByDepartmentIdShouldReturnCoursesResponseIfArgumentIsDepartmentId() {
+        long departmentId = 1;
+
+        when(departmentDao.findById(departmentId)).thenReturn(Optional.of(Department.builder().withId(1L).build()));
+        when(professorDao.findByDepartmentId(departmentId)).thenReturn(Arrays.asList(Professor.builder().withId(1L).build(),
+                Professor.builder().withId(2L).build()));
+
+        professorService.findByDepartmentId(departmentId);
+
+        verify(departmentDao).findById(departmentId);
+        verify(professorDao).findByDepartmentId(departmentId);
+    }
+
+    @Test
+    void findByDepartmentIdShouldThrowExceptionIfDepartmentNotExist() {
+        long departmentId = 1;
+
+        when(departmentDao.findById(departmentId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> professorService.findByDepartmentId(departmentId)).hasMessage("There no department with id: 1");
+
+        verify(departmentDao).findById(departmentId);
     }
 
     @Test
@@ -141,12 +214,34 @@ class ProfessorServiceImplTest {
     }
 
     @Test
-    void findByIdShouldReturnOptionalOfProfessorResponseIfArgumentIsProfessorId() {
+    void findByIdShouldReturnProfessorResponseIfArgumentIsProfessorId() {
         long professorId = 1;
 
         when(professorDao.findById(professorId)).thenReturn(Optional.of(Professor.builder().withId(1L).build()));
 
         professorService.findById(professorId);
+
+        verify(professorDao).findById(professorId);
+    }
+
+    @Test
+    void findByIdShouldThrowExceptionIfProfessorNotExist() {
+        long professorId = 1;
+
+        when(professorDao.findById(professorId)).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> professorService.findById(professorId)).hasMessage("There no professor with id: 1");
+
+        verify(professorDao).findById(professorId);
+    }
+
+    @Test
+    void findByIdShouldThrowExceptionIfProfessorNotExistIfArgumentIsProfessorId() {
+        long professorId = 1;
+
+        when(professorDao.findById(professorId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> professorService.findById(professorId)).hasMessage("There no professor with id: 1");
 
         verify(professorDao).findById(professorId);
     }

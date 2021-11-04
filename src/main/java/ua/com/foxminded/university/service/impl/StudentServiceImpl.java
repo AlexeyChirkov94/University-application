@@ -10,6 +10,7 @@ import ua.com.foxminded.university.dto.StudentResponse;
 import ua.com.foxminded.university.entity.Student;
 import ua.com.foxminded.university.mapper.interfaces.StudentRequestMapper;
 import ua.com.foxminded.university.mapper.interfaces.StudentResponseMapper;
+import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.interfaces.StudentService;
 import ua.com.foxminded.university.service.validator.UserValidator;
 import java.util.List;
@@ -37,8 +38,11 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
     }
 
     @Override
-    public Optional<StudentResponse> findById(long id) {
-        return studentDao.findById(id).map(studentResponseMapper::mapEntityToDto);
+    public StudentResponse findById(long id) {
+        Student student = studentDao.findById(id)
+                .orElseThrow(() -> new EntityDontExistException("There no student with id: " + id));
+
+        return studentResponseMapper.mapEntityToDto(student);
     }
 
     @Override

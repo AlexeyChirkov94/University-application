@@ -17,9 +17,12 @@ import org.springframework.web.context.WebApplicationContext;
 import ua.com.foxminded.university.TestsContextConfiguration;
 import ua.com.foxminded.university.dto.DepartmentResponse;
 import ua.com.foxminded.university.dto.FormOfEducationResponse;
+import ua.com.foxminded.university.dto.FormOfLessonRequest;
 import ua.com.foxminded.university.dto.GroupRequest;
 import ua.com.foxminded.university.dto.GroupResponse;
 import ua.com.foxminded.university.dto.StudentResponse;
+import ua.com.foxminded.university.service.exception.EntityAlreadyExistException;
+import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.interfaces.DepartmentService;
 import ua.com.foxminded.university.service.interfaces.FormOfEducationService;
 import ua.com.foxminded.university.service.interfaces.GroupService;
@@ -116,7 +119,7 @@ public class GroupsControllerTest {
         GroupResponse group = new GroupResponse();
         group.setName("Group 1");
 
-        when(groupService.findById(1L)).thenReturn(Optional.of(group));
+        when(groupService.findById(1L)).thenReturn(group);
 
         mockMvc.perform(get("/group/1"))
                 .andExpect(status().is(200))
@@ -178,7 +181,7 @@ public class GroupsControllerTest {
         group.setDepartmentResponse(department1);
         group.setFormOfEducationResponse(formOfEducation1);
 
-        when(groupService.findById(1L)).thenReturn(Optional.of(group));
+        when(groupService.findById(1L)).thenReturn(group);
         when(departmentService.findAll()).thenReturn(allDepartments);
         when(formOfEducationService.findAll()).thenReturn(allFormsOfEducation);
         when(studentService.findAll()).thenReturn(allStudents);
@@ -376,6 +379,45 @@ public class GroupsControllerTest {
                 .andExpect(redirectedUrl("/group"));
 
         verify(groupService).deleteById(1L);
+        verifyNoMoreInteractions(groupService);
+    }
+
+    @Test
+    void entityDoNotExistShouldGetExceptionFromModelAndRenderErrorView() throws Exception {
+        Exception exception = new EntityDontExistException("Group with id = 15 not exist");
+
+        when(groupService.findById(15L)).thenThrow(exception);
+
+        mockMvc.perform(get("/group/15")
+        )
+                .andExpect(status().isOk())
+                .andExpect(view().name("errors handling/entity not exist"))
+                .andExpect(model().attribute("exception", is(exception)));
+
+        verify(groupService).findById(15L);
+        verifyNoMoreInteractions(groupService);
+    }
+
+    @Test
+    void entityAlreadyExistShouldGetExceptionFromModelAndRenderErrorView() throws Exception {
+        GroupRequest groupRequest = new GroupRequest();
+        groupRequest.setName("Group1");
+
+        Exception exception = new EntityAlreadyExistException("Group with same name already exist");
+
+        when(groupService.create(groupRequest)).thenThrow(exception);
+
+        mockMvc.perform(post("/group")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("name", groupRequest.getName())
+                .param("formOfEducationId", "1")
+                .param("departmentId", "1")
+        )
+                .andExpect(status().isOk())
+                .andExpect(view().name("errors handling/entity already exist"))
+                .andExpect(model().attribute("exception", is(exception)));
+
+        verify(groupService).create(groupRequest);
         verifyNoMoreInteractions(groupService);
     }
 

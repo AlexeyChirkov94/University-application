@@ -101,7 +101,7 @@ class FrontControllerImplTest {
         when(viewProvider.readInt()).thenReturn(1, 0);
         doNothing().when(viewProvider).printMessage("Input student Id");
         when(viewProvider.readLong()).thenReturn(2L);
-        when(studentService.findById(2)).thenReturn(Optional.of(STUDENT_RESPONSE_1));
+        when(studentService.findById(2)).thenReturn(STUDENT_RESPONSE_1);
         when(lessonService.formTimeTableForGroup(1)).thenReturn(LESSON_RESPONSES);
         doNothing().when(viewProvider).printMessage("Time table for group with id: 1: \n");
         doNothing().when(viewProvider).printMessage(LESSON_RESPONSES.get(0).toString());

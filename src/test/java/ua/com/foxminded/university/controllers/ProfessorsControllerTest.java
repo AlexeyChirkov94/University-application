@@ -20,6 +20,7 @@ import ua.com.foxminded.university.dto.ProfessorRequest;
 import ua.com.foxminded.university.dto.ProfessorResponse;
 import ua.com.foxminded.university.dto.ScienceDegreeResponse;
 import ua.com.foxminded.university.service.exception.EntityAlreadyExistException;
+import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.exception.ValidateException;
 import ua.com.foxminded.university.service.interfaces.CourseService;
 import ua.com.foxminded.university.service.interfaces.ProfessorService;
@@ -114,7 +115,7 @@ public class ProfessorsControllerTest {
         professor.setLastName("Chirkov");
         professor.setEmail("chirkov@gamil.com");
         professor.setPassword("1234");
-        when(professorService.findById(1L)).thenReturn(Optional.of(professor));
+        when(professorService.findById(1L)).thenReturn(professor);
 
         mockMvc.perform(get("/professor/1"))
                 .andExpect(status().is(200))
@@ -167,7 +168,7 @@ public class ProfessorsControllerTest {
         professor.setCoursesResponse(professorCourses);
         professor.setScienceDegreeResponse(ScienceDegreeResponse.GRADUATE);
 
-        when(professorService.findById(1L)).thenReturn(Optional.of(professor));
+        when(professorService.findById(1L)).thenReturn(professor);
         when(courseService.findByProfessorId(1L)).thenReturn(professorCourses);
         when(courseService.findAll()).thenReturn(allCourses);
 
@@ -348,10 +349,26 @@ public class ProfessorsControllerTest {
                 .param("firstName", repeatableProfessor.getFirstName())
         )
                 .andExpect(status().isOk())
-                .andExpect(view().name("errors handling/common creating error"))
+                .andExpect(view().name("errors handling/entity already exist"))
                 .andExpect(model().attribute("exception", is(exception)));
 
         verify(professorService).register(repeatableProfessor);
+        verifyNoMoreInteractions(professorService);
+    }
+
+    @Test
+    void entityDoNotExistShouldGetExceptionFromModelAndRenderErrorView() throws Exception {
+        Exception exception = new EntityDontExistException("Professor with id = 15 not exist");
+
+        when(professorService.findById(15L)).thenThrow(exception);
+
+        mockMvc.perform(get("/professor/15")
+        )
+                .andExpect(status().isOk())
+                .andExpect(view().name("errors handling/entity not exist"))
+                .andExpect(model().attribute("exception", is(exception)));
+
+        verify(professorService).findById(15L);
         verifyNoMoreInteractions(professorService);
     }
 

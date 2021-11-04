@@ -2,16 +2,13 @@ package ua.com.foxminded.university.service.interfaces;
 
 import ua.com.foxminded.university.dto.GroupRequest;
 import ua.com.foxminded.university.dto.GroupResponse;
-import ua.com.foxminded.university.entity.Group;
-
 import java.util.List;
-import java.util.Optional;
 
 public interface GroupService {
 
     GroupResponse create(GroupRequest requestDto);
 
-    Optional<GroupResponse> findById(long id);
+    GroupResponse findById(long id);
 
     List<GroupResponse> findByFormOfEducation(long formOfEducationId);
 

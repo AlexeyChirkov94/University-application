@@ -192,12 +192,23 @@ class GroupServiceImplTest {
     }
 
     @Test
-    void findByIdShouldReturnOptionalOfGroupResponseIfArgumentIsGroupId() {
+    void findByIdShouldReturnGroupResponseIfArgumentIsGroupId() {
         long groupId = 1;
 
         when(groupDao.findById(groupId)).thenReturn(Optional.of(Group.builder().withId(1L).build()));
 
         groupService.findById(groupId);
+
+        verify(groupDao).findById(groupId);
+    }
+
+    @Test
+    void findByIdShouldThrowExceptionIfGroupNotExist() {
+        long groupId = 1;
+
+        when(groupDao.findById(groupId)).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> groupService.findById(groupId)).hasMessage("There no group with id: 1");
 
         verify(groupDao).findById(groupId);
     }

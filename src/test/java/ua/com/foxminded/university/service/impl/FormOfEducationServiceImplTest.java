@@ -1,5 +1,6 @@
 package ua.com.foxminded.university.service.impl;
 
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -61,18 +62,29 @@ class FormOfEducationServiceImplTest {
         when(formOfEducationDao.findByName(formOfEducationName)).thenReturn(Optional.of(FormOfEducation.builder()
                 .withName(formOfEducationName).build()));
 
-        assertThatThrownBy(() -> formOfEducationService.create(formOfEducationRequest)).hasMessage("FormOfEducation with same name already exist");
+        assertThatThrownBy(() -> formOfEducationService.create(formOfEducationRequest)).hasMessage("Form of education with same name already exist");
 
         verify(formOfEducationDao).findByName(formOfEducationName);
     }
 
     @Test
-    void findByIdShouldReturnOptionalOfFormOfEducationResponseIfArgumentIsFormOfEducationId() {
+    void findByIdShouldReturnFormOfEducationResponseIfArgumentIsFormOfEducationId() {
         long formOfEducationId = 1;
 
         when(formOfEducationDao.findById(formOfEducationId)).thenReturn(Optional.of(FormOfEducation.builder().withId(1L).build()));
 
         formOfEducationService.findById(formOfEducationId);
+
+        verify(formOfEducationDao).findById(formOfEducationId);
+    }
+
+    @Test
+    void findByIdShouldThrowExceptionIfFormOfEducationNotExistIfArgumentIsFormOfEducationId() {
+        long formOfEducationId = 1;
+
+        when(formOfEducationDao.findById(formOfEducationId)).thenReturn(Optional.empty());
+
+        AssertionsForClassTypes.assertThatThrownBy(() -> formOfEducationService.findById(formOfEducationId)).hasMessage("There no form of education with id: 1");
 
         verify(formOfEducationDao).findById(formOfEducationId);
     }

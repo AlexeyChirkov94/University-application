@@ -33,17 +33,17 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
+    public LayoutDialect layoutDialect() {
+        return new LayoutDialect();
+    }
+
+    @Bean
     public SpringTemplateEngine templateEngine() {
         SpringTemplateEngine templateEngine = new SpringTemplateEngine();
         templateEngine.addDialect(new LayoutDialect());
         templateEngine.setTemplateResolver(templateResolver());
         templateEngine.setEnableSpringELCompiler(true);
         return templateEngine;
-    }
-
-    @Bean
-    public LayoutDialect layoutDialect() {
-        return new LayoutDialect();
     }
 
     @Override

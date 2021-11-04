@@ -2,17 +2,23 @@ package ua.com.foxminded.university.service.impl;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ua.com.foxminded.university.dao.interfaces.CourseDao;
 import ua.com.foxminded.university.dao.interfaces.DepartmentDao;
-import ua.com.foxminded.university.dto.CourseResponse;
+import ua.com.foxminded.university.dao.interfaces.GroupDao;
+import ua.com.foxminded.university.dao.interfaces.ProfessorDao;
 import ua.com.foxminded.university.dto.DepartmentRequest;
 import ua.com.foxminded.university.dto.DepartmentResponse;
+import ua.com.foxminded.university.entity.Course;
 import ua.com.foxminded.university.entity.Department;
+import ua.com.foxminded.university.entity.Group;
+import ua.com.foxminded.university.entity.Professor;
 import ua.com.foxminded.university.mapper.interfaces.DepartmentRequestMapper;
 import ua.com.foxminded.university.mapper.interfaces.DepartmentResponseMapper;
 import ua.com.foxminded.university.service.exception.EntityAlreadyExistException;
+import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.interfaces.DepartmentService;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,6 +26,9 @@ import java.util.stream.Collectors;
 public class DepartmentServiceImpl extends AbstractPageableCrudService implements DepartmentService {
 
     private final DepartmentDao departmentDao;
+    private final ProfessorDao professorDao;
+    private final CourseDao courseDao;
+    private final GroupDao groupDao;
     private final DepartmentRequestMapper departmentRequestMapper;
     private final DepartmentResponseMapper departmentResponseMapper;
 
@@ -36,8 +45,11 @@ public class DepartmentServiceImpl extends AbstractPageableCrudService implement
     }
 
     @Override
-    public Optional<DepartmentResponse> findById(long id) {
-        return departmentDao.findById(id).map(departmentResponseMapper::mapEntityToDto);
+    public DepartmentResponse findById(long id) {
+        Department department = departmentDao.findById(id)
+                .orElseThrow(() -> new EntityDontExistException("There no department with id: " + id));
+
+        return departmentResponseMapper.mapEntityToDto(department);
     }
 
     @Override
@@ -64,8 +76,25 @@ public class DepartmentServiceImpl extends AbstractPageableCrudService implement
     }
 
     @Override
+    @Transactional(transactionManager = "txManager")
     public boolean deleteById(long id) {
         if(departmentDao.findById(id).isPresent()){
+
+            List<Professor> departmentsProfessors = professorDao.findByDepartmentId(id);
+            for (Professor professor : departmentsProfessors){
+                professorDao.removeDepartmentFromProfessor(professor.getId());
+            }
+
+            List<Course> departmentsCourses = courseDao.findByDepartmentId(id);
+            for(Course course : departmentsCourses){
+                courseDao.removeDepartmentFromCourse(course.getId());
+            }
+
+            List<Group> departmentsGroup = groupDao.findByDepartmentId(id);
+            for (Group group : departmentsGroup){
+                groupDao.removeDepartmentFromGroup(group.getId());
+            }
+
             return departmentDao.deleteById(id);
         }
         return false;

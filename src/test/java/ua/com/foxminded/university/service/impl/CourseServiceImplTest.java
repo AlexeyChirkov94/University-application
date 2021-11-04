@@ -1,5 +1,6 @@
 package ua.com.foxminded.university.service.impl;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -229,7 +230,7 @@ class CourseServiceImplTest {
     }
 
     @Test
-    void findByIdShouldReturnOptionalOfCourseResponseIfArgumentIsCourseId() {
+    void findByIdShouldReturnCourseResponseIfArgumentIsCourseId() {
         long courseId = 1;
 
         when(courseDao.findById(courseId)).thenReturn(Optional.of(Course.builder().withId(1L).build()));
@@ -237,6 +238,31 @@ class CourseServiceImplTest {
         courseService.findById(courseId);
 
         verify(courseDao).findById(courseId);
+    }
+
+    @Test
+    void findByIdShouldThrowExceptionIfCourseNotExist() {
+        long courseId = 1;
+
+        when(courseDao.findById(courseId)).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> courseService.findById(courseId)).hasMessage("There no course with id: 1");
+
+        verify(courseDao).findById(courseId);
+    }
+
+    @Test
+    void findByDepartmentIdShouldReturnCoursesResponseIfArgumentIsDepartmentId() {
+        long departmentId = 1;
+
+        when(departmentDao.findById(departmentId)).thenReturn(Optional.of(Department.builder().withId(1L).build()));
+        when(courseDao.findByDepartmentId(departmentId)).thenReturn(Arrays.asList(Course.builder().withId(1L).build(),
+                Course.builder().withId(2L).build()));
+
+        courseService.findByDepartmentId(departmentId);
+
+        verify(departmentDao).findById(departmentId);
+        verify(courseDao).findByDepartmentId(departmentId);
     }
 
     @Test

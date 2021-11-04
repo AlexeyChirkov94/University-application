@@ -3,7 +3,7 @@
       layout:decorate="~{templates/layout.html}"
       xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Professors</title>
+    <title>Forms of lesson</title>
 </head>
 
 <body>
@@ -14,28 +14,24 @@
 
 <section layout:fragment="page-content">
 
-    <p class="h1">All professors</p>
+    <p class="h1">All forms of lesson</p>
 
     <table class="table table-striped">
         <thead>
         <tr>
             <th scope="col">Id</th>
-            <th scope="col">First name</th>
-            <th scope="col">Last name</th>
-            <th scope="col">Email</th>
-            <th scope="col">Department</th>
+            <th scope="col">Name</th>
+            <th scope="col">Duration</th>
             <th scope="col">More</th>
         </tr>
         </thead>
         <tbody>
-        <div th:each="professor : ${professors}">
+        <div th:each="formOfLesson : ${formsOfLesson}">
             <tr>
-                <th scope="row" th:text="${professor.getId()}"></th>
-                <td th:text="${professor.getFirstName()}"> </td>
-                <td th:text="${professor.getLastName()}"></td>
-                <td th:text="${professor.getEmail()}"> </td>
-                <td th:text="${professor.getDepartmentResponse().getName()}"> </td>
-                <td> <a class="btn btn-secondary" th:href="@{/professor/{id}(id=${professor.getId()})}" role="button">Go to</a> </td>
+                <th scope="row" th:text="${formOfLesson.getId()}"></th>
+                <td th:text="${formOfLesson.getName()}"> </td>
+                <td th:text="${formOfLesson.getDuration() + ' ' +'min'}"></td>
+                <td> <a class="btn btn-secondary" th:href="@{/lesson/type/{id}(id=${formOfLesson.getId()})}" role="button">Go to</a> </td>
             </tr>
         </div>
         </tbody>
@@ -45,19 +41,19 @@
 
     <ul class="pagination pagination-lg flex-wrap justify-content-center">
         <li th:class="${liPreviousPageLabelStatus}">
-            <a th:class="${aPreviousPageLabelStatus}" th:href="@{/professor/?page={page}(page=${previousPage})}">Previous</a>
+            <a th:class="${aPreviousPageLabelStatus}" th:href="@{/lesson/type/?page={page}(page=${previousPage})}">Previous</a>
         </li>
         <li th:class="${liPreviousPageNumberStatus}">
-            <a th:class="${aPreviousPageNumberStatus}" th:href="@{/professor/?page={page}(page=${previousPage})}" th:text="${previousPage}">Previous</a>
+            <a th:class="${aPreviousPageNumberStatus}" th:href="@{/lesson/type/?page={page}(page=${previousPage})}" th:text="${previousPage}">Previous</a>
         </li>
         <li class="page-item active" aria-current="page">
             <text class="page-link" th:text="${currentPage}" >currentPage</text>
         </li>
         <li class="page-item">
-            <a class="page-link" th:href="@{/professor/?page={page}(page=${nextPage})}" th:text="${nextPage}">Previous</a>
+            <a class="page-link" th:href="@{/lesson/type/?page={page}(page=${nextPage})}" th:text="${nextPage}">Previous</a>
         </li>
         <li class="page-item">
-            <a class="page-link" th:href="@{/professor/?page={page}(page=${nextPage})}">Next</a>
+            <a class="page-link" th:href="@{/lesson/type/?page={page}(page=${nextPage})}">Next</a>
         </li>
     </ul>
 

@@ -1,11 +1,11 @@
 package ua.com.foxminded.university.service.impl;
 
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.interfaces.FormOfLessonDao;
 import ua.com.foxminded.university.dao.interfaces.LessonDao;
 import ua.com.foxminded.university.dto.FormOfLessonRequest;
@@ -61,18 +61,29 @@ class FormOfLessonServiceImplTest {
 
         when(formOfLessonDao.findByName(formOfLessonName)).thenReturn(Optional.of(FormOfLesson.builder().withName(formOfLessonName).build()));
 
-        assertThatThrownBy(() -> formOfLessonService.create(formOfLessonRequest)).hasMessage("FormOfLesson with same name already exist");
+        assertThatThrownBy(() -> formOfLessonService.create(formOfLessonRequest)).hasMessage("Form of lesson with same name already exist");
 
         verify(formOfLessonDao).findByName(formOfLessonName);
     }
 
     @Test
-    void findByIdShouldReturnOptionalOfFormOfLessonResponseIfArgumentIsFormOfLessonId() {
+    void findByIdShouldReturnFormOfLessonResponseIfArgumentIsFormOfLessonId() {
         long formOfLessonId = 1;
 
         when(formOfLessonDao.findById(formOfLessonId)).thenReturn(Optional.of(FormOfLesson.builder().withId(1L).build()));
 
         formOfLessonService.findById(formOfLessonId);
+
+        verify(formOfLessonDao).findById(formOfLessonId);
+    }
+
+    @Test
+    void findByIdShouldThrowExceptionIfFormOfLessonNotExistIfArgumentIsFormOfLessonId() {
+        long formOfLessonId = 1;
+
+        when(formOfLessonDao.findById(formOfLessonId)).thenReturn(Optional.empty());
+
+        AssertionsForClassTypes.assertThatThrownBy(() -> formOfLessonService.findById(formOfLessonId)).hasMessage("There no form of lesson with id: 1");
 
         verify(formOfLessonDao).findById(formOfLessonId);
     }

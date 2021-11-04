@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{templates/layout.html}"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Update form of lesson</title>
+</head>
+
+<body>
+
+<section layout:fragment="header"> <div th:replace="templates/fragments/header.html"></div> </section>
+<section layout:fragment="footer"> <div th:replace="templates/fragments/footer.html"></div> </section>
+<section layout:fragment="sidebar"> <div th:replace="templates/fragments/sidebar.html"></div> </section>
+
+<section layout:fragment="page-content">
+
+    <h4 th:text="${'Update form of lesson ' + formOfLessonRequest.getName() +' with ID: ' + formOfLessonRequest.getId()}" >ID</h4>
+    <br>
+
+    <h4>Form of lesson updating</h4>
+
+    <form th:method="PATCH" th:action="@{/lesson/type/{id}(id=${formOfLessonRequest.getId()})}" th:object="${formOfLessonRequest}">
+
+        <div class="form-floating mb-2">
+            <input type="text" th:field="*{name}" class="form-control" id="name" placeholder="Change name of form of lesson:">
+            <label for="name">Change name of form of lesson:</label>
+        </div>
+
+        <div class="form-floating mb-2">
+            <input type="number" th:field="*{duration}" class="form-control" id="duration" placeholder="Change duration of form of lesson:">
+            <label for="duration">Change duration of form of lesson:</label>
+        </div>
+
+        <input class="btn btn-success" type="submit" role="button" value="Update form of lesson"/>
+    </form>
+
+    <br>
+
+</section>
+
+</body>
+</html>

@@ -148,12 +148,23 @@ class LessonServiceImplTest {
     }
 
     @Test
-    void findByIdShouldReturnOptionalOfLessonIfArgumentIsLessonId() {
+    void findByIdShouldReturnLessonIfArgumentIsLessonId() {
         long lessonId = 1;
 
         when(lessonDao.findById(lessonId)).thenReturn(Optional.of(Lesson.builder().withId(1L).build()));
 
         lessonService.findById(lessonId);
+
+        verify(lessonDao).findById(lessonId);
+    }
+
+    @Test
+    void findByIdShouldThrowExceptionIfLessonNotExist() {
+        long lessonId = 1;
+
+        when(lessonDao.findById(lessonId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> lessonService.findById(lessonId)).hasMessage("There no lesson with id: 1");
 
         verify(lessonDao).findById(lessonId);
     }

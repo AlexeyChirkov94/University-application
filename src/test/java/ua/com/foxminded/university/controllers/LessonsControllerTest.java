@@ -16,11 +16,15 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import ua.com.foxminded.university.TestsContextConfiguration;
 import ua.com.foxminded.university.dto.CourseResponse;
+import ua.com.foxminded.university.dto.FormOfLessonRequest;
 import ua.com.foxminded.university.dto.FormOfLessonResponse;
 import ua.com.foxminded.university.dto.GroupResponse;
 import ua.com.foxminded.university.dto.LessonRequest;
 import ua.com.foxminded.university.dto.LessonResponse;
 import ua.com.foxminded.university.dto.ProfessorResponse;
+import ua.com.foxminded.university.dto.StudentRequest;
+import ua.com.foxminded.university.service.exception.EntityAlreadyExistException;
+import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.exception.IncompatibilityCourseAndProfessorException;
 import ua.com.foxminded.university.service.exception.ValidateException;
 import ua.com.foxminded.university.service.interfaces.CourseService;
@@ -113,7 +117,7 @@ class LessonsControllerTest {
         lessonResponse.setId(1L);
         lessonResponse.setTimeOfStartLesson(LocalDateTime.of(2020, 1, 10, 10, 00, 00));
 
-        when(lessonService.findById(1L)).thenReturn(Optional.of(lessonResponse));
+        when(lessonService.findById(1L)).thenReturn(lessonResponse);
 
         mockMvc.perform(get("/lesson/1"))
                 .andExpect(status().is(200))
@@ -154,7 +158,7 @@ class LessonsControllerTest {
         LessonRequest lessonRequest = new LessonRequest();
         lessonRequest.setTimeOfStartLesson(lessonResponse.getTimeOfStartLesson());
 
-        when(lessonService.findById(1L)).thenReturn(Optional.of(lessonResponse));
+        when(lessonService.findById(1L)).thenReturn(lessonResponse);
         when(groupService.findAll()).thenReturn(allGroups);
         when(formOfLessonService.findAll()).thenReturn(allFormsOfLesson);
         when(professorService.findAll()).thenReturn(availableProfessors);
@@ -205,7 +209,7 @@ class LessonsControllerTest {
         LessonRequest lessonRequest = new LessonRequest();
         lessonRequest.setTimeOfStartLesson(lessonResponse.getTimeOfStartLesson());
 
-        when(lessonService.findById(1L)).thenReturn(Optional.of(lessonResponse));
+        when(lessonService.findById(1L)).thenReturn(lessonResponse);
         when(groupService.findAll()).thenReturn(allGroups);
         when(formOfLessonService.findAll()).thenReturn(allFormsOfLesson);
         when(professorService.findByCourseId(1L)).thenReturn(availableProfessors);
@@ -354,6 +358,182 @@ class LessonsControllerTest {
 
         verify(lessonService).create(notValidLesson);
         verifyNoMoreInteractions(lessonService);
+    }
+
+
+    @Test
+    void showAllShouldAddFormsOfLessonToModelAndRenderIndexView() throws Exception {
+        FormOfLessonResponse first = new FormOfLessonResponse();
+        FormOfLessonResponse second = new FormOfLessonResponse();
+        first.setId(1L);
+        second.setId(2L);
+        List<FormOfLessonResponse> formsOfLessonResponse = Arrays.asList(first, second);
+        when(formOfLessonService.findAll(null)).thenReturn(formsOfLessonResponse);
+
+        mockMvc.perform(get("/lesson/type"))
+                .andExpect(status().is(200))
+                .andExpect(view().name("/formOfLesson/all"))
+                .andExpect(forwardedUrl("/formOfLesson/all"))
+                .andExpect(model().attribute("formsOfLesson", hasSize(2)))
+                .andExpect(model().attribute("formsOfLesson", is(formsOfLessonResponse)));
+
+        verify(formOfLessonService).findAll(null);
+        verifyNoMoreInteractions(formOfLessonService);
+    }
+
+    @Test
+    void showShouldAddFormOfLessonToModelAndRenderShowView() throws Exception {
+        FormOfLessonResponse formOfLessonResponse = new FormOfLessonResponse();
+        formOfLessonResponse.setId(1L);
+        formOfLessonResponse.setName("lecture");
+
+        when(formOfLessonService.findById(1L)).thenReturn(formOfLessonResponse);
+
+        mockMvc.perform(get("/lesson/type/1"))
+                .andExpect(status().is(200))
+                .andExpect(view().name("/formOfLesson/show"))
+                .andExpect(forwardedUrl("/formOfLesson/show"))
+                .andExpect(model().attribute("formOfLesson", is(formOfLessonResponse)));
+
+        verify(formOfLessonService).findById(1L);
+        verifyNoMoreInteractions(formOfLessonService);
+    }
+
+    @Test
+    void newShouldGetFormOfLessonFromModelAndRenderNewView() throws Exception {
+
+        mockMvc.perform(get("/lesson/type/new"))
+                .andExpect(status().is(200))
+                .andExpect(view().name("/formOfLesson/add"))
+                .andExpect(forwardedUrl("/formOfLesson/add"));
+    }
+
+    @Test
+    void editShouldAddFormOfLessonToModelAndRenderEditView() throws Exception {
+        FormOfLessonResponse formOfLessonResponse = new FormOfLessonResponse();
+        formOfLessonResponse.setId(1L);
+        formOfLessonResponse.setName("lecture");
+        FormOfLessonRequest formOfLessonRequest = new FormOfLessonRequest();
+        formOfLessonRequest.setId(formOfLessonResponse.getId());
+        formOfLessonRequest.setName(formOfLessonResponse.getName());
+
+        when(formOfLessonService.findById(1L)).thenReturn(formOfLessonResponse);
+
+        mockMvc.perform(get("/lesson/type/1/edit"))
+                .andExpect(status().is(200))
+                .andExpect(view().name("/formOfLesson/edit"))
+                .andExpect(forwardedUrl("/formOfLesson/edit"))
+                .andExpect(model().attribute("formOfLessonRequest", is(formOfLessonRequest)));
+
+        verify(formOfLessonService).findById(1L);
+        verifyNoMoreInteractions(formOfLessonService);
+    }
+
+    @Test
+    void createShouldGetFormOfLessonFromModelAndRenderIndexView() throws Exception {
+        FormOfLessonRequest formOfLessonRequest = new FormOfLessonRequest();
+        formOfLessonRequest.setId(1L);
+        formOfLessonRequest.setName("lecture");
+        formOfLessonRequest.setDuration(60);
+
+        FormOfLessonResponse formOfLessonResponse = new FormOfLessonResponse();
+
+        when(formOfLessonService.create(formOfLessonRequest)).thenReturn(formOfLessonResponse);
+
+        mockMvc.perform(post("/lesson/type")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("id", formOfLessonRequest.getId().toString())
+                .param("name", formOfLessonRequest.getName())
+                .param("duration", formOfLessonRequest.getDuration().toString())
+        )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/lesson/type"))
+                .andExpect(redirectedUrl("/lesson/type"))
+                .andExpect(model().attribute("formOfLesson", hasProperty("id", is(formOfLessonRequest.getId()))))
+                .andExpect(model().attribute("formOfLesson", hasProperty("name", is(formOfLessonRequest.getName()))))
+                .andExpect(model().attribute("formOfLesson", hasProperty("duration", is(formOfLessonRequest.getDuration()))));
+
+        verify(formOfLessonService).create(formOfLessonRequest);
+        verifyNoMoreInteractions(formOfLessonService);
+    }
+
+    @Test
+    void updateShouldGetFormOfLessonFromModelAndRenderIndexView() throws Exception {
+        FormOfLessonRequest formOfLessonRequest = new FormOfLessonRequest();
+        formOfLessonRequest.setId(1L);
+        formOfLessonRequest.setName("lecture");
+        formOfLessonRequest.setDuration(60);
+
+        doNothing().when(formOfLessonService).edit(formOfLessonRequest);
+
+        mockMvc.perform(patch("/lesson/type/1")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("id", formOfLessonRequest.getId().toString())
+                .param("name", formOfLessonRequest.getName())
+                .param("duration", formOfLessonRequest.getDuration().toString())
+        )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/lesson/type"))
+                .andExpect(redirectedUrl("/lesson/type"))
+                .andExpect(model().attribute("formOfLessonRequest", hasProperty("id", is(formOfLessonRequest.getId()))))
+                .andExpect(model().attribute("formOfLessonRequest", hasProperty("name", is(formOfLessonRequest.getName()))))
+                .andExpect(model().attribute("formOfLessonRequest", hasProperty("duration", is(formOfLessonRequest.getDuration()))));
+
+        verify(formOfLessonService).edit(formOfLessonRequest);
+        verifyNoMoreInteractions(formOfLessonService);
+    }
+
+    @Test
+    void deleteShouldGetFormOfLessonIdFromUrlAndRenderIndexView() throws Exception {
+
+        when(formOfLessonService.deleteById(1L)).thenReturn(true);
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/lesson/type/1")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+        )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/lesson/type"))
+                .andExpect(redirectedUrl("/lesson/type"));
+
+        verify(formOfLessonService).deleteById(1L);
+        verifyNoMoreInteractions(formOfLessonService);
+    }
+
+    @Test
+    void entityDoNotExistShouldGetExceptionFromModelAndRenderErrorView() throws Exception {
+        Exception exception = new EntityDontExistException("Lesson with id = 15 not exist");
+
+        when(lessonService.findById(15L)).thenThrow(exception);
+
+        mockMvc.perform(get("/lesson/15")
+        )
+                .andExpect(status().isOk())
+                .andExpect(view().name("errors handling/entity not exist"))
+                .andExpect(model().attribute("exception", is(exception)));
+
+        verify(lessonService).findById(15L);
+        verifyNoMoreInteractions(lessonService);
+    }
+
+    @Test
+    void entityAlreadyExistShouldGetExceptionFromModelAndRenderErrorView() throws Exception {
+        FormOfLessonRequest formOfLessonRequest = new FormOfLessonRequest();
+        formOfLessonRequest.setName("lecture");
+
+        Exception exception = new EntityAlreadyExistException("Form of lesson with same name already exist");
+
+        when(formOfLessonService.create(formOfLessonRequest)).thenThrow(exception);
+
+        mockMvc.perform(post("/lesson/type")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("name", formOfLessonRequest.getName())
+        )
+                .andExpect(status().isOk())
+                .andExpect(view().name("errors handling/entity already exist"))
+                .andExpect(model().attribute("exception", is(exception)));
+
+        verify(formOfLessonService).create(formOfLessonRequest);
+        verifyNoMoreInteractions(formOfLessonService);
     }
 
 }
