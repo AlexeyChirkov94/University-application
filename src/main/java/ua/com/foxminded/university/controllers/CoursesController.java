@@ -89,14 +89,14 @@ public class CoursesController {
         return "redirect:/course";
     }
 
-    @PostMapping("/{id}/addProfessorToCourse")
+    @PostMapping("/{id}/assign/professor")
     public String addProfessorToCourse(Model model, @PathVariable("id") long courseId, @RequestParam long idNewProfessor) {
         model.addAttribute("idNewProfessor", idNewProfessor);
         courseService.addCourseToProfessorCourseList(courseId, idNewProfessor);
         return "redirect:/course/" + courseId + "/edit";
     }
 
-    @PostMapping("/{id}/removeProfessorFromCourse")
+    @PostMapping("/{id}/remove/professor")
     public String removeProfessorFromCourse(Model model, @PathVariable("id") long courseId, @RequestParam long idRemovingProfessor) {
         model.addAttribute("idRemovingProfessor", idRemovingProfessor);
         courseService.removeCourseFromProfessorCourseList(courseId, idRemovingProfessor);

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{templates/layout.html}"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>New department</title>
+</head>
+
+<body>
+
+<section layout:fragment="header"> <div th:replace="templates/fragments/header.html"></div> </section>
+<section layout:fragment="footer"> <div th:replace="templates/fragments/footer.html"></div> </section>
+<section layout:fragment="sidebar"> <div th:replace="templates/fragments/sidebar.html"></div> </section>
+
+<section layout:fragment="page-content">
+
+    <h4>Registration of a new department</h4>
+
+    <br>
+
+    <form th:method="POST" th:action="@{/department}" th:object="${department}">
+
+        <div class="form-floating mb-3">
+            <input type="text" th:field="*{name}" class="form-control" id="name of department" placeholder="Choose name of new department:">
+            <label for="name of department">Choose name of new department:</label>
+        </div>
+
+        <input class="btn btn-success" type="submit" role="button" value="Add new department"/>
+
+    </form>
+
+</section>
+
+</body>
+</html>

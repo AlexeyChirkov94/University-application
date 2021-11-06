@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{templates/layout.html}"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Update form of Education</title>
+</head>
+
+<body>
+
+<section layout:fragment="header"> <div th:replace="templates/fragments/header.html"></div> </section>
+<section layout:fragment="footer"> <div th:replace="templates/fragments/footer.html"></div> </section>
+<section layout:fragment="sidebar"> <div th:replace="templates/fragments/sidebar.html"></div> </section>
+
+<section layout:fragment="page-content">
+
+    <h4 th:text="${'Update form of education ' + formOfEducationRequest.getName() +' with ID: ' + formOfEducationRequest.getId()}" >ID</h4>
+    <br>
+
+    <h4>Form of education updating</h4>
+
+    <form th:method="PATCH" th:action="@{/education/form/{id}(id=${formOfEducationRequest.getId()})}" th:object="${formOfEducationRequest}">
+
+        <div class="form-floating mb-2">
+            <input type="text" th:field="*{name}" class="form-control" id="name" placeholder="Change name of form of education:">
+            <label for="name">Change name of form of education:</label>
+        </div>
+
+        <input class="btn btn-success" type="submit" role="button" value="Update form of education"/>
+    </form>
+
+    <br>
+    <hr>
+
+    <h4>Groups current form of education</h4>
+    <h6>Current groups:</h6>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Name</th>
+            <th scope="col">Department</th>
+            <th scope="col">Remove group from form of education</th>
+        </tr>
+        </thead>
+        <tbody>
+        <div th:each="formOfEducationGroup : ${formOfEducationGroups}">
+            <tr>
+                <th scope="row" th:text="${formOfEducationGroup.getId()}"></th>
+                <td th:text="${formOfEducationGroup.getName()}"> </td>
+                <td th:text="${formOfEducationGroup.getDepartmentResponse().getName()}"></td>
+                <td>
+                    <form method="post" th:action="@{/education/form/{id}/remove/group/(id=${formOfEducationRequest.getId()})}">
+                        <input type="hidden" name="idRemovingGroup" th:value="${formOfEducationGroup.getId()}">
+                        <button class="btn btn-danger" type="submit">Remove group from form of education</button>
+                    </form>
+                </td>
+            </tr>
+        </div>
+        </tbody>
+    </table>
+    <br>
+
+    <h6>Management:</h6>
+    <form method="post" th:action="@{/education/form/{id}/assign/group/(id=${formOfEducationRequest.getId()})}" class="mb-2">
+        <select class="form-select  mb-2" name="idNewGroup">
+            <option selected="" disabled="" value="">Choose group for adding to this form of education:</option>
+            <div th:each="notFormOfEducationGroup : ${notFormOfEducationGroups}">
+                <option th:value="${notFormOfEducationGroup.getId()}"
+                        th:text="${notFormOfEducationGroup.getName() + ' (ID: ' + notFormOfEducationGroup.getId() + ')'
+                        +', current form of education:' + notFormOfEducationGroup.getFormOfEducationResponse().getName()
+                            }"> </option>
+            </div>
+        </select>
+        <button class="btn btn-success" type="submit">Add group to current from of education course</button>
+    </form>
+    <form method="post" th:action="@{/education/form/{id}/remove/group/(id=${formOfEducationRequest.getId()})}" class="mb-2">
+        <select class="form-select  mb-2" name="idRemovingGroup">
+            <option selected="" disabled="" value="">Choose group for removing to this form of education::</option>
+            <div th:each="formOfEducationGroup : ${formOfEducationGroups}">
+                <option th:value="${formOfEducationGroup.getId()}"
+                        th:text="${formOfEducationGroup.getName() + ' (ID: ' + formOfEducationGroup.getId() + ')'
+                        +', current form of education:' + formOfEducationGroup.getFormOfEducationResponse().getName()
+                            }"> </option>
+            </div>
+        </select>
+        <button class="btn btn-danger" type="submit">Remove group to current from of education course</button>
+    </form>
+
+</section>
+
+</body>
+</html>

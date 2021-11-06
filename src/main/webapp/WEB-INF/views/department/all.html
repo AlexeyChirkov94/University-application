@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{templates/layout.html}"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Departments</title>
+</head>
+
+<body>
+
+<section layout:fragment="header"> <div th:replace="templates/fragments/header.html"></div> </section>
+<section layout:fragment="footer"> <div th:replace="templates/fragments/footer.html"></div> </section>
+<section layout:fragment="sidebar"> <div th:replace="templates/fragments/sidebar.html"></div> </section>
+
+<section layout:fragment="page-content">
+
+    <p class="h1">All departments</p>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Name</th>
+            <th scope="col">More</th>
+        </tr>
+        </thead>
+        <tbody>
+        <div th:each="department : ${departments}">
+            <tr>
+                <th scope="row" th:text="${department.getId()}"></th>
+                <td th:text="${department.getName()}"> </td>
+                <td> <a class="btn btn-secondary" th:href="@{/department/{id}(id=${department.getId()})}" role="button">Go to</a> </td>
+            </tr>
+        </div>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <ul class="pagination pagination-lg flex-wrap justify-content-center">
+        <li th:class="${liPreviousPageLabelStatus}">
+            <a th:class="${aPreviousPageLabelStatus}" th:href="@{/department/?page={page}(page=${previousPage})}">Previous</a>
+        </li>
+        <li th:class="${liPreviousPageNumberStatus}">
+            <a th:class="${aPreviousPageNumberStatus}" th:href="@{/department/?page={page}(page=${previousPage})}" th:text="${previousPage}">Previous</a>
+        </li>
+        <li class="page-item active" aria-current="page">
+            <text class="page-link" th:text="${currentPage}" >currentPage</text>
+        </li>
+        <li class="page-item">
+            <a class="page-link" th:href="@{/department/?page={page}(page=${nextPage})}" th:text="${nextPage}">Previous</a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" th:href="@{/department/?page={page}(page=${nextPage})}">Next</a>
+        </li>
+    </ul>
+
+</section>
+
+</body>
+</html>

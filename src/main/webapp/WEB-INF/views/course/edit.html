@@ -61,7 +61,7 @@
                 <td th:text="${teacher.getLastName()}"></td>
                 <td th:text="${teacher.getEmail()}"> </td>
                 <td>
-                    <form method="post" th:action="@{/course/{id}/removeProfessorFromCourse/(id=${courseResponse.getId()})}">
+                    <form method="post" th:action="@{/course/{id}/remove/professor/(id=${courseResponse.getId()})}">
                         <input type="hidden" name="idRemovingProfessor" th:value="${teacher.getId()}">
                         <button class="btn btn-danger" type="submit">Remove professor from course</button>
                     </form>
@@ -73,7 +73,7 @@
     <br>
 
     <h6>Management:</h6>
-    <form method="post" th:action="@{/course/{id}/addProfessorToCourse/(id=${courseResponse.getId()})}" class="mb-2">
+    <form method="post" th:action="@{/course/{id}/assign/professor/(id=${courseResponse.getId()})}" class="mb-2">
         <select class="form-select  mb-2" name="idNewProfessor">
             <option selected="" disabled="" value="">Choose professor for adding to course:</option>
             <div th:each="professor : ${notTeachersOfCourse}">
@@ -85,7 +85,7 @@
         </select>
         <button class="btn btn-success" type="submit">Add professor to course</button>
     </form>
-    <form method="post" th:action="@{/course/{id}/removeProfessorFromCourse/(id=${courseResponse.getId()})}" class="mb-2">
+    <form method="post" th:action="@{/course/{id}/remove/professor/(id=${courseResponse.getId()})}" class="mb-2">
         <select class="form-select  mb-2" name="idRemovingProfessor">
             <option selected="" disabled="" value="">Choose professor for removing from course:</option>
             <div th:each="professor : ${teachersOfCourse}">
