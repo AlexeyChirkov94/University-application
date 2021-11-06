@@ -3,13 +3,12 @@ package ua.com.foxminded.university.service.interfaces;
 import ua.com.foxminded.university.dto.LessonRequest;
 import ua.com.foxminded.university.dto.LessonResponse;
 import java.util.List;
-import java.util.Optional;
 
 public interface LessonService {
 
     LessonResponse create(LessonRequest requestDto);
 
-    Optional<LessonResponse> findById(long id);
+    LessonResponse findById(long id);
 
     List<LessonResponse> findAll(String page);
 

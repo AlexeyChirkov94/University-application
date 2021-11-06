@@ -154,4 +154,71 @@ class ProfessorDaoImplTest {
         assertUsersProfessors(actual, expected);
     }
 
+    @Test
+    void findByDepartmentIdShouldFindListOfProfessorsIfArgumentIsIdOfDepartment(){
+        List<Professor> expected = Arrays.asList(professorDao.findById(7L).get(),
+                professorDao.findById(8L).get(), professorDao.findById(9L).get(), professorDao.findById(10L).get());
+        List<Professor> actual = professorDao.findByDepartmentId(1);
+
+        assertUsersProfessors(actual, expected);
+    }
+
+    @Test
+    void removeDepartmentFromProfessorShouldRemoveDepartmentFromProfessorIfArgumentIsIdOfProfessor(){
+        Professor expectedBeforeChanging = Professor.builder()
+                .withId(10L)
+                .withFirstName("Ivan")
+                .withLastName("Mazurin")
+                .withEmail("Mazurin@gmail.com")
+                .withPassword("1234")
+                .withDepartment(departmentDao.findById(1L).get())
+                .withScienceDegree(ScienceDegree.PH_D_CANDIDATE)
+                .build();
+        Professor actualBeforeChanging = professorDao.findById(10L).get();
+        assertUsers(actualBeforeChanging, expectedBeforeChanging);
+
+        professorDao.removeDepartmentFromProfessor(10L);
+
+        Professor expectedAfterChanging = Professor.builder()
+                .withId(10L)
+                .withFirstName("Ivan")
+                .withLastName("Mazurin")
+                .withEmail("Mazurin@gmail.com")
+                .withPassword("1234")
+                .withDepartment(Department.builder().withId(0L).build())
+                .withScienceDegree(ScienceDegree.PH_D_CANDIDATE)
+                .build();
+        Professor actualAfterChanging = professorDao.findById(10L).get();
+        assertUsers(actualAfterChanging, expectedAfterChanging);
+    }
+
+    @Test
+    void changeDepartmentFromProfessorShouldChangeDepartmentOfProfessorIfArgumentIsIdOfProfessorAndIdOfNewDepartment(){
+        Professor expectedBeforeChanging = Professor.builder()
+                .withId(10L)
+                .withFirstName("Ivan")
+                .withLastName("Mazurin")
+                .withEmail("Mazurin@gmail.com")
+                .withPassword("1234")
+                .withDepartment(departmentDao.findById(1L).get())
+                .withScienceDegree(ScienceDegree.PH_D_CANDIDATE)
+                .build();
+        Professor actualBeforeChanging = professorDao.findById(10L).get();
+        assertUsers(actualBeforeChanging, expectedBeforeChanging);
+
+        professorDao.changeDepartment(10L, 2L);
+
+        Professor expectedAfterChanging = Professor.builder()
+                .withId(10L)
+                .withFirstName("Ivan")
+                .withLastName("Mazurin")
+                .withEmail("Mazurin@gmail.com")
+                .withPassword("1234")
+                .withDepartment(departmentDao.findById(2L).get())
+                .withScienceDegree(ScienceDegree.PH_D_CANDIDATE)
+                .build();
+        Professor actualAfterChanging = professorDao.findById(10L).get();
+        assertUsers(actualAfterChanging, expectedAfterChanging);
+    }
+
 }

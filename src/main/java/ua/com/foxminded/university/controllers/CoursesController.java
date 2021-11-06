@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -11,12 +12,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 import ua.com.foxminded.university.dto.CourseRequest;
 import ua.com.foxminded.university.dto.CourseResponse;
 import ua.com.foxminded.university.dto.ProfessorResponse;
+import ua.com.foxminded.university.service.exception.EntityAlreadyExistException;
+import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.interfaces.CourseService;
 import ua.com.foxminded.university.service.interfaces.DepartmentService;
 import ua.com.foxminded.university.service.interfaces.ProfessorService;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import static ua.com.foxminded.university.controllers.ControllersUtility.setPagesValueAndStatus;
 
@@ -39,7 +44,7 @@ public class CoursesController {
 
     @GetMapping("/{id}")
     public String show(@PathVariable("id") long id, Model model){
-        model.addAttribute("course", courseService.findById(id).get());
+        model.addAttribute("course", courseService.findById(id));
         model.addAttribute("teachersOfCourse", professorService.findByCourseId(id));
 
         return "/course/show";
@@ -61,7 +66,7 @@ public class CoursesController {
 
     @GetMapping("/{id}/edit")
     public String edit(Model model, @PathVariable("id") long id) {
-        CourseResponse courseResponse = courseService.findById(id).get();
+        CourseResponse courseResponse = courseService.findById(id);
         CourseRequest courseRequest = new CourseRequest();
         courseRequest.setName(courseResponse.getName());
 
@@ -102,6 +107,24 @@ public class CoursesController {
     public String delete(@PathVariable("id") long id) {
         courseService.deleteById(id);
         return "redirect:/course";
+    }
+
+    @ExceptionHandler(EntityDontExistException.class)
+    public ModelAndView entityDontExistException(HttpServletRequest request, Exception ex) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("exception", ex);
+        modelAndView.setViewName("errors handling/entity not exist");
+
+        return modelAndView;
+    }
+
+    @ExceptionHandler(EntityAlreadyExistException.class)
+    public ModelAndView entityAlreadyExistExceptionLesson(HttpServletRequest request, Exception ex) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("exception", ex);
+        modelAndView.setViewName("errors handling/entity already exist");
+
+        return modelAndView;
     }
 
 }

@@ -15,10 +15,15 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import ua.com.foxminded.university.TestsContextConfiguration;
+import ua.com.foxminded.university.dao.interfaces.CourseDao;
 import ua.com.foxminded.university.dto.CourseRequest;
 import ua.com.foxminded.university.dto.CourseResponse;
 import ua.com.foxminded.university.dto.DepartmentResponse;
+import ua.com.foxminded.university.dto.GroupRequest;
 import ua.com.foxminded.university.dto.ProfessorResponse;
+import ua.com.foxminded.university.entity.Course;
+import ua.com.foxminded.university.service.exception.EntityAlreadyExistException;
+import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.interfaces.CourseService;
 import ua.com.foxminded.university.service.interfaces.DepartmentService;
 import ua.com.foxminded.university.service.interfaces.ProfessorService;
@@ -99,7 +104,7 @@ class CoursesControllerTest {
         courseResponse.setId(1L);
         courseResponse.setName("Math");
 
-        when(courseService.findById(1L)).thenReturn(Optional.of(courseResponse));
+        when(courseService.findById(1L)).thenReturn(courseResponse);
 
         mockMvc.perform(get("/course/1"))
                 .andExpect(status().is(200))
@@ -140,7 +145,7 @@ class CoursesControllerTest {
         mathProfessors.add(professorMath);
         allProfessors.removeAll(mathProfessors);
 
-        when(courseService.findById(1L)).thenReturn(Optional.of(courseResponse));
+        when(courseService.findById(1L)).thenReturn(courseResponse);
         when(professorService.findAll()).thenReturn(allProfessors);
         when(professorService.findByCourseId(1L)).thenReturn(mathProfessors);
         when(departmentService.findAll()).thenReturn(departments);
@@ -267,6 +272,45 @@ class CoursesControllerTest {
                 .andExpect(model().attribute("idRemovingProfessor", is(2L)));
 
         verify(courseService).removeCourseFromProfessorCourseList(1L, 2);
+        verifyNoMoreInteractions(courseService);
+    }
+
+    @Test
+    void entityDoNotExistShouldGetExceptionFromModelAndRenderErrorView() throws Exception {
+        Exception exception = new EntityDontExistException("Course with id = 15 not exist");
+
+        when(courseService.findById(15L)).thenThrow(exception);
+
+        mockMvc.perform(get("/course/15")
+        )
+                .andExpect(status().isOk())
+                .andExpect(view().name("errors handling/entity not exist"))
+                .andExpect(model().attribute("exception", is(exception)));
+
+        verify(courseService).findById(15L);
+        verifyNoMoreInteractions(courseService);
+    }
+
+    @Test
+    void entityAlreadyExistShouldGetExceptionFromModelAndRenderErrorView() throws Exception {
+        CourseRequest courseRequest = new CourseRequest();
+        courseRequest.setName("Course 1");
+        courseRequest.setDepartmentId(0L);
+
+        Exception exception = new EntityAlreadyExistException("Course with same name already exist");
+
+        when(courseService.create(courseRequest)).thenThrow(exception);
+
+        mockMvc.perform(post("/course")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("name", "Course 1")
+                .param("departmentId", "0")
+        )
+                .andExpect(status().isOk())
+                .andExpect(view().name("errors handling/entity already exist"))
+                .andExpect(model().attribute("exception", is(exception)));
+
+        verify(courseService).create(courseRequest);
         verifyNoMoreInteractions(courseService);
     }
 

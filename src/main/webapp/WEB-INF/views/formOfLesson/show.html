@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{templates/layout.html}"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Form of lesson</title>
+</head>
+
+<body>
+
+<section layout:fragment="header"> <div th:replace="templates/fragments/header.html"></div> </section>
+<section layout:fragment="footer"> <div th:replace="templates/fragments/footer.html"></div> </section>
+<section layout:fragment="sidebar"> <div th:replace="templates/fragments/sidebar.html"></div> </section>
+
+<section layout:fragment="page-content">
+
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title" th:text="${'Form of lesson: ' + formOfLesson.getName()}">Card title</h4>
+            <p class="card-text" th:text="${'ID: ' + formOfLesson.getId()}" >ID</p>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item" th:text="${'Duration: ' + formOfLesson.getDuration() + ' ' +'min'}">email</li>
+
+            <li class="list-group-item"><a class="btn btn-info" th:href="@{/lesson/type/{id}/edit(id=${formOfLesson.getId()})}" role="button">Edit</a></li>
+            <li class="list-group-item">
+                <form th:method="DELETE" th:action="@{/lesson/type/{id}(id=${formOfLesson.getId()})}">
+                    <input class="btn btn-danger" type="submit" value="Delete"/>
+                    <text>Be careful, all lessons with current form of lesson will lose form of lesson</text>
+                </form>
+            </li>
+        </ul>
+    </div>
+
+</section>
+
+</body>
+</html>

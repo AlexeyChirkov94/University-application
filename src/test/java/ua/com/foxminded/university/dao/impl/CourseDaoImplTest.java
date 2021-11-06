@@ -168,4 +168,13 @@ class CourseDaoImplTest {
         assertThat(expected).isEqualTo(actual);
     }
 
+    @Test
+    void findByDepartmentIdShouldReturnOptionalOfDepartmentEntityIfDepartmentId(){
+        List<Course> expected = Arrays.asList(courseDao.findById(1L).get(), courseDao.findById(2L).get(),
+                courseDao.findById(3L).get(), courseDao.findById(4L).get());
+        List<Course> actual = courseDao.findByDepartmentId(1L);
+
+        assertCourses(actual, expected);
+    }
+
 }

@@ -32,6 +32,7 @@ public class CourseDaoImpl extends AbstractPageableCrudDaoImpl<Course> implement
     private static final String COUNT_QUERY = "SELECT COUNT(*) as count from courses";
     private static final String FIND_BY_PROFESSOR_ID = FIND_QUERY + "left join professor_course pc on c.id = pc.course_id " +
             "where pc.professor_id = ?";
+    private static final String FIND_BY_DEPARTMENT_ID = FIND_QUERY + "where c.department_id = ?";
     private static final String REMOVE_COURSE_FROM_PROFESSOR_COURSE_LIST_QUERY =
             "DELETE FROM professor_course WHERE professor_id = ? AND course_id = ?";
     private static final String ADD_COURSE_FROM_PROFESSOR_COURSE_LIST_QUERY =
@@ -85,6 +86,11 @@ public class CourseDaoImpl extends AbstractPageableCrudDaoImpl<Course> implement
     @Override
     public List<Course> findByProfessorId(long professorId){
         return jdbcTemplate.query(FIND_BY_PROFESSOR_ID, ROW_MAPPER, professorId);
+    }
+
+    @Override
+    public List<Course> findByDepartmentId(long departmentId) {
+        return jdbcTemplate.query(FIND_BY_DEPARTMENT_ID, ROW_MAPPER, departmentId);
     }
 
     @Override

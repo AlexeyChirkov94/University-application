@@ -19,7 +19,6 @@ import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.interfaces.LessonService;
 import ua.com.foxminded.university.service.validator.LessonValidator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -79,8 +78,11 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
     }
 
     @Override
-    public Optional<LessonResponse> findById(long id) {
-        return lessonDao.findById(id).map(lessonResponseMapper::mapEntityToDto);
+    public LessonResponse findById(long id) {
+        Lesson lesson = lessonDao.findById(id)
+                .orElseThrow(() -> new EntityDontExistException("There no lesson with id: " + id));
+
+        return lessonResponseMapper.mapEntityToDto(lesson);
     }
 
     @Override
@@ -130,7 +132,6 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
         return false;
     }
 
-    @Transactional(transactionManager = "txManager")
     private void changeGroup(long lessonId, long newGroupId) {
         checkThatLessonExist(lessonId);
         checkThatGroupExist(newGroupId);
@@ -141,7 +142,6 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
 
     }
 
-    @Transactional(transactionManager = "txManager")
     private void changeFormOfLesson(long lessonId, long newFormOfLessonId) {
         checkThatLessonExist(lessonId);
         checkThatFormOfLessonExist(newFormOfLessonId);

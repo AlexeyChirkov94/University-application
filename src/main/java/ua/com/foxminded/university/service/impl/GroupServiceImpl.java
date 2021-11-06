@@ -19,7 +19,6 @@ import ua.com.foxminded.university.service.exception.EntityAlreadyExistException
 import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.interfaces.GroupService;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -77,8 +76,11 @@ public class GroupServiceImpl extends AbstractPageableCrudService implements Gro
     }
 
     @Override
-    public Optional<GroupResponse> findById(long id) {
-        return groupDao.findById(id).map(groupResponseMapper::mapEntityToDto);
+    public GroupResponse findById(long id) {
+        Group group = groupDao.findById(id)
+                .orElseThrow(() -> new EntityDontExistException("There no group with id: " + id));
+
+        return groupResponseMapper.mapEntityToDto(group);
     }
 
     @Override

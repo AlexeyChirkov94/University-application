@@ -18,6 +18,7 @@ import ua.com.foxminded.university.dto.ProfessorRequest;
 import ua.com.foxminded.university.dto.ProfessorResponse;
 import ua.com.foxminded.university.dto.ScienceDegreeResponse;
 import ua.com.foxminded.university.service.exception.EntityAlreadyExistException;
+import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.exception.ValidateException;
 import ua.com.foxminded.university.service.interfaces.CourseService;
 import ua.com.foxminded.university.service.interfaces.ProfessorService;
@@ -43,7 +44,7 @@ public class ProfessorsController {
 
     @GetMapping("/{id}")
     public String show(@PathVariable("id") long id, Model model){
-        model.addAttribute("professor", professorService.findById(id).get());
+        model.addAttribute("professor", professorService.findById(id));
         model.addAttribute("professorsCourses", courseService.findByProfessorId(id));
         return "/professor/show";
     }
@@ -64,7 +65,7 @@ public class ProfessorsController {
         List<CourseResponse> professorsCourses = courseService.findByProfessorId(id);
         List<CourseResponse> anotherCourses = courseService.findAll();
         anotherCourses.removeAll(professorsCourses);
-        ProfessorResponse professor = professorService.findById(id).get();
+        ProfessorResponse professor = professorService.findById(id);
 
         model.addAttribute("professor", professor);
         model.addAttribute("ScienceDegree", professor.getScienceDegreeResponse());
@@ -116,11 +117,20 @@ public class ProfessorsController {
         return modelAndView;
     }
 
+    @ExceptionHandler(EntityDontExistException.class)
+    public ModelAndView entityDontExistException(HttpServletRequest request, Exception ex) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("exception", ex);
+        modelAndView.setViewName("errors handling/entity not exist");
+
+        return modelAndView;
+    }
+
     @ExceptionHandler(EntityAlreadyExistException.class)
     public ModelAndView entityAlreadyExistException(HttpServletRequest request, Exception ex) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject("exception", ex);
-        modelAndView.setViewName("errors handling/common creating error");
+        modelAndView.setViewName("errors handling/entity already exist");
 
         return modelAndView;
     }

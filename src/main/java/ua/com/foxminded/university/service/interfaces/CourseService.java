@@ -3,13 +3,16 @@ package ua.com.foxminded.university.service.interfaces;
 import ua.com.foxminded.university.dto.CourseRequest;
 import ua.com.foxminded.university.dto.CourseResponse;
 import java.util.List;
-import java.util.Optional;
 
 public interface CourseService {
 
     CourseResponse create(CourseRequest requestDto);
 
-    Optional<CourseResponse> findById(long id);
+    CourseResponse findById(long id);
+
+    List<CourseResponse> findByProfessorId(long professorId);
+
+    List<CourseResponse> findByDepartmentId(long departmentId);
 
     List<CourseResponse> findAll(String page);
 
@@ -23,7 +26,7 @@ public interface CourseService {
 
     void removeCourseFromProfessorCourseList(long courseId, long professorId);
 
-    List<CourseResponse> findByProfessorId(long professorId);
+    void changeDepartment(long courseId, long departmentId);
 
     void removeDepartmentFromCourse(long courseId);
 

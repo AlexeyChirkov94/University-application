@@ -1,5 +1,6 @@
 package ua.com.foxminded.university.service.impl;
 
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -10,7 +11,6 @@ import ua.com.foxminded.university.dao.interfaces.GroupDao;
 import ua.com.foxminded.university.dao.interfaces.StudentDao;
 import ua.com.foxminded.university.dto.StudentRequest;
 import ua.com.foxminded.university.entity.Group;
-import ua.com.foxminded.university.entity.Professor;
 import ua.com.foxminded.university.entity.Student;
 import ua.com.foxminded.university.mapper.interfaces.StudentRequestMapper;
 import ua.com.foxminded.university.mapper.interfaces.StudentResponseMapper;
@@ -175,12 +175,23 @@ class StudentServiceImplTest {
     }
 
     @Test
-    void findByIdShouldReturnOptionalOfStudentResponseIfArgumentIsStudentId() {
+    void findByIdShouldReturnStudentResponseIfArgumentIsStudentId() {
         long studentId = 1;
 
         when(studentDao.findById(studentId)).thenReturn(Optional.of(Student.builder().withId(1L).build()));
 
         studentService.findById(studentId);
+
+        verify(studentDao).findById(studentId);
+    }
+
+    @Test
+    void findByIdShouldThrowExceptionIfStudentNotExistIfArgumentIsProfessorId() {
+        long studentId = 1;
+
+        when(studentDao.findById(studentId)).thenReturn(Optional.empty());
+
+        AssertionsForClassTypes.assertThatThrownBy(() -> studentService.findById(studentId)).hasMessage("There no student with id: 1");
 
         verify(studentDao).findById(studentId);
     }

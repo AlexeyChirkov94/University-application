@@ -10,4 +10,10 @@ public interface ProfessorService extends UserService<ProfessorRequest, Professo
 
     List<ProfessorResponse> findByCourseId(long courseId);
 
+    List<ProfessorResponse> findByDepartmentId(long departmentId);
+
+    void changeDepartment(long professorId, long departmentId);
+
+    void removeDepartmentFromProfessor(long professorId);
+
 }

@@ -4,6 +4,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.interfaces.CourseDao;
+import ua.com.foxminded.university.dao.interfaces.DepartmentDao;
 import ua.com.foxminded.university.dao.interfaces.LessonDao;
 import ua.com.foxminded.university.dao.interfaces.ProfessorDao;
 import ua.com.foxminded.university.dto.ProfessorRequest;
@@ -14,6 +15,7 @@ import ua.com.foxminded.university.entity.Professor;
 import ua.com.foxminded.university.entity.ScienceDegree;
 import ua.com.foxminded.university.mapper.interfaces.ProfessorRequestMapper;
 import ua.com.foxminded.university.mapper.interfaces.ProfessorResponseMapper;
+import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.interfaces.ProfessorService;
 import ua.com.foxminded.university.service.validator.ScienceDegreeValidator;
 import ua.com.foxminded.university.service.validator.UserValidator;
@@ -29,17 +31,19 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
     private final ProfessorDao professorDao;
     private final LessonDao lessonDao;
     private final CourseDao courseDao;
+    private final DepartmentDao departmentDao;
     private final ProfessorRequestMapper professorRequestMapper;
     private final ProfessorResponseMapper professorResponseMapper;
     private final UserValidator userValidator;
 
-    public ProfessorServiceImpl(ProfessorDao professorDao, LessonDao lessonDao, CourseDao courseDao, PasswordEncoder passwordEncoder,
-                                UserValidator userValidator, ScienceDegreeValidator scienceDegreeValidator,
+    public ProfessorServiceImpl(ProfessorDao professorDao, LessonDao lessonDao, CourseDao courseDao, DepartmentDao departmentDao,
+                                PasswordEncoder passwordEncoder, UserValidator userValidator, ScienceDegreeValidator scienceDegreeValidator,
                                 ProfessorRequestMapper professorRequestMapper, ProfessorResponseMapper professorResponseMapper) {
         super(passwordEncoder, professorDao, userValidator);
         this.professorDao = professorDao;
         this.lessonDao = lessonDao;
         this.courseDao = courseDao;
+        this.departmentDao = departmentDao;
         this.scienceDegreeValidator = scienceDegreeValidator;
         this.professorRequestMapper = professorRequestMapper;
         this.professorResponseMapper = professorResponseMapper;
@@ -47,8 +51,11 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
     }
 
     @Override
-    public Optional<ProfessorResponse> findById(long id) {
-        return professorDao.findById(id).map(professorResponseMapper::mapEntityToDto);
+    public ProfessorResponse findById(long id) {
+        Professor professor = professorDao.findById(id)
+                .orElseThrow(() -> new EntityDontExistException("There no professor with id: " + id));
+
+        return professorResponseMapper.mapEntityToDto(professor);
     }
 
     @Override
@@ -119,11 +126,46 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
     }
 
     @Override
+    public List<ProfessorResponse> findByDepartmentId(long departmentId) {
+        checkThatDepartmentExist(departmentId);
+
+        return professorDao.findByDepartmentId(departmentId)
+                .stream().map(professorResponseMapper ::mapEntityToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void changeDepartment(long professorId, long departmentId) {
+        checkThatDepartmentExist(departmentId);
+        checkThatProfessorExist(professorId);
+
+        professorDao.changeDepartment(professorId, departmentId);
+    }
+
+    @Override
+    public void removeDepartmentFromProfessor(long professorId) {
+        checkThatProfessorExist(professorId);
+        professorDao.removeDepartmentFromProfessor(professorId);
+    }
+
+    @Override
     protected ProfessorResponse registerCertainUser(ProfessorRequest userDto) {
         Professor professorBeforeSave = professorRequestMapper.mapDtoToEntity(userDto);
         Professor professorAfterSave = professorDao.save(professorBeforeSave);
 
         return professorResponseMapper.mapEntityToDto(professorAfterSave);
+    }
+
+    private void checkThatProfessorExist(long professorId){
+        if (!professorDao.findById(professorId).isPresent()) {
+            throw new EntityDontExistException("There no professor with id: " + professorId);
+        }
+    }
+
+    private void checkThatDepartmentExist(long departmentId){
+        if (!departmentDao.findById(departmentId).isPresent()) {
+            throw new EntityDontExistException("There no department with id: " + departmentId);
+        }
     }
 
 }

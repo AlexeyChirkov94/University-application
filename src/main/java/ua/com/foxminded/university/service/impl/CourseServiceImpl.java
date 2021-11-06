@@ -11,14 +11,12 @@ import ua.com.foxminded.university.dto.CourseRequest;
 import ua.com.foxminded.university.dto.CourseResponse;
 import ua.com.foxminded.university.entity.Course;
 import ua.com.foxminded.university.entity.Lesson;
-import ua.com.foxminded.university.entity.Student;
 import ua.com.foxminded.university.mapper.interfaces.CourseRequestMapper;
 import ua.com.foxminded.university.mapper.interfaces.CourseResponseMapper;
 import ua.com.foxminded.university.service.exception.EntityAlreadyExistException;
 import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.interfaces.CourseService;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,12 +54,29 @@ public class CourseServiceImpl extends AbstractPageableCrudService implements Co
 
     @Override
     @Transactional(transactionManager = "txManager")
+    public void changeDepartment(long courseId, long departmentId) {
+        checkThatCourseExist(courseId);
+        checkThatDepartmentExist(departmentId);
+
+        courseDao.changeDepartment(courseId, departmentId);
+    }
+
+    @Override
+    @Transactional(transactionManager = "txManager")
     public List<CourseResponse> findByProfessorId(long professorId) {
         if (professorDao.findById(professorId).isPresent()){
             return courseDao.findByProfessorId(professorId).stream().map(courseResponseMapper::mapEntityToDto)
                     .collect(Collectors.toList());
         } else
             throw new EntityDontExistException("There no professor with id = " + professorId);
+    }
+
+    @Override
+    public List<CourseResponse> findByDepartmentId(long departmentId) {
+        checkThatDepartmentExist(departmentId);
+
+        return courseDao.findByDepartmentId(departmentId).stream()
+                .map(courseResponseMapper::mapEntityToDto).collect(Collectors.toList());
     }
 
     @Override
@@ -85,8 +100,11 @@ public class CourseServiceImpl extends AbstractPageableCrudService implements Co
     }
 
     @Override
-    public Optional<CourseResponse> findById(long id) {
-        return courseDao.findById(id).map(courseResponseMapper::mapEntityToDto);
+    public CourseResponse findById(long id) {
+        Course course = courseDao.findById(id)
+                .orElseThrow(() -> new EntityDontExistException("There no course with id: " + id));
+
+        return courseResponseMapper.mapEntityToDto(course);
     }
 
     @Override
@@ -113,10 +131,7 @@ public class CourseServiceImpl extends AbstractPageableCrudService implements Co
         courseDao.update(courseRequestMapper.mapDtoToEntity(courseRequest));
 
         if(courseRequest.getDepartmentId() != 0L){
-            checkThatCourseExist(courseRequest.getId());
-            checkThatDepartmentExist(courseRequest.getDepartmentId());
-
-            courseDao.changeDepartment(courseRequest.getId(), courseRequest.getDepartmentId());
+            changeDepartment(courseRequest.getId(), courseRequest.getDepartmentId());
         }
 
     }

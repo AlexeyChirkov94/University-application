@@ -14,11 +14,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import ua.com.foxminded.university.dto.CourseResponse;
+import ua.com.foxminded.university.dto.FormOfLessonRequest;
 import ua.com.foxminded.university.dto.FormOfLessonResponse;
 import ua.com.foxminded.university.dto.GroupResponse;
 import ua.com.foxminded.university.dto.LessonRequest;
 import ua.com.foxminded.university.dto.LessonResponse;
 import ua.com.foxminded.university.dto.ProfessorResponse;
+import ua.com.foxminded.university.service.exception.EntityAlreadyExistException;
+import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.exception.IncompatibilityCourseAndProfessorException;
 import ua.com.foxminded.university.service.exception.ValidateException;
 import ua.com.foxminded.university.service.interfaces.CourseService;
@@ -45,7 +48,7 @@ public class LessonsController {
     private final CourseService courseService;
 
     @GetMapping()
-    public String showAll(Model model, @RequestParam(value="page", required = false) String page){
+    public String showAllLessons(Model model, @RequestParam(value="page", required = false) String page){
         setPagesValueAndStatus(page, model);
         List<LessonResponse> lessons = lessonService.findAll(page);
         Map<Long, String> stringDateTimes = getStringDateTimes(lessons);
@@ -57,8 +60,8 @@ public class LessonsController {
     }
 
     @GetMapping("/{id}")
-    public String show(@PathVariable("id") long id, Model model){
-        LessonResponse lesson = lessonService.findById(id).get();
+    public String showLesson(@PathVariable("id") long id, Model model){
+        LessonResponse lesson = lessonService.findById(id);
 
         model.addAttribute("lesson", lesson);
         model.addAttribute("stringDateTimes", getStringDateTime(lesson));
@@ -77,15 +80,15 @@ public class LessonsController {
 
 
     @PostMapping()
-    public String create(@ModelAttribute("lesson") LessonRequest lessonRequest) {
+    public String createLesson(@ModelAttribute("lesson") LessonRequest lessonRequest) {
 
         lessonService.create(lessonRequest);
         return "redirect:/lesson";
     }
 
     @GetMapping("/{id}/edit")
-    public String edit(Model model, @PathVariable("id") long id) {
-        LessonResponse lessonResponse = lessonService.findById(id).get();
+    public String editLesson(Model model, @PathVariable("id") long id) {
+        LessonResponse lessonResponse = lessonService.findById(id);
         LessonRequest lessonRequest = new LessonRequest();
         lessonRequest.setTimeOfStartLesson(lessonResponse.getTimeOfStartLesson());
         CourseResponse course = lessonResponse.getCourseResponse();
@@ -109,19 +112,19 @@ public class LessonsController {
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute("lesson") LessonRequest lessonRequest) {
+    public String updateLesson(@ModelAttribute("lesson") LessonRequest lessonRequest) {
         lessonService.edit(lessonRequest);
         return "redirect:/lesson";
     }
 
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable("id") long id) {
+    public String deleteLesson(@PathVariable("id") long id) {
         lessonService.deleteById(id);
         return "redirect:/lesson";
     }
 
     @ExceptionHandler(ValidateException.class)
-    public ModelAndView incompatibilityTimeTablesException(HttpServletRequest request, Exception ex) {
+    public ModelAndView incompatibilityTimeTablesExceptionLesson(HttpServletRequest request, Exception ex) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject("exception", ex);
         modelAndView.setViewName("errors handling/common creating error");
@@ -130,10 +133,77 @@ public class LessonsController {
     }
 
     @ExceptionHandler(IncompatibilityCourseAndProfessorException.class)
-    public ModelAndView incompatibilityCourseAndProfessor(HttpServletRequest request, Exception ex) {
+    public ModelAndView incompatibilityCourseAndProfessorLesson(HttpServletRequest request, Exception ex) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject("exception", ex);
         modelAndView.setViewName("errors handling/lesson creating error incompatibility course and professor ");
+
+        return modelAndView;
+    }
+
+    @GetMapping("/type")
+    public String showAllFromOFLesson(Model model, @RequestParam(value="page", required = false) String page){
+        setPagesValueAndStatus(page, model);
+        model.addAttribute("formsOfLesson", formOfLessonService.findAll(page));
+
+        return "/formOfLesson/all";
+    }
+
+    @GetMapping("/type/{id}")
+    public String showFromOFLesson(@PathVariable("id") long id, Model model){
+        model.addAttribute("formOfLesson", formOfLessonService.findById(id));
+        return "/formOfLesson/show";
+    }
+
+    @GetMapping("/type/new")
+    public String newFromOFLesson(Model model, @ModelAttribute("formOfLesson") FormOfLessonRequest formOfLessonRequest) {
+        return "/formOfLesson/add";
+    }
+
+    @PostMapping("/type")
+    public String createFromOFLesson(@ModelAttribute("formOfLesson") FormOfLessonRequest formOfLessonRequest) {
+        formOfLessonService.create(formOfLessonRequest);
+        return "redirect:/lesson/type";
+    }
+
+    @GetMapping("type/{id}/edit")
+    public String editFromOFLesson(Model model, @PathVariable("id") long id) {
+        FormOfLessonResponse formOfLessonResponse = formOfLessonService.findById(id);
+        FormOfLessonRequest formOfLessonRequest = new FormOfLessonRequest();
+        formOfLessonRequest.setId(formOfLessonResponse.getId());
+        formOfLessonRequest.setName(formOfLessonResponse.getName());
+        formOfLessonRequest.setDuration(formOfLessonResponse.getDuration());
+
+        model.addAttribute("formOfLessonRequest", formOfLessonRequest);
+        return "/formOfLesson/edit";
+    }
+
+    @PatchMapping("type/{id}")
+    public String updateFromOFLesson(@ModelAttribute("formOfLessonRequest") FormOfLessonRequest formOfLessonRequest) {
+        formOfLessonService.edit(formOfLessonRequest);
+        return "redirect:/lesson/type";
+    }
+
+    @DeleteMapping("type/{id}")
+    public String deleteFromOFLesson(@PathVariable("id") long id) {
+        formOfLessonService.deleteById(id);
+        return "redirect:/lesson/type";
+    }
+
+    @ExceptionHandler(EntityDontExistException.class)
+    public ModelAndView entityDontExistExceptionLesson(HttpServletRequest request, Exception ex) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("exception", ex);
+        modelAndView.setViewName("errors handling/entity not exist");
+
+        return modelAndView;
+    }
+
+    @ExceptionHandler(EntityAlreadyExistException.class)
+    public ModelAndView entityAlreadyExistExceptionLesson(HttpServletRequest request, Exception ex) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("exception", ex);
+        modelAndView.setViewName("errors handling/entity already exist");
 
         return modelAndView;
     }

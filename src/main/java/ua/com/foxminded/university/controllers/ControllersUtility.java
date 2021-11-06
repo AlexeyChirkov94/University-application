@@ -3,7 +3,6 @@ package ua.com.foxminded.university.controllers;
 import lombok.experimental.UtilityClass;
 import org.springframework.ui.Model;
 import ua.com.foxminded.university.dto.LessonResponse;
-
 import java.time.Month;
 import java.util.HashMap;
 import java.util.List;

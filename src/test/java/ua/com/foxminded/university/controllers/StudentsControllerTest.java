@@ -19,6 +19,7 @@ import ua.com.foxminded.university.dto.GroupResponse;
 import ua.com.foxminded.university.dto.StudentRequest;
 import ua.com.foxminded.university.dto.StudentResponse;
 import ua.com.foxminded.university.service.exception.EntityAlreadyExistException;
+import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.exception.ValidateException;
 import ua.com.foxminded.university.service.interfaces.GroupService;
 import ua.com.foxminded.university.service.interfaces.StudentService;
@@ -118,7 +119,7 @@ class StudentsControllerTest {
         student.setEmail("chirkov@gamil.com");
         student.setPassword("1234");
         student.setGroupResponse(group);
-        when(studentService.findById(1L)).thenReturn(Optional.of(student));
+        when(studentService.findById(1L)).thenReturn(student);
 
         mockMvc.perform(get("/student/1"))
                 .andExpect(status().is(200))
@@ -162,8 +163,8 @@ class StudentsControllerTest {
         student.setPassword("1234");
         student.setGroupResponse(group1);
 
-        when(studentService.findById(1L)).thenReturn(Optional.of(student));
-        when(groupService.findById(1L)).thenReturn(Optional.of(group1));
+        when(studentService.findById(1L)).thenReturn(student);
+        when(groupService.findById(1L)).thenReturn(group1);
         when(groupService.findAll()).thenReturn(allGroups);
 
         mockMvc.perform(get("/student/1/edit"))
@@ -205,8 +206,8 @@ class StudentsControllerTest {
         student.setGroupResponse(studentGroup);
 
 
-        when(studentService.findById(1L)).thenReturn(Optional.of(student));
-        when(groupService.findById(1L)).thenReturn(Optional.of(group1));
+        when(studentService.findById(1L)).thenReturn(student);
+        when(groupService.findById(1L)).thenReturn(group1);
         when(groupService.findAll()).thenReturn(allGroups);
 
         mockMvc.perform(get("/student/1/edit"))
@@ -363,10 +364,26 @@ class StudentsControllerTest {
                 .param("firstName", repeatableStudent.getFirstName())
         )
                 .andExpect(status().isOk())
-                .andExpect(view().name("errors handling/common creating error"))
+                .andExpect(view().name("errors handling/entity already exist"))
                 .andExpect(model().attribute("exception", is(exception)));
 
         verify(studentService).register(repeatableStudent);
+        verifyNoMoreInteractions(studentService);
+    }
+
+    @Test
+    void entityDoNotExistShouldGetExceptionFromModelAndRenderErrorView() throws Exception {
+        Exception exception = new EntityDontExistException("Student with id = 15 not exist");
+
+        when(studentService.findById(15L)).thenThrow(exception);
+
+        mockMvc.perform(get("/student/15")
+        )
+                .andExpect(status().isOk())
+                .andExpect(view().name("errors handling/entity not exist"))
+                .andExpect(model().attribute("exception", is(exception)));
+
+        verify(studentService).findById(15L);
         verifyNoMoreInteractions(studentService);
     }
 
