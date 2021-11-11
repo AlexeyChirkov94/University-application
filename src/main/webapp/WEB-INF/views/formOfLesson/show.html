@@ -16,17 +16,17 @@
 
     <div class="card">
         <div class="card-body">
-            <h4 class="card-title" th:text="${'Form of lesson: ' + formOfLesson.getName()}">Card title</h4>
+            <h4 class="card-title" th:text="#{form.of.lesson} + ': ' + ${formOfLesson.getName()}">Card title</h4>
             <p class="card-text" th:text="${'ID: ' + formOfLesson.getId()}" >ID</p>
         </div>
         <ul class="list-group list-group-flush">
-            <li class="list-group-item" th:text="${'Duration: ' + formOfLesson.getDuration() + ' ' +'min'}">email</li>
+            <li class="list-group-item" th:text="#{duration} + ': ' + ${formOfLesson.getDuration() + ' ' +'min'}">email</li>
 
-            <li class="list-group-item"><a class="btn btn-info" th:href="@{/lesson/type/{id}/edit(id=${formOfLesson.getId()})}" role="button">Edit</a></li>
+            <li class="list-group-item"><a class="btn btn-info" th:href="@{/lesson/type/{id}/edit(id=${formOfLesson.getId()})}" role="button" th:text="#{edit}">Edit</a></li>
             <li class="list-group-item">
                 <form th:method="DELETE" th:action="@{/lesson/type/{id}(id=${formOfLesson.getId()})}">
-                    <input class="btn btn-danger" type="submit" value="Delete"/>
-                    <text>Be careful, all lessons with current form of lesson will lose form of lesson</text>
+                    <input class="btn btn-danger" type="submit" th:value="#{delete}"/>
+                    <text th:text="#{form.of.lesson.delete.warning}">Be careful, all lessons with current form of lesson will lose form of lesson</text>
                 </form>
             </li>
         </ul>

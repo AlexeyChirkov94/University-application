@@ -16,17 +16,17 @@
 
     <div class="card">
         <div class="card-body">
-            <h4 class="card-title" th:text="${'Student: ' + student.getFirstName() + ' ' + student.getLastName()}">Card title</h4>
+            <h4 class="card-title" th:text="#{student} + ': ' + ${student.getLastName()} + ' ' + ${student.getFirstName()}">Card title</h4>
             <p class="card-text" th:text="${'ID: ' + student.getId()}" >ID</p>
         </div>
         <ul class="list-group list-group-flush">
-            <li class="list-group-item" th:text="${'Email: ' + student.getEmail()}">email</li>
-            <li class="list-group-item" th:text="${'Group: ' + student.getGroupResponse().getName() +
-                            ' (ID: ' + student.getGroupResponse().getId() + ')'}">group</li>
-            <li class="list-group-item"><a class="btn btn-info" th:href="@{/student/{id}/edit(id=${student.getId()})}" role="button">Edit</a></li>
+            <li class="list-group-item" th:text="#{email} + ': ' + ${student.getEmail()}">email</li>
+            <li class="list-group-item" th:text="#{group} + ': ' + ${student.getGroupResponse().getName()} +
+                            ' (ID: ' + ${student.getGroupResponse().getId()} + ')'">group</li>
+            <li class="list-group-item"><a class="btn btn-info" th:href="@{/student/{id}/edit(id=${student.getId()})}" role="button" th:text="#{edit}">Edit</a></li>
             <li class="list-group-item">
                 <form th:method="DELETE" th:action="@{/student/{id}(id=${student.getId()})}">
-                    <input class="btn btn-danger" type="submit" value="Delete"/>
+                    <input class="btn btn-danger" type="submit" th:value="#{delete}"/>
                 </form>
             </li>
         </ul>

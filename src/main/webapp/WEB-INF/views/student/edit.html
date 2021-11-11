@@ -14,49 +14,50 @@
 
 <section layout:fragment="page-content">
 
-    <h4 th:text="${'Update student ' + student.getFirstName() + ' ' + student.getLastName() + ' with ID: ' + student.getId()}" >ID</h4>
+    <h4 th:text="#{update.of.student} + ' ' + ${student.getLastName()} + ' ' + ${student.getFirstName()}
+     + ' ' + #{with} + ' ID: ' + ${student.getId()}" >ID</h4>
     <br>
 
-    <h4>Common info</h4>
+    <h5 th:text="#{common.information}">Common information</h5>
     <form th:method="PATCH" th:action="@{/student/{id}(id=${student.getId()})}" th:object="${student}">
         <div class="form-floating mb-2">
             <input type="text" th:field="*{firstName}" class="form-control" id="firstName1" placeholder="First name">
-            <label for="firstName1">Change first name:</label>
+            <label for="firstName1" th:text="#{enter.new.student.first.name}">Change first name:</label>
         </div>
         <div class="form-floating mb-2">
             <input type="text" th:field="*{lastName}" class="form-control" id="LastNme2" placeholder="Last name">
-            <label for="LastNme2">Change last name:</label>
+            <label for="LastNme2" th:text="#{enter.new.student.last.name}">Change last name:</label>
         </div>
         <div class="form-floating mb-2">
             <input type="text" th:field="*{email}" class="form-control" id="email1" placeholder="name@example.com">
-            <label for="email1">Change email:</label>
+            <label for="email1" th:text="#{enter.new.student.email}">Change email:</label>
         </div>
         <div class="form-floating mb-2">
             <input type="password" th:field="*{password}" class="form-control" id="floatingPassword" placeholder="Password">
-            <label for="floatingPassword">Change password:</label>
+            <label for="floatingPassword" th:text="#{enter.new.student.password}">Change password:</label>
         </div>
-        <input class="btn btn-success" type="submit" role="button" value="Update"/>
+        <input class="btn btn-success" type="submit" role="button" th:value="#{update.student}"/>
     </form>
     <hr>
     <br>
 
-    <h4>Student group</h4>
-    <h6>Current group:</h6>
+    <h4 th:text="#{group.of.student}">Group of student</h4>
+    <h6 th:text="#{current.group} + ':'">Current group:</h6>
     <div> <text style="margin-left: 20px" th:text="${studentGroup.getName + '(ID: ' + studentGroup.getId() + ')'}" >Name</text> </div>
     <br>
 
-    <h6>Management:</h6>
+    <h6 th:text="#{management} + ':'">Management:</h6>
     <form method="post" th:action="@{/student/{id}/assign/group(id=${student.getId()})}"  class="mb-2">
         <select class="form-select  mb-2" name="idNewGroup">
-            <option selected="" disabled="" value="">Choose new group:</option>
+            <option selected="" disabled="" value="" th:text="#{choose.new.group.of.student}">Choose new group of student</option>
             <div th:each="group : ${anotherGroups}">
                 <option th:value="${group.getId()}" th:text="${group.getName()}"> Group </option>
             </div>
         </select>
-        <button class="btn btn-success" type="submit">Change group</button>
+        <button class="btn btn-success" type="submit" th:text="#{change.group.of.student}">Change group</button>
     </form>
     <form th:method="PATCH"  th:action="@{/student/{id}/remove/group(id=${student.getId()})}">
-        <input class="btn btn-danger" type="submit" role="button" value="Leave group"/>
+        <input class="btn btn-danger" type="submit" role="button" th:value="#{exclude.student.from.group}"/>
     </form>
     <br>
 

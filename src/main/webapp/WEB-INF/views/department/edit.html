@@ -14,34 +14,34 @@
 
 <section layout:fragment="page-content">
 
-    <h4 th:text="${'Update department ' + departmentRequest.getName() +' with ID: ' + departmentRequest.getId()}" >ID</h4>
+    <h4 th:text="#{update.of.department} + ' ' + ${departmentRequest.getName()} + ' ' + #{with} + ' id: ' + ${departmentRequest.getId()}">ID</h4>
     <br>
 
-    <h4>Department updating</h4>
+    <h6 th:text="#{name.of.department}">Change name</h6>
 
     <form th:method="PATCH" th:action="@{/department/{id}(id=${departmentRequest.getId()})}" th:object="${departmentRequest}">
 
         <div class="form-floating mb-2">
-            <input type="text" th:field="*{name}" class="form-control" id="name" placeholder="Change name department:">
-            <label for="name">Change name of department:</label>
+            <input type="text" th:field="*{name}" class="form-control" id="name" th:placeholder="#{enter.new.department.name}">
+            <label for="name" th:text="#{enter.new.department.name}">Change name of department:</label>
         </div>
 
-        <input class="btn btn-success" type="submit" role="button" value="Update department"/>
+        <input class="btn btn-success" type="submit" role="button" th:value="#{update.department}"/>
     </form>
 
     <br>
     <hr>
 
-    <h4>Department professors</h4>
-    <h6>Current professors:</h6>
+    <h4 th:text="#{professors.of.department}">Professors of department</h4>
+    <h6 th:text="#{current.professors} + ':'">Current professors:</h6>
     <table class="table table-striped">
         <thead>
         <tr>
-            <th scope="col">Id</th>
-            <th scope="col">First name</th>
-            <th scope="col">Last name</th>
-            <th scope="col">Email</th>
-            <th scope="col">Remove from department</th>
+            <th scope="col" th:text="#{id}">Id</th>
+            <th scope="col" th:text="#{first.name}">First name</th>
+            <th scope="col" th:text="#{last.name}">Last name</th>
+            <th scope="col" th:text="#{email}">Email</th>
+            <th scope="col" th:text="#{remove.professor.from.department}">Remove from department</th>
         </tr>
         </thead>
         <tbody>
@@ -54,7 +54,7 @@
                 <td>
                     <form method="post" th:action="@{/department/{id}/remove/professor/(id=${departmentRequest.getId()})}">
                         <input type="hidden" name="idRemovingProfessor" th:value="${professor.getId()}">
-                        <button class="btn btn-danger" type="submit">Remove professor from department</button>
+                        <button class="btn btn-danger" type="submit" th:text="#{remove.professor.from.department}">Remove professor from department</button>
                     </form>
                 </td>
             </tr>
@@ -63,22 +63,22 @@
     </table>
     <br>
 
-    <h6>Management:</h6>
+    <h6 th:text="#{management} + ':'">Management:</h6>
     <form method="post" th:action="@{/department/{id}/assign/professor/(id=${departmentRequest.getId()})}" class="mb-2">
         <select class="form-select  mb-2" name="idNewProfessor">
-            <option selected="" disabled="" value="">Choose professor for adding to department:</option>
+            <option selected="" disabled="" value="" th:text="#{choose.professor.for.adding.to.department}">Choose professor for adding to department:</option>
             <div th:each="professor : ${anotherProfessors}">
                 <option th:value="${professor.getId()}"
-                        th:text="${professor.getScienceDegreeResponse() + ', '
-            + professor.getLastName() + ' ' + professor.getFirstName() + ' (ID: ' + professor.getId() + ')'
-            + ' Current department: ' + professor.getDepartmentResponse().getName()}"> adding students </option>
+                        th:text="${professor.getScienceDegreeResponse()} + ', '
+            + ${professor.getLastName()} + ' ' + ${professor.getFirstName()} + ' (ID: ' + ${professor.getId()} + ')'
+            + ' ' + #{current.department} +': ' + ${professor.getDepartmentResponse().getName()}"> adding students </option>
             </div>
         </select>
-        <button class="btn btn-success" type="submit">Add professor to department</button>
+        <button class="btn btn-success" type="submit" th:text="#{add.professor.to.department}">Add professor to department</button>
     </form>
     <form method="post" th:action="@{/department/{id}/remove/professor/(id=${departmentRequest.getId()})}" class="mb-2">
         <select class="form-select  mb-2" name="idRemovingProfessor">
-            <option selected="" disabled="" value="">Choose professor for removing from department:</option>
+            <option selected="" disabled="" value="" th:text="#{choose.professor.for.removing.from.department}">Choose professor for removing from department:</option>
             <div th:each="professor : ${departmentProfessors}">
                 <option th:value="${professor.getId()}"
                         th:text="${professor.getScienceDegreeResponse() + ', '
@@ -86,20 +86,20 @@
                             ' (ID: ' + professor.getId() + ')'}"> adding students </option>
             </div>
         </select>
-        <button class="btn btn-danger" type="submit">Remove professor from this department</button>
+        <button class="btn btn-danger" type="submit" th:text="#{remove.professor.from.department}">Remove professor from this department</button>
     </form>
 
     <hr>
     <br>
 
-    <h4>Department courses</h4>
-    <h6>Current courses:</h6>
+    <h4 th:text="#{courses.of.department}">Department courses</h4>
+    <h6 th:text="#{current.courses} + ':'">Current courses:</h6>
     <table class="table table-striped">
         <thead>
         <tr>
-            <th scope="col">Id</th>
-            <th scope="col">Name</th>
-            <th scope="col">Remove from department</th>
+            <th scope="col" th:text="#{id}">Id</th>
+            <th scope="col" th:text="#{name}">Name</th>
+            <th scope="col" th:text="#{remove.course.from.department}">Remove from department</th>
         </tr>
         </thead>
         <tbody>
@@ -110,7 +110,7 @@
                 <td>
                     <form method="post" th:action="@{/department/{id}/remove/course/(id=${departmentRequest.getId()})}">
                         <input type="hidden" name="idRemovingCourse" th:value="${course.getId()}">
-                        <button class="btn btn-danger" type="submit">Remove course from department</button>
+                        <button class="btn btn-danger" type="submit" th:text="#{remove.course.from.department}">Remove course from department</button>
                     </form>
                 </td>
             </tr>
@@ -119,41 +119,41 @@
     </table>
     <br>
 
-    <h6>Management:</h6>
+    <h6 th:text="#{management} + ':'">Management:</h6>
     <form method="post" th:action="@{/department/{id}/assign/course/(id=${departmentRequest.getId()})}" class="mb-2">
         <select class="form-select  mb-2" name="idNewCourse">
-            <option selected="" disabled="" value="">Choose course for adding to department:</option>
+            <option selected="" disabled="" value="" th:text="#{choose.course.for.adding.to.department}">Choose course for adding to department:</option>
             <div th:each="course : ${anotherCourses}">
                 <option th:value="${course.getId()}"
-                        th:text="${course.getName() + ' (ID: ' + course.getId() + ')'
-                        + ' Current department: ' + course.getDepartmentResponse().getName()}"> adding students </option>
+                        th:text="${course.getName()} + ' (ID: ' + ${course.getId()} + ')'
+                        + ' ' + #{current.department} + ': ' + ${course.getDepartmentResponse().getName()}"> adding students </option>
             </div>
         </select>
-        <button class="btn btn-success" type="submit">Add course to department</button>
+        <button class="btn btn-success" type="submit" th:text="#{add.course.to.department}">Add course to department</button>
     </form>
     <form method="post" th:action="@{/department/{id}/remove/course/(id=${departmentRequest.getId()})}" class="mb-2">
         <select class="form-select  mb-2" name="idRemovingCourse">
-            <option selected="" disabled="" value="">Choose course for removing from department:</option>
+            <option selected="" disabled="" value="" th:text="#{choose.course.for.removing.from.department}">Choose course for removing from department:</option>
             <div th:each="course : ${departmentCourses}">
                 <option th:value="${course.getId()}"
                         th:text="${course.getName() + ' (ID: ' + course.getId() + ')' }"> adding students </option>
             </div>
         </select>
-        <button class="btn btn-danger" type="submit">Remove course from this department</button>
+        <button class="btn btn-danger" type="submit" th:text="#{remove.course.from.department}">Remove course from this department</button>
     </form>
 
     <hr>
     <br>
 
-    <h4>Department groups</h4>
-    <h6>Current groups:</h6>
+    <h4 th:text="#{groups.of.department}">Department groups</h4>
+    <h6 th:text="#{current.groups} + ':'">Current groups:</h6>
     <table class="table table-striped">
         <thead>
         <tr>
-            <th scope="col">Id</th>
-            <th scope="col">Name</th>
-            <th scope="col">From of education</th>
-            <th scope="col">Remove from department</th>
+            <th scope="col" th:text="#{id}">Id</th>
+            <th scope="col" th:text="#{name}">Name</th>
+            <th scope="col" th:text="#{form.of.education}">From of education</th>
+            <th scope="col" th:text="#{remove.group.from.department}">Remove from department</th>
         </tr>
         </thead>
         <tbody>
@@ -165,7 +165,7 @@
                 <td>
                     <form method="post" th:action="@{/department/{id}/remove/group/(id=${departmentRequest.getId()})}">
                         <input type="hidden" name="idRemovingGroup" th:value="${group.getId()}">
-                        <button class="btn btn-danger" type="submit">Remove group from department</button>
+                        <button class="btn btn-danger" type="submit" th:text="#{remove.group.from.department}">Remove group from department</button>
                     </form>
                 </td>
             </tr>
@@ -174,27 +174,27 @@
     </table>
     <br>
 
-    <h6>Management:</h6>
+    <h6 th:text="#{management} + ':'">Management:</h6>
     <form method="post" th:action="@{/department/{id}/assign/group/(id=${departmentRequest.getId()})}" class="mb-2">
         <select class="form-select  mb-2" name="idNewGroup">
-            <option selected="" disabled="" value="">Choose group for adding to department:</option>
+            <option selected="" disabled="" value="" th:text="#{choose.group.for.adding.to.department}">Choose group for adding to department:</option>
             <div th:each="group : ${anotherGroups}">
                 <option th:value="${group.getId()}"
-                        th:text="${group.getName() + ' (ID: ' + group.getId() + ')'
-                        + ' Current department: ' + group.getDepartmentResponse().getName()}"> adding students </option>
+                        th:text="${group.getName()} + ' (ID: ' + ${group.getId()} + ')'
+                        + ' ' + #{current.department} + ': ' + ${group.getDepartmentResponse().getName()}"> adding students </option>
             </div>
         </select>
-        <button class="btn btn-success" type="submit">Add group to department</button>
+        <button class="btn btn-success" type="submit" th:text="#{add.group.to.department}">Add group to department</button>
     </form>
     <form method="post" th:action="@{/department/{id}/remove/group/(id=${departmentRequest.getId()})}" class="mb-2">
         <select class="form-select  mb-2" name="idRemovingGroup">
-            <option selected="" disabled="" value="">Choose group for removing from department:</option>
+            <option selected="" disabled="" value="" th:text="#{choose.group.for.removing.from.department}">Choose group for removing from department:</option>
             <div th:each="group : ${departmentGroups}">
                 <option th:value="${group.getId()}"
                         th:text="${group.getName() + ' (ID: ' + group.getId() + ')' }"> adding students </option>
             </div>
         </select>
-        <button class="btn btn-danger" type="submit">Remove group from this department</button>
+        <button class="btn btn-danger" type="submit" th:text="#{remove.group.from.department}">Remove group from this department</button>
     </form>
 
 </section>

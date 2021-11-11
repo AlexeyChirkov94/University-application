@@ -16,18 +16,18 @@
 
     <div class="card">
         <div class="card-body">
-            <h4 class="card-title" th:text="${'Professor: ' + professor.getFirstName() + ' ' + professor.getLastName()}">Card title</h4>
+            <h4 class="card-title" th:text="#{professor} + ': ' + ${professor.getLastName()} + ' ' + ${professor.getFirstName()}">Card title</h4>
             <p class="card-text" th:text="${'ID: ' + professor.getId()}" >ID</p>
         </div>
         <ul class="list-group list-group-flush">
-            <li class="list-group-item" th:text="${'Email: ' + professor.getEmail()}">email</li>
-            <li class="list-group-item" th:text="${'Department: ' + professor.getDepartmentResponse().getName() +
-                            ' (ID: ' + professor.getDepartmentResponse().getId() + ')'}">Department</li>
-            <li class="list-group-item" th:text="${'Science Degree: ' + professor.getScienceDegreeResponse() +
-                            ' (ID: ' + professor.getScienceDegreeResponse().getId() + ')'}">Science Degree</li>
+            <li class="list-group-item" th:text="#{email} + ': ' + ${professor.getEmail()}">email</li>
+            <li class="list-group-item" th:text="#{department} + ': ' + ${professor.getDepartmentResponse().getName()} +
+                            ' (ID: ' + ${professor.getDepartmentResponse().getId()} + ')'">Department</li>
+            <li class="list-group-item" th:text="#{science.degree} + ': ' + ${professor.getScienceDegreeResponse()} +
+                            ' (ID: ' + ${professor.getScienceDegreeResponse().getId()} + ')'">Science Degree</li>
             <li class="list-group-item">
                 <div class="row justify-content-left">
-                    <div class="col-auto"> Courses of professor: </div>
+                    <div class="col-auto" th:text="#{courses.of.professor} + ': '"> Courses of professor: </div>
                     <div class="col-auto">
                         <div th:each="professorCourses : ${professorsCourses}">
                             <text th:text="${professorCourses.getName() +
@@ -36,11 +36,11 @@
                     </div>
                 </div>
             </li>
-            <li class="list-group-item"><a class="btn btn-info" th:href="@{/professor/{id}/edit(id=${professor.getId()})}" role="button">Edit</a></li>
+            <li class="list-group-item"><a class="btn btn-info" th:href="@{/professor/{id}/edit(id=${professor.getId()})}" role="button" th:text="#{edit}">Edit</a></li>
             <li class="list-group-item">
                 <form th:method="DELETE" th:action="@{/professor/{id}(id=${professor.getId()})}">
-                    <input class="btn btn-danger" type="submit" value="Delete"/>
-                    <text>Be careful, all lessons taught by this professor will be left without a teacher</text>
+                    <input class="btn btn-danger" type="submit" th:value="#{delete}"/>
+                    <text th:text="#{professor.delete.warning}">Be careful, all lessons taught by this professor will be left without a teacher</text>
                 </form>
             </li>
         </ul>

@@ -28,20 +28,22 @@
 <main>
   <nav class="navbar navbar-expand navbar-light bg-white justify-content-center" aria-label="Third navbar example">
     <div class="container-fluid">
-      <a class="navbar-brand" href="/">My University</a>
+      <a class="navbar-brand" href="/" th:text="#{project.name}">My University</a>
 
-      <div class="collapse navbar-collapse"> <!-- id="navbarsExample03"> -->
+      <div class="collapse navbar-collapse">
 
         <ul class="navbar-nav me-auto mb-0 mb-sm-0">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/">Home</a>
+            <a class="nav-link active" aria-current="page" href="/"  th:text="#{home}">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="https://git.foxminded.com.ua/alexey_chirkov/universityapplication" target="_blank">Project git repository</a>
+            <a class="nav-link" href="https://git.foxminded.com.ua/alexey_chirkov/universityapplication" target="_blank"
+               th:text="#{project.git.repository}">Project git repository</a>
           </li>
           <li class="nav-item">
             <div class="text-end">
-            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Made by Chrikov Alexey under the supervision of Foxminded school</a>
+            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true" th:text="#{author}">
+              Made by Chrikov Alexey under the supervision of Foxminded school</a>
             </div>
           </li>
 

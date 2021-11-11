@@ -16,25 +16,25 @@
 
     <div class="card">
         <div class="card-body">
-            <h4 class="card-title" th:text="${'Group: ' + group.getName()}">Card title</h4>
+            <h4 class="card-title" th:text="#{group} + ': ' + ${group.getName()}">Card title</h4>
             <p class="card-text" th:text="${'ID: ' + group.getId()}" >ID</p>
         </div>
         <ul class="list-group list-group-flush">
-            <li class="list-group-item" th:text="${'Department: ' + group.getDepartmentResponse().getName()}">email</li>
-            <li class="list-group-item" th:text="${'Form of education: ' + group.getFormOfEducationResponse().getName()}">Department</li>
+            <li class="list-group-item" th:text="#{department} + ': ' + ${group.getDepartmentResponse().getName()}">email</li>
+            <li class="list-group-item" th:text="#{form.of.education} + ': ' + ${group.getFormOfEducationResponse().getName()}">Department</li>
             <li class="list-group-item">
                 <div class="row justify-content-left">
-                    <div class="col-2"> Students of group: </div>
+                    <div class="col-2" th:text="#{students.of.group} + ':'"> Students of group: </div>
                     <div class="col-10">
 
                         <table class="table table-striped">
                             <thead>
                             <tr>
-                                <th scope="col">Id</th>
-                                <th scope="col">First name</th>
-                                <th scope="col">Last name</th>
-                                <th scope="col">Email</th>
-                                <th scope="col">More</th>
+                                <th scope="col" th:text="#{id}">Id</th>
+                                <th scope="col" th:text="#{first.name}">First name</th>
+                                <th scope="col" th:text="#{last.name}">Last name</th>
+                                <th scope="col" th:text="#{email}">Email</th>
+                                <th scope="col" th:text="#{more}">More</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -44,7 +44,7 @@
                                     <td th:text="${student.getFirstName()}"> </td>
                                     <td th:text="${student.getLastName()}"></td>
                                     <td th:text="${student.getEmail()}"> </td>
-                                    <td> <a class="btn btn-secondary" th:href="@{/student/{id}(id=${student.getId()})}" role="button">Go to</a> </td>
+                                    <td> <a class="btn btn-secondary" th:href="@{/student/{id}(id=${student.getId()})}" role="button" th:text="#{go.to}">Go to</a> </td>
                                 </tr>
                             </div>
                             </tbody>
@@ -53,11 +53,11 @@
                     </div>
                 </div>
             </li>
-            <li class="list-group-item"><a class="btn btn-info" th:href="@{/group/{id}/edit(id=${group.getId()})}" role="button">Edit</a></li>
+            <li class="list-group-item"><a class="btn btn-info" th:href="@{/group/{id}/edit(id=${group.getId()})}" role="button" th:text="#{edit}">Edit</a></li>
             <li class="list-group-item">
                 <form th:method="DELETE" th:action="@{/group/{id}(id=${group.getId()})}">
-                    <input class="btn btn-danger" type="submit" value="Delete"/>
-                    <text>Be careful, all students will be remove from group, and lessons of this group will lose group</text>
+                    <input class="btn btn-danger" type="submit" th:value="#{delete}"/>
+                    <text th:text="#{group.delete.warning}">Be careful, all students will be remove from group, and lessons of this group will lose group</text>
                 </form>
             </li>
         </ul>

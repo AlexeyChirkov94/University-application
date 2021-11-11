@@ -16,23 +16,23 @@
 
     <div class="card">
         <div class="card-body">
-            <h4 class="card-title" th:text="${'Form of education: ' + formOfEducation.getName()}">Card title</h4>
+            <h4 class="card-title" th:text="#{form.of.education} + ': ' + ${formOfEducation.getName()}">Card title</h4>
             <p class="card-text" th:text="${'ID: ' + formOfEducation.getId()}" >ID</p>
         </div>
         <ul class="list-group list-group-flush">
 
             <li class="list-group-item">
                 <div class="row justify-content-left">
-                    <div class="col-2"> Groups of form of education: </div>
+                    <div class="col-2" th:text="#{groups.of.current.form.of.education}"> Groups of form of education: </div>
                     <div class="col-10">
 
                         <table class="table table-striped">
                             <thead>
                             <tr>
-                                <th scope="col">Id</th>
-                                <th scope="col">Name</th>
-                                <th scope="col">Department</th>
-                                <th scope="col">More</th>
+                                <th scope="col" th:text="#{id}">Id</th>
+                                <th scope="col" th:text="#{name}">Name</th>
+                                <th scope="col" th:text="#{department}">Department</th>
+                                <th scope="col" th:text="#{more}">More</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -41,7 +41,7 @@
                                     <th scope="row" th:text="${formOfEducationGroup.getId()}"></th>
                                     <td th:text="${formOfEducationGroup.getName()}"> </td>
                                     <td th:text="${formOfEducationGroup.getDepartmentResponse().getName()}"></td>
-                                    <td> <a class="btn btn-secondary" th:href="@{/group/{id}(id=${formOfEducationGroup.getId()})}" role="button">Go to</a> </td>
+                                    <td> <a class="btn btn-secondary" th:href="@{/group/{id}(id=${formOfEducationGroup.getId()})}" role="button" th:text="#{go.to}">Go to</a> </td>
                                 </tr>
                             </div>
                             </tbody>
@@ -51,11 +51,11 @@
                 </div>
             </li>
 
-            <li class="list-group-item"><a class="btn btn-info" th:href="@{/education/form/{id}/edit(id=${formOfEducation.getId()})}" role="button">Edit</a></li>
+            <li class="list-group-item"><a class="btn btn-info" th:href="@{/education/form/{id}/edit(id=${formOfEducation.getId()})}" role="button" th:text="#{edit}">Edit</a></li>
             <li class="list-group-item">
                 <form th:method="DELETE" th:action="@{/education/form/{id}(id=${formOfEducation.getId()})}">
-                    <input class="btn btn-danger" type="submit" value="Delete"/>
-                    <text>Be careful, all groups with current form of education will lose form of education</text>
+                    <input class="btn btn-danger" type="submit" th:value="#{delete}"/>
+                    <text th:text="#{form.of.education.delete.warning}">Be careful, all groups with current form of education will lose form of education</text>
                 </form>
             </li>
         </ul>
