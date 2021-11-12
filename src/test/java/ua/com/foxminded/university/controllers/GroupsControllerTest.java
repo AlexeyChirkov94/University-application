@@ -299,7 +299,7 @@ public class GroupsControllerTest {
 
         doNothing().when(groupService).changeDepartment(1L, 2);
 
-        mockMvc.perform(post("/group/1/changeDepartment")
+        mockMvc.perform(post("/group/1/assign/department")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("idNewDepartment", "2")
         )
@@ -317,7 +317,7 @@ public class GroupsControllerTest {
 
         doNothing().when(groupService).changeFormOfEducation(1L, 2);
 
-        mockMvc.perform(post("/group/1/changeFormOfEducation")
+        mockMvc.perform(post("/group/1/assign/education/form")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("idNewFormOfEducation", "2")
         )
@@ -335,7 +335,7 @@ public class GroupsControllerTest {
 
         when(studentService.enterGroup(2, 1)).thenReturn(true);
 
-        mockMvc.perform(post("/group/1/addStudentToGroup")
+        mockMvc.perform(post("/group/1/add/student")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("idNewStudent", "2")
         )
@@ -353,7 +353,7 @@ public class GroupsControllerTest {
 
         when(studentService.leaveGroup(2)).thenReturn(true);
 
-        mockMvc.perform(post("/group/1/removeStudentFromGroup")
+        mockMvc.perform(post("/group/1/remove/student")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("idRemovingStudent", "2")
         )

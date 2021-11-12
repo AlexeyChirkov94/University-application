@@ -88,13 +88,13 @@ public class StudentsController {
         return "redirect:/student";
     }
 
-    @PatchMapping("/{id}/leaveGroup")
+    @PatchMapping("/{id}/remove/group")
     public String leaveGroup(@PathVariable("id") long studentId) {
         studentService.leaveGroup(studentId);
         return "redirect:/student/" + studentId + "/edit";
     }
 
-    @PostMapping("/{id}/enterGroup")
+    @PostMapping("/{id}/assign/group")
     public String enterGroup(Model model, @PathVariable("id") long studentId, @RequestParam Integer idNewGroup) {
         model.addAttribute("idNewGroup", idNewGroup);
         studentService.enterGroup(studentId, idNewGroup);

@@ -107,28 +107,28 @@ public class GroupsController {
         return "redirect:/group";
     }
 
-    @PostMapping("/{id}/changeDepartment")
+    @PostMapping("/{id}/assign/department")
     public String changeDepartment(Model model, @PathVariable("id") long groupId, @RequestParam long idNewDepartment) {
         model.addAttribute("idNewDepartment", idNewDepartment);
         groupService.changeDepartment(groupId, idNewDepartment);
         return "redirect:/group/" + groupId + "/edit";
     }
 
-    @PostMapping("/{id}/changeFormOfEducation")
+    @PostMapping("/{id}/assign/education/form")
     public String changeFormOfEducation(Model model, @PathVariable("id") long groupId, @RequestParam long idNewFormOfEducation) {
         model.addAttribute("idNewFormOfEducation", idNewFormOfEducation);
         groupService.changeFormOfEducation(groupId, idNewFormOfEducation);
         return "redirect:/group/" + groupId + "/edit";
     }
 
-    @PostMapping("/{id}/addStudentToGroup")
+    @PostMapping("/{id}/add/student")
     public String addStudentToGroup(Model model, @PathVariable("id") long groupId, @RequestParam long idNewStudent) {
         model.addAttribute("idNewStudent", idNewStudent);
         studentService.enterGroup(idNewStudent, groupId);
         return "redirect:/group/" + groupId + "/edit";
     }
 
-    @PostMapping("/{id}/removeStudentFromGroup")
+    @PostMapping("/{id}/remove/student")
     public String removeStudentFromGroup(Model model, @PathVariable("id") long groupId, @RequestParam long idRemovingStudent) {
         model.addAttribute("idRemovingStudent", idRemovingStudent);
         studentService.leaveGroup(idRemovingStudent);

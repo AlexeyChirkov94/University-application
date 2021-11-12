@@ -285,7 +285,7 @@ class StudentsControllerTest {
 
         when(studentService.leaveGroup(1L)).thenReturn(true);
 
-        mockMvc.perform(patch("/student/1/leaveGroup")
+        mockMvc.perform(patch("/student/1/remove/group")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("id", "1")
         )
@@ -302,7 +302,7 @@ class StudentsControllerTest {
 
         when(studentService.enterGroup(1L, 2L)).thenReturn(true);
 
-        mockMvc.perform(post("/student/1/enterGroup")
+        mockMvc.perform(post("/student/1/assign/group")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("idNewGroup", "2")
         )

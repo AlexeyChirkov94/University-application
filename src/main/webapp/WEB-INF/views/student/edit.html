@@ -46,7 +46,7 @@
     <br>
 
     <h6>Management:</h6>
-    <form method="post" th:action="@{/student/{id}/enterGroup(id=${student.getId()})}"  class="mb-2">
+    <form method="post" th:action="@{/student/{id}/assign/group(id=${student.getId()})}"  class="mb-2">
         <select class="form-select  mb-2" name="idNewGroup">
             <option selected="" disabled="" value="">Choose new group:</option>
             <div th:each="group : ${anotherGroups}">
@@ -55,7 +55,7 @@
         </select>
         <button class="btn btn-success" type="submit">Change group</button>
     </form>
-    <form th:method="PATCH"  th:action="@{/student/{id}/leaveGroup(id=${student.getId()})}">
+    <form th:method="PATCH"  th:action="@{/student/{id}/remove/group(id=${student.getId()})}">
         <input class="btn btn-danger" type="submit" role="button" value="Leave group"/>
     </form>
     <br>

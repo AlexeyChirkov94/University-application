@@ -81,21 +81,21 @@ public class ProfessorsController {
         return "redirect:/professor";
     }
 
-    @PostMapping("/{id}/changeScienceDegree")
+    @PostMapping("/{id}/assign/scienceDegree")
     public String changeScienceDegree(Model model, @PathVariable("id") long professorId, @RequestParam Integer idNewScienceDegree) {
         model.addAttribute("idNewScienceDegree", idNewScienceDegree);
         professorService.changeScienceDegree(professorId, idNewScienceDegree);
         return "redirect:/professor/" + professorId + "/edit";
     }
 
-    @PostMapping("/{id}/addCourse")
+    @PostMapping("/{id}/assign/course")
     public String addCourse(Model model, @PathVariable("id") long professorId, @RequestParam Integer idOfAddingCourse) {
         model.addAttribute("idOfAddingCourse", idOfAddingCourse);
         courseService.addCourseToProfessorCourseList(idOfAddingCourse, professorId);
         return "redirect:/professor/" + professorId + "/edit";
     }
 
-    @PostMapping("/{id}/removeCourse")
+    @PostMapping("/{id}/remove/course")
     public String removeCourse(Model model, @PathVariable("id") long professorId, @RequestParam Integer idOfRemovingCourse) {
         model.addAttribute("idOfRemovingCourse", idOfRemovingCourse);
         courseService.removeCourseFromProfessorCourseList(idOfRemovingCourse, professorId);

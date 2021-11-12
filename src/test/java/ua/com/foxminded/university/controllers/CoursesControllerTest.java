@@ -244,7 +244,7 @@ class CoursesControllerTest {
 
         doNothing().when(courseService).addCourseToProfessorCourseList(1L, 2L);
 
-        mockMvc.perform(post("/course/1/addProfessorToCourse")
+        mockMvc.perform(post("/course/1/assign/professor")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("idNewProfessor", "2")
         )
@@ -262,7 +262,7 @@ class CoursesControllerTest {
 
         doNothing().when(courseService).removeCourseFromProfessorCourseList(1L, 2L);
 
-        mockMvc.perform(post("/course/1/removeProfessorFromCourse")
+        mockMvc.perform(post("/course/1/remove/professor")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("idRemovingProfessor", "2")
         )

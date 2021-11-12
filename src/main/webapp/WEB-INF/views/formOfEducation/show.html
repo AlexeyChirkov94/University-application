@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{templates/layout.html}"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Form of education</title>
+</head>
+
+<body>
+
+<section layout:fragment="header"> <div th:replace="templates/fragments/header.html"></div> </section>
+<section layout:fragment="footer"> <div th:replace="templates/fragments/footer.html"></div> </section>
+<section layout:fragment="sidebar"> <div th:replace="templates/fragments/sidebar.html"></div> </section>
+
+<section layout:fragment="page-content">
+
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title" th:text="${'Form of education: ' + formOfEducation.getName()}">Card title</h4>
+            <p class="card-text" th:text="${'ID: ' + formOfEducation.getId()}" >ID</p>
+        </div>
+        <ul class="list-group list-group-flush">
+
+            <li class="list-group-item">
+                <div class="row justify-content-left">
+                    <div class="col-2"> Groups of form of education: </div>
+                    <div class="col-10">
+
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th scope="col">Id</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Department</th>
+                                <th scope="col">More</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <div th:each="formOfEducationGroup : ${formOfEducationGroups}">
+                                <tr>
+                                    <th scope="row" th:text="${formOfEducationGroup.getId()}"></th>
+                                    <td th:text="${formOfEducationGroup.getName()}"> </td>
+                                    <td th:text="${formOfEducationGroup.getDepartmentResponse().getName()}"></td>
+                                    <td> <a class="btn btn-secondary" th:href="@{/group/{id}(id=${formOfEducationGroup.getId()})}" role="button">Go to</a> </td>
+                                </tr>
+                            </div>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </li>
+
+            <li class="list-group-item"><a class="btn btn-info" th:href="@{/education/form/{id}/edit(id=${formOfEducation.getId()})}" role="button">Edit</a></li>
+            <li class="list-group-item">
+                <form th:method="DELETE" th:action="@{/education/form/{id}(id=${formOfEducation.getId()})}">
+                    <input class="btn btn-danger" type="submit" value="Delete"/>
+                    <text>Be careful, all groups with current form of education will lose form of education</text>
+                </form>
+            </li>
+        </ul>
+    </div>
+
+</section>
+
+</body>
+</html>

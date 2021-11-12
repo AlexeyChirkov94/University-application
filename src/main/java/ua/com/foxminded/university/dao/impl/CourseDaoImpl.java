@@ -31,8 +31,8 @@ public class CourseDaoImpl extends AbstractPageableCrudDaoImpl<Course> implement
     private static final String DELETE_QUERY = "DELETE FROM courses WHERE id = ?";
     private static final String COUNT_QUERY = "SELECT COUNT(*) as count from courses";
     private static final String FIND_BY_PROFESSOR_ID = FIND_QUERY + "left join professor_course pc on c.id = pc.course_id " +
-            "where pc.professor_id = ?";
-    private static final String FIND_BY_DEPARTMENT_ID = FIND_QUERY + "where c.department_id = ?";
+            "where pc.professor_id = ? order by c.id";
+    private static final String FIND_BY_DEPARTMENT_ID = FIND_QUERY + "where c.department_id = ? order by c.id";
     private static final String REMOVE_COURSE_FROM_PROFESSOR_COURSE_LIST_QUERY =
             "DELETE FROM professor_course WHERE professor_id = ? AND course_id = ?";
     private static final String ADD_COURSE_FROM_PROFESSOR_COURSE_LIST_QUERY =
