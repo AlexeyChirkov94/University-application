@@ -16,18 +16,20 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import ua.com.foxminded.university.TestsContextConfiguration;
 import ua.com.foxminded.university.dto.GroupResponse;
+import ua.com.foxminded.university.dto.LessonResponse;
 import ua.com.foxminded.university.dto.StudentRequest;
 import ua.com.foxminded.university.dto.StudentResponse;
 import ua.com.foxminded.university.service.exception.EntityAlreadyExistException;
 import ua.com.foxminded.university.service.exception.EntityDontExistException;
+import ua.com.foxminded.university.service.exception.TimeTableStudentWithoutGroupException;
 import ua.com.foxminded.university.service.exception.ValidateException;
 import ua.com.foxminded.university.service.interfaces.GroupService;
+import ua.com.foxminded.university.service.interfaces.LessonService;
 import ua.com.foxminded.university.service.interfaces.StudentService;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import static org.mockito.Mockito.times;
+import java.util.Map;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
@@ -45,6 +47,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.doNothing;
+import static ua.com.foxminded.university.controllers.ControllersUtility.getStringDateTimes;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TestsContextConfiguration.class})
@@ -61,6 +64,9 @@ class StudentsControllerTest {
     @Autowired
     GroupService groupService;
 
+    @Autowired
+    LessonService lessonService;
+
     MockMvc mockMvc;
 
     StudentsController studentsController;
@@ -69,6 +75,7 @@ class StudentsControllerTest {
     void setUp() {
         Mockito.reset(studentService);
         Mockito.reset(groupService);
+        Mockito.reset(lessonService);
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         studentsController = webApplicationContext.getBean(StudentsController.class);
     }
@@ -142,7 +149,7 @@ class StudentsControllerTest {
     }
 
     @Test
-    void editIfStudentHaveAGroupShouldAddStudentToModelAndRenderShowEdit() throws Exception {
+    void editIfStudentShouldAddStudentToModelAndRenderShowEdit() throws Exception {
         GroupResponse group1 = new GroupResponse();
         group1.setId(1L);
         group1.setName("Group 1");
@@ -152,18 +159,18 @@ class StudentsControllerTest {
         List<GroupResponse> allGroups = new ArrayList<>();
         allGroups.add(group1);
         allGroups.add(group2);
-        List<GroupResponse> anotherGroups = new ArrayList<>();
-        anotherGroups.add(group2);
+        StudentResponse studentResponse = new StudentResponse();
+        studentResponse.setId(1L);
+        studentResponse.setFirstName("Alexey");
+        studentResponse.setLastName("Chirkov");
+        studentResponse.setEmail("chirkov@gamil.com");
+        studentResponse.setPassword("1234");
+        StudentRequest studentRequest = new StudentRequest();
+        studentRequest.setFirstName(studentResponse.getFirstName());
+        studentRequest.setLastName(studentResponse.getLastName());
+        studentRequest.setEmail(studentResponse.getEmail());
 
-        StudentResponse student = new StudentResponse();
-        student.setId(1L);
-        student.setFirstName("Alexey");
-        student.setLastName("Chirkov");
-        student.setEmail("chirkov@gamil.com");
-        student.setPassword("1234");
-        student.setGroupResponse(group1);
-
-        when(studentService.findById(1L)).thenReturn(student);
+        when(studentService.findById(1L)).thenReturn(studentResponse);
         when(groupService.findById(1L)).thenReturn(group1);
         when(groupService.findAll()).thenReturn(allGroups);
 
@@ -171,52 +178,9 @@ class StudentsControllerTest {
                 .andExpect(status().is(200))
                 .andExpect(view().name("/student/edit"))
                 .andExpect(forwardedUrl("/student/edit"))
-                .andExpect(model().attribute("student", is(student)))
-                .andExpect(model().attribute("studentGroup", is(group1)))
-                .andExpect(model().attribute("anotherGroups", is(anotherGroups)));
-
-        verify(studentService).findById(1L);
-        verify(groupService).findById(1L);
-        verify(groupService).findAll();
-        verifyNoMoreInteractions(studentService);
-        verifyNoMoreInteractions(groupService);
-    }
-
-    @Test
-    void editIfStudentHaveNoGroupShouldAddStudentToModelAndRenderShowEdit() throws Exception {
-        GroupResponse studentGroup = new GroupResponse();
-        studentGroup = new GroupResponse();
-        studentGroup.setId(0L);
-        studentGroup.setName("not appointed");
-        GroupResponse group1 = new GroupResponse();
-        group1.setId(1L);
-        group1.setName("Group 1");
-        GroupResponse group2 = new GroupResponse();
-        group2.setId(2L);
-        group2.setName("Group 2");
-        List<GroupResponse> allGroups = new ArrayList<>();
-        allGroups.add(group1);
-        allGroups.add(group2);
-        StudentResponse student = new StudentResponse();
-        student.setId(1L);
-        student.setFirstName("Alexey");
-        student.setLastName("Chirkov");
-        student.setEmail("chirkov@gamil.com");
-        student.setPassword("1234");
-        student.setGroupResponse(studentGroup);
-
-
-        when(studentService.findById(1L)).thenReturn(student);
-        when(groupService.findById(1L)).thenReturn(group1);
-        when(groupService.findAll()).thenReturn(allGroups);
-
-        mockMvc.perform(get("/student/1/edit"))
-                .andExpect(status().is(200))
-                .andExpect(view().name("/student/edit"))
-                .andExpect(forwardedUrl("/student/edit"))
-                .andExpect(model().attribute("student", is(student)))
-                .andExpect(model().attribute("studentGroup", is(studentGroup)))
-                .andExpect(model().attribute("anotherGroups", is(allGroups)));
+                .andExpect(model().attribute("studentResponse", is(studentResponse)))
+                .andExpect(model().attribute("studentRequest", is(studentRequest)))
+                .andExpect(model().attribute("groups", is(allGroups)));
 
         verify(studentService).findById(1L);
         verify(groupService).findAll();
@@ -281,6 +245,36 @@ class StudentsControllerTest {
     }
 
     @Test
+    void timetableShouldAddLessonsToModelAndRenderTimetableView() throws Exception {
+        StudentResponse student = new StudentResponse();
+        student.setId(1L);
+        student.setFirstName("Alex");
+        LessonResponse lesson1 = new LessonResponse();
+        LessonResponse lesson2 = new LessonResponse();
+        lesson1.setId(1L);
+        lesson2.setId(2L);
+        List<LessonResponse> lessons = Arrays.asList(lesson1, lesson2);
+
+        Map<Long, String> stringDateTimes = getStringDateTimes(lessons);
+
+        when(studentService.findById(1L)).thenReturn(student);
+        when(lessonService.formTimeTableForStudent(1L)).thenReturn(lessons);
+
+        mockMvc.perform(get("/student/1/timetable"))
+                .andExpect(status().is(200))
+                .andExpect(view().name("/student/timetable"))
+                .andExpect(forwardedUrl("/student/timetable"))
+                .andExpect(model().attribute("student", is(student)))
+                .andExpect(model().attribute("lessons", is(lessons)))
+                .andExpect(model().attribute("stringDateTimes", is(stringDateTimes)));
+
+        verify(studentService).findById(1L);
+        verify(lessonService).formTimeTableForStudent(1L);
+        verifyNoMoreInteractions(studentService);
+        verifyNoMoreInteractions(lessonService);
+    }
+
+    @Test
     void leaveGroupShouldGetStudentIdFromUrlAndGroupIdFromModelAndRenderEditView() throws Exception {
 
         when(studentService.leaveGroup(1L)).thenReturn(true);
@@ -300,7 +294,7 @@ class StudentsControllerTest {
     @Test
     void enterGroupShouldGetStudentIdFromUrlAndGroupIdFromModelAndRenderEditView() throws Exception {
 
-        when(studentService.enterGroup(1L, 2L)).thenReturn(true);
+        when(studentService.changeGroup(1L, 2L)).thenReturn(true);
 
         mockMvc.perform(post("/student/1/assign/group")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -311,7 +305,7 @@ class StudentsControllerTest {
                 .andExpect(redirectedUrl("/student/1/edit?idNewGroup=2"))
                 .andExpect(model().attribute("idNewGroup", is(2)));
 
-        verify(studentService).enterGroup(1L, 2L);
+        verify(studentService).changeGroup(1L, 2L);
         verifyNoMoreInteractions(studentService);
     }
 
@@ -386,5 +380,22 @@ class StudentsControllerTest {
         verify(studentService).findById(15L);
         verifyNoMoreInteractions(studentService);
     }
+
+    @Test
+    void timetableExceptionShouldGetExceptionFromModelAndRenderErrorView() throws Exception {
+        Exception exception = new TimeTableStudentWithoutGroupException("Student with id: 2 not a member of any group");
+
+        when(lessonService.formTimeTableForStudent(2)).thenThrow(exception);
+
+        mockMvc.perform(get("/student/2/timetable/")
+        )
+                .andExpect(status().isOk())
+                .andExpect(view().name("errors handling/timetable show error"))
+                .andExpect(model().attribute("exception", is(exception)));
+
+        verify(lessonService).formTimeTableForStudent(2L);
+        verifyNoMoreInteractions(lessonService);
+    }
+
 
 }

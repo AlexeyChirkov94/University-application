@@ -1,9 +1,7 @@
 package ua.com.foxminded.university.mapper.interfaces;
 
-public interface Mapper<E, D> {
+public interface RequestMapper<E, D> {
 
     E mapDtoToEntity(D dto);
-
-    D mapEntityToDto(E entity);
 
 }

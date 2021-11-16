@@ -38,17 +38,4 @@ class GroupRequestMapperImplTest {
         assertThat(groupRequestMapper.mapDtoToEntity(null)).isNull();
     }
 
-    @Test
-    void mapEntityToDtoShouldMapEntityToDtoIfArgumentIsFormOfLessonEntity() {
-        GroupRequest expected = groupRequest;
-        GroupRequest actual = groupRequestMapper.mapEntityToDto(group);
-
-        assertThat(actual).isEqualTo(expected);
-    }
-
-    @Test
-    void mapEntityToDtoShouldShouldReturnNullIfArgumentNull() {
-        assertThat(groupRequestMapper.mapEntityToDto(null)).isNull();
-    }
-
 }

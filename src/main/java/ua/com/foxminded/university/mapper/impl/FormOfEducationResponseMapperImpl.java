@@ -9,25 +9,13 @@ import ua.com.foxminded.university.mapper.interfaces.FormOfEducationResponseMapp
 public class FormOfEducationResponseMapperImpl implements FormOfEducationResponseMapper {
 
     @Override
-    public FormOfEducation mapDtoToEntity(FormOfEducationResponse dto) {
-        if (dto == null) {
-            return null;
-        } else {
-            return FormOfEducation.builder()
-                    .withId(dto.getId())
-                    .withName(dto.getName())
-                    .build();
-        }
-    }
-
-    @Override
     public FormOfEducationResponse mapEntityToDto(FormOfEducation entity) {
         FormOfEducationResponse formOfEducationResponse = new FormOfEducationResponse();
         if (entity == null) {
             return null;
         } else if (entity.getId() == 0L){
             formOfEducationResponse.setId(0L);
-            formOfEducationResponse.setName("not chosen");
+            formOfEducationResponse.setName("");
         } else {
             formOfEducationResponse.setId(entity.getId());
             formOfEducationResponse.setName(entity.getName());

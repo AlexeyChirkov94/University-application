@@ -3,7 +3,7 @@
       layout:decorate="~{templates/layout.html}"
       xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Error of creating</title>
+    <title>Timetable error</title>
 </head>
 
 <body>
@@ -14,7 +14,7 @@
 
 <section layout:fragment="page-content">
 
-    <h4 th:text="#{error.creating}">Creating error</h4>
+    <h4 th:text="#{error.timetable.without.group}">Student can`t attend lessons without a group</h4>
 
     <p th:text="${exception.getMessage()}">VALUE</p>
 

@@ -16,6 +16,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import ua.com.foxminded.university.TestsContextConfiguration;
 import ua.com.foxminded.university.dto.CourseResponse;
+import ua.com.foxminded.university.dto.DepartmentResponse;
+import ua.com.foxminded.university.dto.LessonResponse;
 import ua.com.foxminded.university.dto.ProfessorRequest;
 import ua.com.foxminded.university.dto.ProfessorResponse;
 import ua.com.foxminded.university.dto.ScienceDegreeResponse;
@@ -23,11 +25,13 @@ import ua.com.foxminded.university.service.exception.EntityAlreadyExistException
 import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.exception.ValidateException;
 import ua.com.foxminded.university.service.interfaces.CourseService;
+import ua.com.foxminded.university.service.interfaces.DepartmentService;
+import ua.com.foxminded.university.service.interfaces.LessonService;
 import ua.com.foxminded.university.service.interfaces.ProfessorService;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
@@ -45,6 +49,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.doNothing;
+import static ua.com.foxminded.university.controllers.ControllersUtility.getStringDateTimes;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TestsContextConfiguration.class})
@@ -59,6 +64,12 @@ public class ProfessorsControllerTest {
     ProfessorService professorService;
 
     @Autowired
+    DepartmentService departmentService;
+
+    @Autowired
+    LessonService lessonService;
+
+    @Autowired
     CourseService courseService;
 
     MockMvc mockMvc;
@@ -69,6 +80,8 @@ public class ProfessorsControllerTest {
     void setUp() {
         Mockito.reset(professorService);
         Mockito.reset(courseService);
+        Mockito.reset(departmentService);
+        Mockito.reset(lessonService);
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         professorsController = webApplicationContext.getBean(ProfessorsController.class);
     }
@@ -159,34 +172,52 @@ public class ProfessorsControllerTest {
         List<CourseResponse> anotherCourses = new ArrayList<>();
         anotherCourses.add(course3);
 
-        ProfessorResponse professor = new ProfessorResponse();
-        professor.setId(1L);
-        professor.setFirstName("Alexey");
-        professor.setLastName("Chirkov");
-        professor.setEmail("chirkov@gamil.com");
-        professor.setPassword("1234");
-        professor.setCoursesResponse(professorCourses);
-        professor.setScienceDegreeResponse(ScienceDegreeResponse.GRADUATE);
+        DepartmentResponse department1 = new DepartmentResponse();
+        DepartmentResponse department2 = new DepartmentResponse();
+        department1.setId(1L);
+        department2.setId(2L);
 
-        when(professorService.findById(1L)).thenReturn(professor);
+        List<DepartmentResponse> allDepartments = new ArrayList<>();
+        allDepartments.add(department1);
+        allDepartments.add(department2);
+
+        ProfessorResponse professorResponse = new ProfessorResponse();
+        professorResponse.setId(1L);
+        professorResponse.setFirstName("Alexey");
+        professorResponse.setLastName("Chirkov");
+        professorResponse.setEmail("chirkov@gamil.com");
+        professorResponse.setPassword("1234");
+        professorResponse.setCoursesResponse(professorCourses);
+        professorResponse.setScienceDegreeResponse(ScienceDegreeResponse.GRADUATE);
+
+        ProfessorRequest professorRequest = new ProfessorRequest();
+        professorRequest.setFirstName(professorResponse.getFirstName());
+        professorRequest.setLastName(professorResponse.getLastName());
+        professorRequest.setEmail(professorResponse.getEmail());
+
+        when(professorService.findById(1L)).thenReturn(professorResponse);
         when(courseService.findByProfessorId(1L)).thenReturn(professorCourses);
         when(courseService.findAll()).thenReturn(allCourses);
+        when(departmentService.findAll()).thenReturn(allDepartments);
 
         mockMvc.perform(get("/professor/1/edit"))
                 .andExpect(status().is(200))
                 .andExpect(view().name("/professor/edit"))
                 .andExpect(forwardedUrl("/professor/edit"))
-                .andExpect(model().attribute("professor", is(professor)))
+                .andExpect(model().attribute("professorResponse", is(professorResponse)))
+                .andExpect(model().attribute("professorRequest", is(professorRequest)))
+                .andExpect(model().attribute("ScienceDegrees", is(ScienceDegreeResponse.values())))
+                .andExpect(model().attribute("departments", is(allDepartments)))
                 .andExpect(model().attribute("professorsCourses", is(professorCourses)))
-                .andExpect(model().attribute("anotherCourses", is(anotherCourses)))
-                .andExpect(model().attribute("ScienceDegree", is(ScienceDegreeResponse.GRADUATE)))
-                .andExpect(model().attribute("ScienceDegrees", is(ScienceDegreeResponse.values())));
+                .andExpect(model().attribute("anotherCourses", is(anotherCourses)));
 
         verify(professorService).findById(1L);
         verify(courseService).findByProfessorId(1L);
         verify(courseService).findAll();
+        verify(departmentService).findAll();
         verifyNoMoreInteractions(professorService);
         verifyNoMoreInteractions(courseService);
+        verifyNoMoreInteractions(departmentService);
     }
 
     @Test
@@ -245,23 +276,34 @@ public class ProfessorsControllerTest {
         verifyNoMoreInteractions(professorService);
     }
 
-
     @Test
-    void changeScienceDegreeShouldGetProfessorIdFromUrlAndScienceDegreeIdFromModelAndRenderEditView() throws Exception {
+    void timetableShouldAddLessonsToModelAndRenderTimetableView() throws Exception {
+        ProfessorResponse professor = new ProfessorResponse();
+        professor.setId(1L);
+        professor.setFirstName("Alex");
+        LessonResponse lesson1 = new LessonResponse();
+        LessonResponse lesson2 = new LessonResponse();
+        lesson1.setId(1L);
+        lesson2.setId(2L);
+        List<LessonResponse> lessons = Arrays.asList(lesson1, lesson2);
 
-        doNothing().when(professorService).changeScienceDegree(1L, 2);
+        Map<Long, String> stringDateTimes = getStringDateTimes(lessons);
 
-        mockMvc.perform(post("/professor/1/assign/scienceDegree")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .param("idNewScienceDegree", "2")
-        )
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/professor/1/edit"))
-                .andExpect(redirectedUrl("/professor/1/edit?idNewScienceDegree=2"))
-                .andExpect(model().attribute("idNewScienceDegree", is(2)));
+        when(professorService.findById(1L)).thenReturn(professor);
+        when(lessonService.formTimeTableForProfessor(1L)).thenReturn(lessons);
 
-        verify(professorService).changeScienceDegree(1L, 2);
+        mockMvc.perform(get("/professor/1/timetable"))
+                .andExpect(status().is(200))
+                .andExpect(view().name("/professor/timetable"))
+                .andExpect(forwardedUrl("/professor/timetable"))
+                .andExpect(model().attribute("professor", is(professor)))
+                .andExpect(model().attribute("lessons", is(lessons)))
+                .andExpect(model().attribute("stringDateTimes", is(stringDateTimes)));
+
+        verify(professorService).findById(1L);
+        verify(lessonService).formTimeTableForProfessor(1L);
         verifyNoMoreInteractions(professorService);
+        verifyNoMoreInteractions(lessonService);
     }
 
     @Test

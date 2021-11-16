@@ -60,7 +60,7 @@ public class ControllersUtility {
         StringBuilder stringBuilder = new StringBuilder();
 
         if (lesson.getTimeOfStartLesson() == null) {
-            return "not appointed";
+            return "";
         } else {
             int intYear = lesson.getTimeOfStartLesson().getYear();
             Month month = lesson.getTimeOfStartLesson().getMonth();

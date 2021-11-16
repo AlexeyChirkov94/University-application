@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{templates/layout.html}"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Professor timetable</title>
+</head>
+
+<body>
+
+<section layout:fragment="header"> <div th:replace="templates/fragments/header.html"></div> </section>
+<section layout:fragment="footer"> <div th:replace="templates/fragments/footer.html"></div> </section>
+<section layout:fragment="sidebar"> <div th:replace="templates/fragments/sidebar.html"></div> </section>
+
+<section layout:fragment="page-content">
+
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title" th:text="#{timetable.for.professor} + ' ' + ${professor.getScienceDegreeResponse()} + ', '
+            + ${professor.getLastName()} + ' ' + ${professor.getFirstName()} +
+                            ' (ID: ' + ${professor.getId()} + ')'">Card title</h4>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th scope="col" th:text="#{id}">Id</th>
+                        <th scope="col" th:text="#{date.and.time}">Date & Time</th>
+                        <th scope="col" th:text="#{course}">Course</th>
+                        <th scope="col" th:text="#{form.of.lesson}">Form of lesson</th>
+                        <th scope="col" th:text="#{group}">Group</th>
+                        <th scope="col" th:text="#{teacher}">Teacher</th>
+                        <th scope="col" th:text="#{more}">More</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <div th:each="lesson : ${lessons}">
+                        <tr>
+                            <th scope="row" th:text="${lesson.getId()}"></th>
+                            <td th:text="${stringDateTimes.get(lesson.getId())}"></td>
+                            <td th:text="${lesson.getCourseResponse().getName()}"></td>
+                            <td th:text="${lesson.getFormOfLessonResponse().getName()}"> </td>
+                            <td th:text="${lesson.getGroupResponse().getName()}"> </td>
+                            <td th:text="${lesson.getTeacher().getLastName() + ', ' + lesson.getTeacher().getFirstName()}"> </td>
+                            <td> <a class="btn btn-secondary" th:href="@{/lesson/{id}(id=${lesson.getId()})}" role="button" th:text="#{go.to}">Go to</a> </td>
+                        </tr>
+                    </div>
+                    </tbody>
+                </table>
+
+            </li>
+
+        </ul>
+    </div>
+
+</section>
+
+</body>
+</html>

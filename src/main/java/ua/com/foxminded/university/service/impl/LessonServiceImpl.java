@@ -8,16 +8,21 @@ import ua.com.foxminded.university.dao.interfaces.FormOfLessonDao;
 import ua.com.foxminded.university.dao.interfaces.GroupDao;
 import ua.com.foxminded.university.dao.interfaces.LessonDao;
 import ua.com.foxminded.university.dao.interfaces.ProfessorDao;
+import ua.com.foxminded.university.dao.interfaces.StudentDao;
 import ua.com.foxminded.university.dto.LessonRequest;
 import ua.com.foxminded.university.dto.LessonResponse;
 import ua.com.foxminded.university.entity.Lesson;;
+import ua.com.foxminded.university.entity.Student;
 import ua.com.foxminded.university.mapper.interfaces.CourseRequestMapper;
 import ua.com.foxminded.university.mapper.interfaces.LessonRequestMapper;
 import ua.com.foxminded.university.mapper.interfaces.LessonResponseMapper;
 import ua.com.foxminded.university.mapper.interfaces.ProfessorRequestMapper;
 import ua.com.foxminded.university.service.exception.EntityDontExistException;
+import ua.com.foxminded.university.service.exception.TimeTableStudentWithoutGroupException;
 import ua.com.foxminded.university.service.interfaces.LessonService;
 import ua.com.foxminded.university.service.validator.LessonValidator;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,17 +35,30 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
     private final ProfessorDao professorDao;
     private final CourseDao courseDao;
     private final GroupDao groupDao;
+    private final StudentDao studentDao;
     private final LessonValidator lessonValidator;
     private final LessonRequestMapper lessonRequestMapper;
     private final LessonResponseMapper lessonResponseMapper;
-    private final ProfessorRequestMapper professorRequestMapper;
-    private final CourseRequestMapper courseRequestMapper;
 
     @Override
     @Transactional(transactionManager = "txManager")
     public List<LessonResponse> formTimeTableForGroup(long groupId) {
         checkThatGroupExist(groupId);
 
+        return lessonDao.findByGroupId(groupId).stream().map(lessonResponseMapper::mapEntityToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(transactionManager = "txManager")
+    public List<LessonResponse> formTimeTableForStudent(long studentId) {
+        Student student = studentDao.findById(studentId)
+                .orElseThrow(() -> new EntityDontExistException("There no student with id: " + studentId));
+
+        long groupId = student.getGroup().getId();
+        if(groupId == 0L){
+            throw new TimeTableStudentWithoutGroupException("Student with id: " + studentId + " not a member of any group");
+        }
         return lessonDao.findByGroupId(groupId).stream().map(lessonResponseMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }

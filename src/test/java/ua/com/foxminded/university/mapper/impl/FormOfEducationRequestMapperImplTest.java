@@ -38,17 +38,4 @@ class FormOfEducationRequestMapperImplTest {
         assertThat(formOfEducationRequestMapper.mapDtoToEntity(null)).isNull();
     }
 
-    @Test
-    void mapEntityToDtoShouldMapEntityToDtoIfArgumentIsFormOfEducationEntity() {
-        FormOfEducationRequest expected = formOfEducationRequest;
-        FormOfEducationRequest actual = formOfEducationRequestMapper.mapEntityToDto(formOfEducation);
-
-        assertThat(actual).isEqualTo(expected);
-    }
-
-    @Test
-    void mapEntityToDtoShouldShouldReturnNullIfArgumentNull() {
-        assertThat(formOfEducationRequestMapper.mapEntityToDto(null)).isNull();
-    }
-
 }

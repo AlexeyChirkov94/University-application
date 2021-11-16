@@ -17,15 +17,20 @@ import ua.com.foxminded.university.dto.DepartmentResponse;
 import ua.com.foxminded.university.dto.FormOfEducationResponse;
 import ua.com.foxminded.university.dto.GroupRequest;
 import ua.com.foxminded.university.dto.GroupResponse;
+import ua.com.foxminded.university.dto.LessonResponse;
 import ua.com.foxminded.university.dto.StudentResponse;
 import ua.com.foxminded.university.service.exception.EntityAlreadyExistException;
 import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.interfaces.DepartmentService;
 import ua.com.foxminded.university.service.interfaces.FormOfEducationService;
 import ua.com.foxminded.university.service.interfaces.GroupService;
+import ua.com.foxminded.university.service.interfaces.LessonService;
 import ua.com.foxminded.university.service.interfaces.StudentService;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
+
+import static ua.com.foxminded.university.controllers.ControllersUtility.getStringDateTimes;
 import static ua.com.foxminded.university.controllers.ControllersUtility.setPagesValueAndStatus;
 
 @AllArgsConstructor
@@ -37,6 +42,7 @@ public class GroupsController {
     private final FormOfEducationService formOfEducationService;
     private final DepartmentService departmentService;
     private final StudentService studentService;
+    private final LessonService lessonService;
 
     @GetMapping()
     public String showAll(Model model, @RequestParam(value="page", required = false) String page){
@@ -62,31 +68,19 @@ public class GroupsController {
     }
 
     @PostMapping()
-    public String create(Model model, @ModelAttribute("group") GroupRequest groupRequest, @RequestParam long formOfEducationId,
-                         @RequestParam long departmentId) {
-        model.addAttribute("formOfEducationId", formOfEducationId);
-        model.addAttribute("departmentId", departmentId);
-
-        GroupResponse groupResponse = groupService.create(groupRequest);
-
-        if(formOfEducationId != 0L){
-            groupService.changeFormOfEducation(groupResponse.getId(), formOfEducationId);
-        }
-        if(departmentId != 0){
-            groupService.changeDepartment(groupResponse.getId(), departmentId);
-        }
-
+    public String create(@ModelAttribute("group") GroupRequest groupRequest) {
+        groupService.create(groupRequest);
         return "redirect:/group";
     }
 
     @GetMapping("/{id}/edit")
     public String edit(Model model, @PathVariable("id") long id) {
-        GroupResponse group = groupService.findById(id);
-        List<DepartmentResponse> anotherDepartments = departmentService.findAll();
-        anotherDepartments.remove(group.getDepartmentResponse());
+        GroupResponse groupResponse = groupService.findById(id);
+        GroupRequest groupRequest = new GroupRequest();
+        groupRequest.setName(groupResponse.getName());
 
-        List<FormOfEducationResponse> anotherFormOfEducation = formOfEducationService.findAll();
-        anotherFormOfEducation.remove(group.getFormOfEducationResponse());
+        List<DepartmentResponse> departments = departmentService.findAll();
+        List<FormOfEducationResponse> formsOfEducation = formOfEducationService.findAll();
 
         List<StudentResponse> studentsAnotherGroups = studentService.findAll();
         List<StudentResponse> studentsCurrentGroup = studentService.findByGroupId(id);
@@ -94,9 +88,10 @@ public class GroupsController {
 
         model.addAttribute("studentsAnotherGroups", studentsAnotherGroups);
         model.addAttribute("studentsCurrentGroup", studentsCurrentGroup);
-        model.addAttribute("anotherFormsOfEducation", anotherFormOfEducation);
-        model.addAttribute("anotherDepartments", anotherDepartments);
-        model.addAttribute("group", group);
+        model.addAttribute("formsOfEducation", formsOfEducation);
+        model.addAttribute("departments", departments);
+        model.addAttribute("groupResponse", groupResponse);
+        model.addAttribute("groupRequest", groupRequest);
 
         return "/group/edit";
     }
@@ -107,24 +102,21 @@ public class GroupsController {
         return "redirect:/group";
     }
 
-    @PostMapping("/{id}/assign/department")
-    public String changeDepartment(Model model, @PathVariable("id") long groupId, @RequestParam long idNewDepartment) {
-        model.addAttribute("idNewDepartment", idNewDepartment);
-        groupService.changeDepartment(groupId, idNewDepartment);
-        return "redirect:/group/" + groupId + "/edit";
-    }
+    @GetMapping("/{id}/timetable")
+    public String timetable(Model model, @PathVariable("id") long id) {
+        List<LessonResponse> lessons = lessonService.formTimeTableForGroup(id);
+        Map<Long, String> stringDateTimes = getStringDateTimes(lessons);
 
-    @PostMapping("/{id}/assign/education/form")
-    public String changeFormOfEducation(Model model, @PathVariable("id") long groupId, @RequestParam long idNewFormOfEducation) {
-        model.addAttribute("idNewFormOfEducation", idNewFormOfEducation);
-        groupService.changeFormOfEducation(groupId, idNewFormOfEducation);
-        return "redirect:/group/" + groupId + "/edit";
+        model.addAttribute("group", groupService.findById(id));
+        model.addAttribute("lessons", lessons);
+        model.addAttribute("stringDateTimes", stringDateTimes);
+        return "/group/timetable";
     }
 
     @PostMapping("/{id}/add/student")
     public String addStudentToGroup(Model model, @PathVariable("id") long groupId, @RequestParam long idNewStudent) {
         model.addAttribute("idNewStudent", idNewStudent);
-        studentService.enterGroup(idNewStudent, groupId);
+        studentService.changeGroup(idNewStudent, groupId);
         return "redirect:/group/" + groupId + "/edit";
     }
 

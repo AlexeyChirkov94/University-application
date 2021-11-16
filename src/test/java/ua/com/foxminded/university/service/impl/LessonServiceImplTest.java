@@ -10,12 +10,14 @@ import ua.com.foxminded.university.dao.interfaces.FormOfLessonDao;
 import ua.com.foxminded.university.dao.interfaces.GroupDao;
 import ua.com.foxminded.university.dao.interfaces.LessonDao;
 import ua.com.foxminded.university.dao.interfaces.ProfessorDao;
+import ua.com.foxminded.university.dao.interfaces.StudentDao;
 import ua.com.foxminded.university.dto.LessonRequest;
 import ua.com.foxminded.university.entity.Course;
 import ua.com.foxminded.university.entity.FormOfLesson;
 import ua.com.foxminded.university.entity.Group;
 import ua.com.foxminded.university.entity.Lesson;
 import ua.com.foxminded.university.entity.Professor;
+import ua.com.foxminded.university.entity.Student;
 import ua.com.foxminded.university.mapper.interfaces.LessonRequestMapper;
 import ua.com.foxminded.university.mapper.interfaces.LessonResponseMapper;
 import ua.com.foxminded.university.service.validator.LessonValidator;
@@ -48,6 +50,9 @@ class LessonServiceImplTest {
     GroupDao groupDao;
 
     @Mock
+    StudentDao studentDao;
+
+    @Mock
     LessonRequestMapper lessonRequestMapper;
 
     @Mock
@@ -72,6 +77,24 @@ class LessonServiceImplTest {
         lessonService.formTimeTableForGroup(groupId);
 
         verify(groupDao).findById(groupId);
+        verify(lessonDao).findByGroupId(groupId);
+    }
+
+    @Test
+    void findByStudentIdShouldReturnListOfLessonResponsesIfArgumentsIsGroupId() {
+        long studentId = 1;
+        long groupId = 2;
+        Lesson lesson1 = Lesson.builder().withId(1L).build();
+        Lesson lesson2 = Lesson.builder().withId(2L).build();
+        List<Lesson> lessons = Arrays.asList(lesson1, lesson2);
+        Student student = Student.builder().withId(studentId).withGroup(Group.builder().withId(groupId).build()).build();
+
+        when(studentDao.findById(studentId)).thenReturn(Optional.of(student));
+        when(lessonDao.findByGroupId(groupId)).thenReturn(lessons);
+
+        lessonService.formTimeTableForStudent(studentId);
+
+        verify(studentDao).findById(studentId);
         verify(lessonDao).findByGroupId(groupId);
     }
 
@@ -448,6 +471,31 @@ class LessonServiceImplTest {
         assertThatThrownBy(() -> lessonService.formTimeTableForGroup(groupId)).hasMessage("There no group with id: 200");
 
         verify(groupDao).findById(groupId);
+    }
+
+    @Test
+    void findByStudentIdShouldShouldThrowExceptionIfStudentDontExist() {
+        long studentId = 1;
+
+        when(studentDao.findById(studentId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> lessonService.formTimeTableForStudent(studentId))
+                .hasMessage("There no student with id: 1");
+
+        verify(studentDao).findById(studentId);
+    }
+
+    @Test
+    void findByStudentIdShouldShouldThrowExceptionIfStudentNotAMemberOfGroup() {
+        long studentId = 1;
+        Student student = Student.builder().withId(studentId).withGroup(Group.builder().withId(0L).build()).build();
+
+        when(studentDao.findById(studentId)).thenReturn(Optional.of(student));
+
+        assertThatThrownBy(() -> lessonService.formTimeTableForStudent(studentId))
+                .hasMessage("Student with id: 1 not a member of any group");
+
+        verify(studentDao).findById(studentId);
     }
 
     @Test

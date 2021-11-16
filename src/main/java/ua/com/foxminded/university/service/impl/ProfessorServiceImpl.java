@@ -10,6 +10,7 @@ import ua.com.foxminded.university.dao.interfaces.ProfessorDao;
 import ua.com.foxminded.university.dto.ProfessorRequest;
 import ua.com.foxminded.university.dto.ProfessorResponse;
 import ua.com.foxminded.university.entity.Course;
+import ua.com.foxminded.university.entity.Group;
 import ua.com.foxminded.university.entity.Lesson;
 import ua.com.foxminded.university.entity.Professor;
 import ua.com.foxminded.university.entity.ScienceDegree;
@@ -77,10 +78,22 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
     }
 
     @Override
-    public void edit(ProfessorRequest user) {
-        userValidator.validate(user);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        professorDao.update(professorRequestMapper.mapDtoToEntity(user));
+    @Transactional(transactionManager = "txManager")
+    public void edit(ProfessorRequest professorRequest) {
+
+        userValidator.validate(professorRequest);
+        professorRequest.setPassword(passwordEncoder.encode(professorRequest.getPassword()));
+
+        professorDao.update(professorRequestMapper.mapDtoToEntity(professorRequest));
+
+        if(professorRequest.getDepartmentId() != 0L){
+            changeDepartment(professorRequest.getId(), professorRequest.getDepartmentId());
+        }
+
+        if(professorRequest.getScienceDegreeId() != 0L){
+            changeScienceDegree(professorRequest.getId(), professorRequest.getScienceDegreeId());
+        }
+
     }
 
     @Override
@@ -110,6 +123,7 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
 
     @Override
     public void changeScienceDegree(long professorId, int idNewScienceDegree) {
+        checkThatProfessorExist(professorId);
         scienceDegreeValidator.validate(ScienceDegree.getById(idNewScienceDegree));
         professorDao.changeScienceDegree(professorId, idNewScienceDegree);
     }
@@ -149,9 +163,18 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
     }
 
     @Override
-    protected ProfessorResponse registerCertainUser(ProfessorRequest userDto) {
-        Professor professorBeforeSave = professorRequestMapper.mapDtoToEntity(userDto);
+    @Transactional(transactionManager = "txManager")
+    protected ProfessorResponse registerCertainUser(ProfessorRequest professorRequest) {
+        Professor professorBeforeSave = professorRequestMapper.mapDtoToEntity(professorRequest);
         Professor professorAfterSave = professorDao.save(professorBeforeSave);
+
+        if(professorRequest.getDepartmentId() != 0L){
+            changeDepartment(professorAfterSave.getId(), professorRequest.getDepartmentId());
+        }
+
+        if(professorRequest.getScienceDegreeId() != 0L){
+            changeScienceDegree(professorAfterSave.getId(), professorRequest.getScienceDegreeId());
+        }
 
         return professorResponseMapper.mapEntityToDto(professorAfterSave);
     }

@@ -17,13 +17,4 @@ public class ScienceDegreeRequestMapperImpl implements ScienceDegreeRequestMappe
         }
     }
 
-    @Override
-    public ScienceDegreeRequest mapEntityToDto(ScienceDegree entity) {
-        if (entity == null) {
-            return null;
-        } else {
-            return ScienceDegreeRequest.getById(entity.getId());
-        }
-    }
-
 }

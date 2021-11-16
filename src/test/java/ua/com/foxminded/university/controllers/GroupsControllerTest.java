@@ -17,20 +17,21 @@ import org.springframework.web.context.WebApplicationContext;
 import ua.com.foxminded.university.TestsContextConfiguration;
 import ua.com.foxminded.university.dto.DepartmentResponse;
 import ua.com.foxminded.university.dto.FormOfEducationResponse;
-import ua.com.foxminded.university.dto.FormOfLessonRequest;
 import ua.com.foxminded.university.dto.GroupRequest;
 import ua.com.foxminded.university.dto.GroupResponse;
+import ua.com.foxminded.university.dto.LessonResponse;
 import ua.com.foxminded.university.dto.StudentResponse;
 import ua.com.foxminded.university.service.exception.EntityAlreadyExistException;
 import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.interfaces.DepartmentService;
 import ua.com.foxminded.university.service.interfaces.FormOfEducationService;
 import ua.com.foxminded.university.service.interfaces.GroupService;
+import ua.com.foxminded.university.service.interfaces.LessonService;
 import ua.com.foxminded.university.service.interfaces.StudentService;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
@@ -48,6 +49,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.doNothing;
+import static ua.com.foxminded.university.controllers.ControllersUtility.getStringDateTimes;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TestsContextConfiguration.class})
@@ -70,6 +72,9 @@ public class GroupsControllerTest {
     @Autowired
     StudentService studentService;
 
+    @Autowired
+    LessonService lessonService;
+
     MockMvc mockMvc;
 
     GroupsController groupsController;
@@ -80,6 +85,7 @@ public class GroupsControllerTest {
         Mockito.reset(formOfEducationService);
         Mockito.reset(departmentService);
         Mockito.reset(studentService);
+        Mockito.reset(lessonService);
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         groupsController = webApplicationContext.getBean(GroupsController.class);
     }
@@ -147,21 +153,17 @@ public class GroupsControllerTest {
         DepartmentResponse department2 = new DepartmentResponse();
         department1.setName("Dep 1");
         department2.setName("Dep 2");
-        List<DepartmentResponse> allDepartments = new ArrayList<>();
-        allDepartments.add(department1);
-        allDepartments.add(department2);
-        List<DepartmentResponse> anotherDepartments = new ArrayList<>();
-        anotherDepartments.add(department2);
+        List<DepartmentResponse> departments = new ArrayList<>();
+        departments.add(department1);
+        departments.add(department2);
 
         FormOfEducationResponse formOfEducation1 = new FormOfEducationResponse();
         FormOfEducationResponse formOfEducation2 = new FormOfEducationResponse();
         formOfEducation1.setName("Form 1");
         formOfEducation1.setName("Form 2");
-        List<FormOfEducationResponse> allFormsOfEducation = new ArrayList<>();
-        allFormsOfEducation.add(formOfEducation1);
-        allFormsOfEducation.add(formOfEducation2);
-        List<FormOfEducationResponse> anotherFormsOfEducation = new ArrayList<>();
-        anotherFormsOfEducation.add(formOfEducation2);
+        List<FormOfEducationResponse> formsOfEducation = new ArrayList<>();
+        formsOfEducation.add(formOfEducation1);
+        formsOfEducation.add(formOfEducation2);
 
         StudentResponse student1 = new StudentResponse();
         StudentResponse student2 = new StudentResponse();
@@ -175,15 +177,17 @@ public class GroupsControllerTest {
         List<StudentResponse> studentsCurrentGroup = new ArrayList<>();
         studentsCurrentGroup.add(student1);
 
-        GroupResponse group = new GroupResponse();
-        group.setId(1L);
-        group.setName("Group 1");
-        group.setDepartmentResponse(department1);
-        group.setFormOfEducationResponse(formOfEducation1);
+        GroupResponse groupResponse = new GroupResponse();
+        groupResponse.setId(1L);
+        groupResponse.setName("Group 1");
+        groupResponse.setDepartmentResponse(department1);
+        groupResponse.setFormOfEducationResponse(formOfEducation1);
+        GroupRequest groupRequest = new GroupRequest();
+        groupRequest.setName(groupResponse.getName());
 
-        when(groupService.findById(1L)).thenReturn(group);
-        when(departmentService.findAll()).thenReturn(allDepartments);
-        when(formOfEducationService.findAll()).thenReturn(allFormsOfEducation);
+        when(groupService.findById(1L)).thenReturn(groupResponse);
+        when(departmentService.findAll()).thenReturn(departments);
+        when(formOfEducationService.findAll()).thenReturn(formsOfEducation);
         when(studentService.findAll()).thenReturn(allStudents);
         when(studentService.findByGroupId(1L)).thenReturn(studentsCurrentGroup);
 
@@ -191,9 +195,10 @@ public class GroupsControllerTest {
                 .andExpect(status().is(200))
                 .andExpect(view().name("/group/edit"))
                 .andExpect(forwardedUrl("/group/edit"))
-                .andExpect(model().attribute("group", is(group)))
-                .andExpect(model().attribute("anotherDepartments", is(anotherDepartments)))
-                .andExpect(model().attribute("anotherFormsOfEducation", is(anotherFormsOfEducation)))
+                .andExpect(model().attribute("groupResponse", is(groupResponse)))
+                .andExpect(model().attribute("groupRequest", is(groupRequest)))
+                .andExpect(model().attribute("departments", is(departments)))
+                .andExpect(model().attribute("formsOfEducation", is(formsOfEducation)))
                 .andExpect(model().attribute("studentsAnotherGroups", is(studentsAnotherGroups)))
                 .andExpect(model().attribute("studentsCurrentGroup", is(studentsCurrentGroup)));
 
@@ -223,52 +228,14 @@ public class GroupsControllerTest {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("id", groupResponse.getId().toString())
                 .param("name", groupResponse.getName())
-                .param("formOfEducationId", "0")
-                .param("departmentId", "0")
         )
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/group"))
-                .andExpect(redirectedUrl("/group?formOfEducationId=0&departmentId=0"))
+                .andExpect(redirectedUrl("/group"))
                 .andExpect(model().attribute("group", hasProperty("id", is(groupResponse.getId()))))
-                .andExpect(model().attribute("group", hasProperty("name",is(groupResponse.getName()))))
-                .andExpect(model().attribute("formOfEducationId", is(0L)))
-                .andExpect(model().attribute("departmentId", is(0L)));
+                .andExpect(model().attribute("group", hasProperty("name",is(groupResponse.getName()))));
 
         verify(groupService).create(groupRequest);
-        verifyNoMoreInteractions(groupService);
-    }
-
-    @Test
-    void createShouldGetGroupFromModelAndFormOfEducationIdAndDepartmentIdFromUrlAndRenderIndexView() throws Exception {
-        GroupRequest groupRequest = new GroupRequest();
-        groupRequest.setId(1L);
-        groupRequest.setName("Group 1");
-        GroupResponse groupResponse = new GroupResponse();
-        groupResponse.setId(1L);
-        groupResponse.setName("Group 1");
-
-        when(groupService.create(groupRequest)).thenReturn(groupResponse);
-        doNothing().when(groupService).changeFormOfEducation(1L, 1);
-        doNothing().when(groupService).changeDepartment(1L, 1);
-
-        mockMvc.perform(post("/group")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .param("id", groupResponse.getId().toString())
-                .param("name", groupResponse.getName())
-                .param("formOfEducationId", "1")
-                .param("departmentId", "1")
-        )
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/group"))
-                .andExpect(redirectedUrl("/group?formOfEducationId=1&departmentId=1"))
-                .andExpect(model().attribute("group", hasProperty("id", is(groupResponse.getId()))))
-                .andExpect(model().attribute("group", hasProperty("name",is(groupResponse.getName()))))
-                .andExpect(model().attribute("formOfEducationId", is(1L)))
-                .andExpect(model().attribute("departmentId", is(1L)));
-
-        verify(groupService).create(groupRequest);
-        verify(groupService).changeFormOfEducation(1L, 1);
-        verify(groupService).changeDepartment(1L, 1);
         verifyNoMoreInteractions(groupService);
     }
 
@@ -295,45 +262,39 @@ public class GroupsControllerTest {
     }
 
     @Test
-    void changeDepartmentShouldGetGroupIdFromUrlAndDepartmentIdFromModelAndRenderEditView() throws Exception {
+    void timetableShouldAddLessonsToModelAndRenderTimetableView() throws Exception {
+        GroupResponse group = new GroupResponse();
+        group.setId(1L);
+        group.setName("group");
+        LessonResponse lesson1 = new LessonResponse();
+        LessonResponse lesson2 = new LessonResponse();
+        lesson1.setId(1L);
+        lesson2.setId(2L);
+        List<LessonResponse> lessons = Arrays.asList(lesson1, lesson2);
 
-        doNothing().when(groupService).changeDepartment(1L, 2);
+        Map<Long, String> stringDateTimes = getStringDateTimes(lessons);
 
-        mockMvc.perform(post("/group/1/assign/department")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .param("idNewDepartment", "2")
-        )
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/group/1/edit"))
-                .andExpect(redirectedUrl("/group/1/edit?idNewDepartment=2"))
-                .andExpect(model().attribute("idNewDepartment", is(2L)));
+        when(groupService.findById(1L)).thenReturn(group);
+        when(lessonService.formTimeTableForGroup(1L)).thenReturn(lessons);
 
-        verify(groupService).changeDepartment(1L, 2);
+        mockMvc.perform(get("/group/1/timetable"))
+                .andExpect(status().is(200))
+                .andExpect(view().name("/group/timetable"))
+                .andExpect(forwardedUrl("/group/timetable"))
+                .andExpect(model().attribute("group", is(group)))
+                .andExpect(model().attribute("lessons", is(lessons)))
+                .andExpect(model().attribute("stringDateTimes", is(stringDateTimes)));
+
+        verify(groupService).findById(1L);
+        verify(lessonService).formTimeTableForGroup(1L);
         verifyNoMoreInteractions(groupService);
-    }
-
-    @Test
-    void changeFormOfEducationShouldGetGroupIdFromUrlAndFormOfEducationIdFromModelAndRenderEditView() throws Exception {
-
-        doNothing().when(groupService).changeFormOfEducation(1L, 2);
-
-        mockMvc.perform(post("/group/1/assign/education/form")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .param("idNewFormOfEducation", "2")
-        )
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/group/1/edit"))
-                .andExpect(redirectedUrl("/group/1/edit?idNewFormOfEducation=2"))
-                .andExpect(model().attribute("idNewFormOfEducation", is(2L)));
-
-        verify(groupService).changeFormOfEducation(1L, 2);
-        verifyNoMoreInteractions(groupService);
+        verifyNoMoreInteractions(lessonService);
     }
 
     @Test
     void addStudentToGroupShouldGetGroupIdFromUrlAndStudentIdFromModelAndRenderEditView() throws Exception {
 
-        when(studentService.enterGroup(2, 1)).thenReturn(true);
+        when(studentService.changeGroup(2, 1)).thenReturn(true);
 
         mockMvc.perform(post("/group/1/add/student")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -344,7 +305,7 @@ public class GroupsControllerTest {
                 .andExpect(redirectedUrl("/group/1/edit?idNewStudent=2"))
                 .andExpect(model().attribute("idNewStudent", is(2L)));
 
-        verify(studentService).enterGroup(2, 1);
+        verify(studentService).changeGroup(2, 1);
         verifyNoMoreInteractions(studentService);
     }
 
@@ -410,8 +371,6 @@ public class GroupsControllerTest {
         mockMvc.perform(post("/group")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("name", groupRequest.getName())
-                .param("formOfEducationId", "1")
-                .param("departmentId", "1")
         )
                 .andExpect(status().isOk())
                 .andExpect(view().name("errors handling/entity already exist"))

@@ -55,7 +55,6 @@ class StudentServiceImplTest {
                 .withId(1L).build()));
         when(passwordEncoder.matches(password, password)).thenReturn(true);
 
-
         studentService.login(email, password);
 
         verify(studentDao).findByEmail(email);
@@ -105,7 +104,7 @@ class StudentServiceImplTest {
         when(groupDao.findById(groupId)).thenReturn(Optional.of(Group.builder().withId(2L).build()));
         doNothing().when(studentDao).enterGroup(studentId, groupId);
 
-        studentService.enterGroup(studentId, groupId);
+        studentService.changeGroup(studentId, groupId);
 
         verify(studentDao).findById(studentId);
         verify(groupDao).findById(groupId);
@@ -119,7 +118,7 @@ class StudentServiceImplTest {
 
         when(studentDao.findById(studentId)).thenReturn(Optional.empty());
 
-        studentService.enterGroup(studentId, groupId);
+        studentService.changeGroup(studentId, groupId);
 
         verify(studentDao).findById(studentId);
     }
@@ -132,29 +131,67 @@ class StudentServiceImplTest {
         when(studentDao.findById(studentId)).thenReturn(Optional.of(Student.builder().withId(1L).build()));
         when(groupDao.findById(groupId)).thenReturn(Optional.empty());
 
-        studentService.enterGroup(studentId, groupId);
+        studentService.changeGroup(studentId, groupId);
 
         verify(studentDao).findById(studentId);
         verify(groupDao).findById(groupId);
     }
 
     @Test
-    void registerShouldAddStudentToDBIfArgumentsIsStudentRequest() {
+    void registerShouldAddStudentToDBIfArgumentsIsStudentRequestWithGroup() {
         String email= "Alexey94@gamil.com";
-        String password= "12345";
+        String password = "12345";
+        Student student = Student.builder().withId(1L).withFirstName("Alex").withEmail(email).build();
+        Group group = Group.builder().withId(1L).withName("Group").build();
         StudentRequest studentRequest = new StudentRequest();
         studentRequest.setEmail(email);
         studentRequest.setPassword(password);
+        studentRequest.setGroupId(1L);
 
         doNothing().when(userValidator).validate(studentRequest);
         when(studentDao.findByEmail(email)).thenReturn(Optional.empty());
         when(passwordEncoder.encode(password)).thenReturn(password);
+        when(studentRequestMapper.mapDtoToEntity(studentRequest)).thenReturn(student);
+        when(studentDao.save(student)).thenReturn(student);
+        when(studentDao.findById(1L)).thenReturn(Optional.of(student));
+        when(groupDao.findById(1L)).thenReturn(Optional.of(group));
+        doNothing().when(studentDao).enterGroup(1L, 1L);
 
         studentService.register(studentRequest);
 
         verify(userValidator).validate(studentRequest);
         verify(studentDao).findByEmail(email);
         verify(passwordEncoder).encode(password);
+        verify(studentRequestMapper).mapDtoToEntity(studentRequest);
+        verify(studentDao).save(student);
+        verify(studentDao).findById(1L);
+        verify(groupDao).findById(1L);
+        verify(studentDao).enterGroup(1L, 1L);
+    }
+
+    @Test
+    void registerShouldAddStudentToDBIfArgumentsIsStudentRequestWithoutGroup() {
+        String email= "Alexey94@gamil.com";
+        String password = "12345";
+        Student student = Student.builder().withId(1L).withFirstName("Alex").withEmail(email).build();
+        StudentRequest studentRequest = new StudentRequest();
+        studentRequest.setEmail(email);
+        studentRequest.setPassword(password);
+        studentRequest.setGroupId(0L);
+
+        doNothing().when(userValidator).validate(studentRequest);
+        when(studentDao.findByEmail(email)).thenReturn(Optional.empty());
+        when(passwordEncoder.encode(password)).thenReturn(password);
+        when(studentRequestMapper.mapDtoToEntity(studentRequest)).thenReturn(student);
+        when(studentDao.save(student)).thenReturn(student);
+
+        studentService.register(studentRequest);
+
+        verify(userValidator).validate(studentRequest);
+        verify(studentDao).findByEmail(email);
+        verify(passwordEncoder).encode(password);
+        verify(studentRequestMapper).mapDtoToEntity(studentRequest);
+        verify(studentDao).save(student);
     }
 
     @Test
@@ -230,10 +267,38 @@ class StudentServiceImplTest {
     }
 
     @Test
-    void editShouldEditDataOfStudentIfArgumentNewStudentRequest() {
+    void editShouldEditDataOfStudentIfArgumentNewStudentRequestWithGroup() {
+        String email= "Alexey94@gamil.com";
+        String password = "12345";
+        Student student = Student.builder().withId(1L).withFirstName("Alex").withEmail(email).build();
+        Group group = Group.builder().withId(1L).withName("Group").build();
+        StudentRequest studentRequest = new StudentRequest();
+        studentRequest.setId(1L);
+        studentRequest.setEmail(email);
+        studentRequest.setPassword(password);
+        studentRequest.setGroupId(1L);
+
+        when(studentRequestMapper.mapDtoToEntity(studentRequest)).thenReturn(student);
+        doNothing().when(studentDao).update(student);
+        when(studentDao.findById(1L)).thenReturn(Optional.of(student));
+        when(groupDao.findById(1L)).thenReturn(Optional.of(group));
+        doNothing().when(studentDao).enterGroup(1L, 1L);
+
+        studentService.edit(studentRequest);
+
+        verify(studentRequestMapper).mapDtoToEntity(studentRequest);
+        verify(studentDao).update(student);
+        verify(studentDao).findById(1L);
+        verify(groupDao).findById(1L);
+        verify(studentDao).enterGroup(1L, 1L);
+    }
+
+    @Test
+    void editShouldEditDataOfStudentIfArgumentNewStudentRequestWithoutGroup() {
         Student student = Student.builder().withId(1L).build();
         StudentRequest studentRequest = new StudentRequest();
         studentRequest.setId(1L);
+        studentRequest.setGroupId(0L);
 
         when(studentRequestMapper.mapDtoToEntity(studentRequest)).thenReturn(student);
         doNothing().when(studentDao).update(student);

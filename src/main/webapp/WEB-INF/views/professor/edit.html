@@ -14,61 +14,90 @@
 
 <section layout:fragment="page-content">
 
-    <h4 th:text="#{update.of.professor} + ' ' + ${professor.getScienceDegreeResponse()} +', ' +
-     ${professor.getLastName()} + ' ' + ${professor.getFirstName()} + ' ' + #{with} + ' ID: ' + ${professor.getId()}" >ID</h4>
+    <h4 th:text="#{update.of.professor} + ' ' + ${professorResponse.getScienceDegreeResponse()} +', ' +
+     ${professorResponse.getLastName()} + ' ' + ${professorResponse.getFirstName()} + ' ' + #{with} + ' ID: ' + ${professorResponse.getId()}" >ID</h4>
     <br>
 
-    <h5 th:text="#{common.information}">Common information</h5>
-    <form th:method="PATCH" th:action="@{/professor/{id}(id=${professor.getId()})}" th:object="${professor}">
+    <form th:method="PATCH" th:action="@{/professor/{id}(id=${professorResponse.getId()})}" th:object="${professorRequest}">
+
+        <h6 th:text="#{first.name.of.professor}">First name of professor</h6>
         <div class="form-floating mb-2">
             <input type="text" th:field="*{firstName}" class="form-control" id="firstName1" placeholder="First name">
             <label for="firstName1" th:text="#{enter.new.professor.first.name}">Change first name:</label>
         </div>
+
+        <h6 th:text="#{last.name.of.professor}">Last name of professor</h6>
         <div class="form-floating mb-2">
             <input type="text" th:field="*{lastName}" class="form-control" id="LastNme2" placeholder="Last name">
             <label for="LastNme2" th:text="#{enter.new.professor.last.name}">Change last name:</label>
         </div>
+
+        <h6 th:text="#{email.of.professor}">Email of professor</h6>
         <div class="form-floating mb-2">
             <input type="text" th:field="*{email}" class="form-control" id="email1" placeholder="name@example.com">
             <label for="email1" th:text="#{enter.new.professor.email}">Change email:</label>
         </div>
+
+        <h6 th:text="#{password.of.professor}">Password of professor</h6>
         <div class="form-floating mb-2">
             <input type="password" th:field="*{password}" class="form-control" id="floatingPassword" placeholder="Password">
             <label for="floatingPassword" th:text="#{enter.new.professor.password}">Change password:</label>
         </div>
+
+        <h6 th:text="#{science.degree.of.professor}">Science Degree of professor</h6>
+        <select class="form-select  mb-2" th:field="*{scienceDegreeId}">
+            <option selected="" th:value="${professorResponse.getScienceDegreeResponse().getId()}"
+                    th:text="#{current.science.degree} + ': ' + ${professorResponse.getScienceDegreeResponse()}">current Science Degree</option>
+            <div th:each="scienceDegree : ${ScienceDegrees}">
+                <option th:value="${scienceDegree.getId()}" th:text="${scienceDegree}"> ScienceDegree </option>
+            </div>
+        </select>
+
+        <h6 th:text="#{department.of.professor}">Department of professor</h6>
+        <select class="form-select  mb-2" th:field="*{departmentId}">
+            <option selected="" th:value="${professorResponse.getDepartmentResponse().getId()}"
+                    th:text="#{current.department} + ': ' + ${professorResponse.getDepartmentResponse().getName()}">current Science Degree</option>
+            <div th:each="department : ${departments}">
+                <option th:value="${department.getId()}" th:text="${department.getName()}"> department </option>
+            </div>
+        </select>
+
         <input class="btn btn-success" type="submit" role="button" th:value="#{update.professor}"/>
     </form>
     <hr>
     <br>
 
-    <h4 th:text="#{science.degree.of.professor}">Science degree of professor</h4>
-    <h6 th:text="#{current.science.degree} + ':'">Current Science Degree:</h6>
-    <div> <text style="margin-left: 20px" th:text="${ScienceDegree + '(ID: ' + ScienceDegree.getId() + ')'}" >Name</text> </div>
-    <br>
-
-    <h6 th:text="#{management} + ':'">Management:</h6>
-    <form method="post" th:action="@{/professor/{id}/assign/scienceDegree/(id=${professor.getId()})}">
-        <select class="form-select  mb-2" name="idNewScienceDegree">
-            <option selected="" disabled="" value="" th:text="#{choose.new.science.degree.of.professor}">Choose new Science Degree:</option>
-            <div th:each="scienceDegree : ${ScienceDegrees}">
-                <option th:value="${scienceDegree.getId()}" th:text="${scienceDegree}"> ScienceDegree </option>
-            </div>
-        </select>
-        <button class="btn btn-success" type="submit" th:text="#{change.science.degree}">Change Science Degree</button>
-    </form>
-    <hr>
-    <br>
-
     <h4 th:text="#{course.list.of.professor}">Course list of professor</h4>
-    <h6 th:text="#{current.course.list} + ':'">Current course list:</h6>
-    <div th:each="professorCourses : ${professorsCourses}">
-        <text style="margin-left: 20px" th:text="${professorCourses.getName() +
-                                                ' (ID: ' + professorCourses.getId() + ')'}"> 11</text>
-    </div>
+    <h6 th:text="#{current.course.list} + ': '">Current course list:</h6>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col" th:text="#{id}">Id</th>
+            <th scope="col" th:text="#{name}">Name</th>
+            <th scope="col" th:text="#{department}">Department</th>
+            <th scope="col" th:text="#{remove.course.from.list}">Remove course from course list of professor</th>
+        </tr>
+        </thead>
+        <tbody>
+        <div th:each="course : ${professorsCourses}">
+            <tr>
+                <th scope="row" th:text="${course.getId()}"></th>
+                <td th:text="${course.getName()}"> </td>
+                <td th:text="${course.getDepartmentResponse().getName()}"></td>
+                <td>
+                    <form method="post" th:action="@{/professor/{id}/remove/course/(id=${professorResponse.getId()})}">
+                        <input type="hidden" name="idOfRemovingCourse" th:value="${course.getId()}">
+                        <button class="btn btn-danger" type="submit" th:text="#{remove.course.from.list}">Remove course from course list of professor</button>
+                    </form>
+                </td>
+            </tr>
+        </div>
+        </tbody>
+    </table>
     <br>
 
     <h6 th:text="#{management} + ':'">Management:</h6>
-    <form method="post" th:action="@{/professor/{id}/assign/course/(id=${professor.getId()})}" class="mb-2">
+    <form method="post" th:action="@{/professor/{id}/assign/course/(id=${professorResponse.getId()})}" class="mb-2">
         <select class="form-select  mb-2" name="idOfAddingCourse">
             <option selected="" disabled="" value="" th:text="#{choose.course.for.adding.to.list}">Choose adding course:</option>
             <div th:each="course : ${anotherCourses}">
@@ -77,7 +106,7 @@
         </select>
         <button class="btn btn-success" type="submit" th:text="#{add.course.to.list}">Add course</button>
     </form>
-    <form method="post" th:action="@{/professor/{id}/remove/course/(id=${professor.getId()})}">
+    <form method="post" th:action="@{/professor/{id}/remove/course/(id=${professorResponse.getId()})}">
         <select class="form-select  mb-2" name="idOfRemovingCourse">
             <option selected="" disabled="" value="" th:text="#{choose.course.for.removing.from.list}">Choose removing course:</option>
             <div th:each="professorsCourse : ${professorsCourses}">

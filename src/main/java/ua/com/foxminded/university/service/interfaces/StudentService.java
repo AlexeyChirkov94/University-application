@@ -8,7 +8,7 @@ public interface StudentService extends UserService<StudentRequest, StudentRespo
 
     boolean leaveGroup(long studentId);
 
-    boolean enterGroup(long studentId, long groupId);
+    boolean changeGroup(long studentId, long groupId);
 
     List<StudentResponse> findByGroupId(long groupId);
 

@@ -14,54 +14,35 @@
 
 <section layout:fragment="page-content">
 
-    <h4 th:text="#{update.of.group} + ' ' + ${group.getName()} + ' ' + #{with} + ' id: ' + ${group.getId()}" >ID</h4>
+    <h4 th:text="#{update.of.group} + ' ' + ${groupResponse.getName()} + ' ' + #{with} + ' id: ' + ${groupResponse.getId()}" >ID</h4>
     <br>
 
-    <form th:method="PATCH" th:action="@{/group/{id}(id=${group.getId()})}" th:object="${group}">
+    <form th:method="PATCH" th:action="@{/group/{id}(id=${groupResponse.getId()})}" th:object="${groupRequest}">
         <h6 th:text="#{name.of.group}">Name of group</h6>
         <div class="form-floating mb-2">
             <input type="text" th:field="*{name}" class="form-control" id="name" placeholder="Group name">
             <label for="name" th:text="#{enter.new.group.name}">Enter new name of group:</label>
         </div>
-        <input class="btn btn-success" type="submit" role="button" th:value="#{update.group}"/>
-    </form>
-    <hr>
-    <br>
 
-    <h4 th:text="#{department.of.group}">Group department</h4>
-    <h6  th:text="#{current.department} + ': '">Current department:</h6>
-    <div> <text style="margin-left: 20px" th:text="${group.getDepartmentResponse().getName()
-     + '(ID: ' + group.getDepartmentResponse().getId() + ')'}" >Name</text> </div>
-    <br>
-
-    <h6 th:text="#{management} + ':'">Management:</h6>
-    <form method="post" th:action="@{/group/{id}/assign/department/(id=${group.getId()})}">
-        <select class="form-select  mb-2" name="idNewDepartment">
-            <option selected="" disabled="" value="" th:text="#{choose.new.department.for.group}">Choose new Department:</option>
-            <div th:each="department : ${anotherDepartments}">
+        <h6 th:text="#{department.of.group}">Department of group</h6>
+        <select class="form-select  mb-2"  th:field="*{departmentId}" >
+            <option selected=""  th:value="${groupResponse.getDepartmentResponse().getId()}"
+                    th:text="#{current.department} + ': ' + ${groupResponse.getDepartmentResponse().getName()}">current department</option>
+            <div th:each="department : ${departments}">
                 <option th:value="${department.getId()}" th:text="${department.getName()}"> department </option>
             </div>
         </select>
-        <button class="btn btn-success" type="submit" th:text="#{change.department}">Change Department</button>
-    </form>
-    <hr>
-    <br>
 
-    <h4 th:text="#{form.of.education.of.group}">Group form of education</h4>
-    <h6 th:text="#{current.form.of.education} + ': '">Current form of education:</h6>
-    <div> <text style="margin-left: 20px" th:text="${group.getFormOfEducationResponse().getName()
-     + '(ID: ' + group.getFormOfEducationResponse().getId() + ')'}" >Name</text> </div>
-    <br>
-
-    <h6 th:text="#{management} + ':'">Management:</h6>
-    <form method="post" th:action="@{/group/{id}/assign/education/form/(id=${group.getId()})}">
-        <select class="form-select  mb-2" name="idNewFormOfEducation">
-            <option selected="" disabled="" value="" th:text="#{choose.new.form.of.education.for.group}">Choose new form of education:</option>
-            <div th:each="formOfEducation : ${anotherFormsOfEducation}">
-                <option th:value="${formOfEducation.getId()}" th:text="${formOfEducation.getName()}"> form of education </option>
+        <h6 th:text="#{form.of.education.of.group}">Form of education of group</h6>
+        <select class="form-select  mb-2"  th:field="*{formOfEducationId}" >
+            <option selected=""  th:value="${groupResponse.getFormOfEducationResponse().getId()}"
+                    th:text="#{current.form.of.education} + ': ' + ${groupResponse.getFormOfEducationResponse().getName()}">current form of education</option>
+            <div th:each="formOfEducation : ${formsOfEducation}">
+                <option th:value="${formOfEducation.getId()}" th:text="${formOfEducation.getName()}"> form Of Education </option>
             </div>
         </select>
-        <button class="btn btn-success" type="submit" th:text="#{change.form.of.education}">Change form of education</button>
+
+        <input class="btn btn-success" type="submit" role="button" th:value="#{update.group}"/>
     </form>
     <hr>
     <br>
@@ -86,7 +67,7 @@
                 <td th:text="${student.getLastName()}"></td>
                 <td th:text="${student.getEmail()}"> </td>
                 <td>
-                    <form method="post" th:action="@{/group/{id}/remove/student/(id=${group.getId()})}">
+                    <form method="post" th:action="@{/group/{id}/remove/student/(id=${groupResponse.getId()})}">
                         <input type="hidden" name="idRemovingStudent" th:value="${student.getId()}">
                         <button class="btn btn-danger" type="submit" th:text="#{remove.student.from.group}">Remove student from group</button>
                     </form>
@@ -98,7 +79,7 @@
     <br>
 
     <h6 th:text="#{management} + ':'">Management:</h6>
-    <form method="post" th:action="@{/group/{id}/add/student/(id=${group.getId()})}" class="mb-2">
+    <form method="post" th:action="@{/group/{id}/add/student/(id=${groupResponse.getId()})}" class="mb-2">
         <select class="form-select  mb-2" name="idNewStudent">
             <option selected="" disabled="" value="" th:text="#{choose.student.for.adding.to.group}">Choose student for adding to group:</option>
             <div th:each="student : ${studentsAnotherGroups}">
@@ -110,7 +91,7 @@
         </select>
         <button class="btn btn-success" type="submit" th:text="#{add.student.to.group}">Add student to group</button>
     </form>
-    <form method="post" th:action="@{/group/{id}/remove/student/(id=${group.getId()})}">
+    <form method="post" th:action="@{/group/{id}/remove/student/(id=${groupResponse.getId()})}">
         <select class="form-select  mb-2" name="idRemovingStudent">
             <option selected="" disabled="" value="" th:text="#{choose.student.for.removing.from.group}">Choose student for removing from group:</option>
             <div th:each="student : ${studentsCurrentGroup}">

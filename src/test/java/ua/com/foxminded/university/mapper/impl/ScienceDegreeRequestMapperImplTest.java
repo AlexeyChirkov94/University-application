@@ -36,17 +36,4 @@ class ScienceDegreeRequestMapperImplTest {
         assertThat(scienceDegreeRequestMapper.mapDtoToEntity(null)).isNull();
     }
 
-    @Test
-    void mapEntityToDtoShouldMapEntityToDtoIfArgumentIsFormOfLessonEntity() {
-        ScienceDegreeRequest expected = scienceDegreeRequest;
-        ScienceDegreeRequest actual = scienceDegreeRequestMapper.mapEntityToDto(scienceDegree);
-
-        assertThat(actual).isEqualTo(expected);
-    }
-
-    @Test
-    void mapEntityToDtoShouldShouldReturnNullIfArgumentNull() {
-        assertThat(scienceDegreeRequestMapper.mapEntityToDto(null)).isNull();
-    }
-
 }

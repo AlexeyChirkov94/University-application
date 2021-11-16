@@ -72,10 +72,17 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
     }
 
     @Override
-    public void edit(StudentRequest user) {
-        userValidator.validate(user);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        studentDao.update(studentRequestMapper.mapDtoToEntity(user));
+    @Transactional(transactionManager = "txManager")
+    public void edit(StudentRequest studentRequest) {
+        userValidator.validate(studentRequest);
+        studentRequest.setPassword(passwordEncoder.encode(studentRequest.getPassword()));
+
+        studentDao.update(studentRequestMapper.mapDtoToEntity(studentRequest));
+
+        if(studentRequest.getGroupId() != 0L){
+            changeGroup(studentRequest.getId(), studentRequest.getGroupId());
+        }
+
     }
 
     @Override
@@ -104,7 +111,7 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
 
     @Override
     @Transactional(transactionManager = "txManager")
-    public boolean enterGroup(long studentId, long groupId) {
+    public boolean changeGroup(long studentId, long groupId) {
         if (studentDao.findById(studentId).isPresent() && groupDao.findById(groupId).isPresent()){
             studentDao.enterGroup(studentId, groupId);
             return true;
@@ -114,9 +121,14 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
     }
 
     @Override
-    protected StudentResponse registerCertainUser(StudentRequest userDto) {
-        Student studentBeforeSave = studentRequestMapper.mapDtoToEntity(userDto);
+    @Transactional(transactionManager = "txManager")
+    protected StudentResponse registerCertainUser(StudentRequest studentRequest) {
+        Student studentBeforeSave = studentRequestMapper.mapDtoToEntity(studentRequest);
         Student studentAfterSave = studentDao.save(studentBeforeSave);
+
+        if(studentRequest.getGroupId() != 0L){
+            changeGroup(studentAfterSave.getId(), studentRequest.getGroupId());
+        }
 
         return studentResponseMapper.mapEntityToDto(studentAfterSave);
     }

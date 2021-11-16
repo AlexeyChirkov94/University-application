@@ -27,15 +27,34 @@
                             ' (ID: ' + ${professor.getScienceDegreeResponse().getId()} + ')'">Science Degree</li>
             <li class="list-group-item">
                 <div class="row justify-content-left">
-                    <div class="col-auto" th:text="#{courses.of.professor} + ': '"> Courses of professor: </div>
-                    <div class="col-auto">
-                        <div th:each="professorCourses : ${professorsCourses}">
-                            <text th:text="${professorCourses.getName() +
-                                                ' (ID: ' + professorCourses.getId() + ')'}"> 11</text>
-                        </div>
+                    <div class="col-2" th:text="#{courses.of.professor} + ':'"> Students of group: </div>
+                    <div class="col-10">
+
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th scope="col" th:text="#{id}">Id</th>
+                                <th scope="col" th:text="#{name}">First name</th>
+                                <th scope="col" th:text="#{department}">Last name</th>
+                                <th scope="col" th:text="#{more}">More</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <div th:each="course : ${professorsCourses}">
+                                <tr>
+                                    <th scope="row" th:text="${course.getId()}"></th>
+                                    <td th:text="${course.getName()}"> </td>
+                                    <td th:text="${course.getDepartmentResponse().getName()}"></td>
+                                    <td> <a class="btn btn-secondary" th:href="@{/course/{id}(id=${course.getId()})}" role="button" th:text="#{go.to}">Go to</a> </td>
+                                </tr>
+                            </div>
+                            </tbody>
+                        </table>
+
                     </div>
                 </div>
             </li>
+            <li class="list-group-item"><a class="btn btn-success" th:href="@{/professor/{id}/timetable(id=${professor.getId()})}" role="button" th:text="#{show.timetable}">Show timetable</a></li>
             <li class="list-group-item"><a class="btn btn-info" th:href="@{/professor/{id}/edit(id=${professor.getId()})}" role="button" th:text="#{edit}">Edit</a></li>
             <li class="list-group-item">
                 <form th:method="DELETE" th:action="@{/professor/{id}(id=${professor.getId()})}">

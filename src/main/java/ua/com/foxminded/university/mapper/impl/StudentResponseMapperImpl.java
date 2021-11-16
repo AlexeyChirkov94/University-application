@@ -16,30 +16,14 @@ public class StudentResponseMapperImpl implements StudentResponseMapper {
     }
 
     @Override
-    public Student mapDtoToEntity(StudentResponse dto) {
-        if (dto == null) {
-            return null;
-        } else {
-            return Student.builder()
-                    .withId(dto.getId())
-                    .withFirstName(dto.getFirstName())
-                    .withLastName(dto.getLastName())
-                    .withEmail(dto.getEmail())
-                    .withPassword(dto.getPassword())
-                    .withGroup(groupResponseMapper.mapDtoToEntity(dto.getGroupResponse()))
-                    .build();
-        }
-    }
-
-    @Override
     public StudentResponse mapEntityToDto(Student entity) {
         StudentResponse studentResponse = new StudentResponse();
         if (entity == null) {
             return null;
         } else if (entity.getId() == 0L){
             studentResponse.setId(0L);
-            studentResponse.setFirstName("not appointed");
-            studentResponse.setLastName("not appointed");
+            studentResponse.setFirstName("");
+            studentResponse.setLastName("");
             studentResponse.setEmail("");
             studentResponse.setPassword("");
             studentResponse.setGroupResponse(groupResponseMapper.mapEntityToDto(entity.getGroup()));

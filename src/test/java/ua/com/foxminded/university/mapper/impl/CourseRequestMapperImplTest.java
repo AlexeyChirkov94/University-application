@@ -9,7 +9,6 @@ import ua.com.foxminded.university.entity.Course;
 import ua.com.foxminded.university.mapper.interfaces.CourseRequestMapper;
 import static org.assertj.core.api.Assertions.assertThat;
 
-
 class CourseRequestMapperImplTest {
 
     ApplicationContext context;
@@ -37,19 +36,6 @@ class CourseRequestMapperImplTest {
     @Test
     void mapDtoToEntityShouldReturnNullIfArgumentNull() {
         assertThat(courseRequestMapper.mapDtoToEntity(null)).isNull();
-    }
-
-//    @Test //todo get answer from mentor
-//    void mapEntityToDtoShouldMapEntityToDtoIfArgumentIsCourseEntity() {
-//        CourseRequest expected = courseRequest;
-//        CourseRequest actual = courseRequestMapper.mapEntityToDto(course);
-//
-//        assertThat(actual).isEqualTo(expected);
-//    }
-
-    @Test
-    void mapEntityToDtoShouldShouldReturnNullIfArgumentNull() {
-        assertThat(courseRequestMapper.mapEntityToDto(null)).isNull();
     }
 
 }

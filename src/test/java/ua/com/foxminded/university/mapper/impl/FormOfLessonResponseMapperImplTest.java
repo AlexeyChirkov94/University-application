@@ -14,34 +14,36 @@ class FormOfLessonResponseMapperImplTest {
     ApplicationContext context;
     FormOfLessonResponseMapper formOfLessonResponseMapper;
     FormOfLesson formOfLesson;
+    FormOfLesson emptyFormOfLesson;
     FormOfLessonResponse formOfLessonResponse;
+    FormOfLessonResponse emptyFormOfLessonResponse;
 
     {
         context = new AnnotationConfigApplicationContext(TestsContextConfiguration.class);
         formOfLessonResponseMapper = context.getBean(FormOfLessonResponseMapperImpl.class);
         formOfLesson = FormOfLesson.builder().withId(1L).withName("FormOfLesson 1").build();
+        emptyFormOfLesson = FormOfLesson.builder().withId(0L).build();
         formOfLessonResponse = new FormOfLessonResponse();
         formOfLessonResponse.setId(1L);
         formOfLessonResponse.setName("FormOfLesson 1");
-    }
-
-    @Test
-    void mapDtoToEntityShouldMapDtoToEntityIfArgumentIsFormOfLessonResponseDto() {
-        FormOfLesson expected = formOfLesson;
-        FormOfLesson actual = formOfLessonResponseMapper.mapDtoToEntity(formOfLessonResponse);
-
-        assertThat(actual).isEqualTo(expected);
-    }
-
-    @Test
-    void mapDtoToEntityShouldReturnNullIfArgumentNull() {
-        assertThat(formOfLessonResponseMapper.mapDtoToEntity(null)).isNull();
+        emptyFormOfLessonResponse = new FormOfLessonResponse();
+        emptyFormOfLessonResponse.setId(0L);
+        emptyFormOfLessonResponse.setName("");
+        emptyFormOfLessonResponse.setDuration(0);
     }
 
     @Test
     void mapEntityToDtoShouldMapEntityToDtoIfArgumentIsFormOfLessonEntity() {
         FormOfLessonResponse expected = formOfLessonResponse;
         FormOfLessonResponse actual = formOfLessonResponseMapper.mapEntityToDto(formOfLesson);
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void mapEntityToDtoShouldMapEntityToDtoIfArgumentIsFormOfLessonEntityWhichNotFoundedInDB() {
+        FormOfLessonResponse expected = emptyFormOfLessonResponse;
+        FormOfLessonResponse actual = formOfLessonResponseMapper.mapEntityToDto(emptyFormOfLesson);
 
         assertThat(actual).isEqualTo(expected);
     }

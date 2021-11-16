@@ -89,10 +89,7 @@ public class CourseServiceImpl extends AbstractPageableCrudService implements Co
             Course courseAfterSave = courseDao.save(courseBeforeSave);
 
             if(courseRequest.getDepartmentId() != 0L){
-                checkThatCourseExist(courseAfterSave.getId());
-                checkThatDepartmentExist(courseRequest.getDepartmentId());
-
-                courseDao.changeDepartment(courseAfterSave.getId(), courseRequest.getDepartmentId());
+                changeDepartment(courseAfterSave.getId(), courseRequest.getDepartmentId());
             }
 
             return courseResponseMapper.mapEntityToDto(courseAfterSave);

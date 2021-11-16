@@ -4,9 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import ua.com.foxminded.university.TestsContextConfiguration;
-import ua.com.foxminded.university.dto.CourseRequest;
 import ua.com.foxminded.university.dto.LessonRequest;
-import ua.com.foxminded.university.entity.Course;
 import ua.com.foxminded.university.entity.Lesson;
 import ua.com.foxminded.university.mapper.interfaces.LessonRequestMapper;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,19 +35,6 @@ class LessonRequestMapperImplTest {
     @Test
     void mapDtoToEntityShouldReturnNullIfArgumentNull() {
         assertThat(lessonRequestMapper.mapDtoToEntity(null)).isNull();
-    }
-
-//    @Test //todo get answer from mentor
-//    void mapEntityToDtoShouldMapEntityToDtoIfArgumentIsFormOfLessonEntity() {
-//        LessonRequest expected = lessonRequest;
-//        LessonRequest actual = lessonRequestMapper.mapEntityToDto(lesson);
-//
-//        assertThat(actual).isEqualTo(expected);
-//    }
-
-    @Test
-    void mapEntityToDtoShouldShouldReturnNullIfArgumentNull() {
-        assertThat(lessonRequestMapper.mapEntityToDto(null)).isNull();
     }
 
 }
