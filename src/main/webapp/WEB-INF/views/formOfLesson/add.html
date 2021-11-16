@@ -14,7 +14,7 @@
 
 <section layout:fragment="page-content">
 
-    <h4>Registration of a new form of lesson</h4>
+    <h4 th:text="#{registration.new.form.of.lesson}">Registration of a new form of lesson</h4>
 
     <br>
 
@@ -22,15 +22,15 @@
 
         <div class="form-floating mb-3">
             <input type="text" th:field="*{name}" class="form-control" id="name of formOfLesson" placeholder="Choose name of new form of lesson:">
-            <label for="name of formOfLesson">Choose name of new form of lesson:</label>
+            <label for="name of formOfLesson" th:text="#{enter.name.of.new.form.of.lesson}">Enter name of new form of lesson</label>
         </div>
 
         <div class="form-floating mb-3">
             <input type="number" th:field="*{duration}" class="form-control" id="duration of formOfLesson" placeholder="Choose duration of new form of lesson:">
-            <label for="duration of formOfLesson">Choose duration of new form of lesson (in minutes):</label>
+            <label for="duration of formOfLesson" th:text="#{enter.duration.of.new.form.of.lesson}">Enter duration of new form of lesson (in minutes)</label>
         </div>
 
-        <input class="btn btn-success" type="submit" role="button" value="Add new form of lesson"/>
+        <input class="btn btn-success" type="submit" role="button" th:value="#{add.new.form.of.lesson}"/>
 
     </form>
 

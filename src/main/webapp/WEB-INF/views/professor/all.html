@@ -14,17 +14,17 @@
 
 <section layout:fragment="page-content">
 
-    <p class="h1">All professors</p>
+    <p class="h1" th:text="#{all.professors}">All professors</p>
 
     <table class="table table-striped">
         <thead>
         <tr>
-            <th scope="col">Id</th>
-            <th scope="col">First name</th>
-            <th scope="col">Last name</th>
-            <th scope="col">Email</th>
-            <th scope="col">Department</th>
-            <th scope="col">More</th>
+            <th scope="col" th:text="#{id}">Id</th>
+            <th scope="col" th:text="#{first.name}">First name</th>
+            <th scope="col" th:text="#{last.name}">Last name</th>
+            <th scope="col" th:text="#{email}">Email</th>
+            <th scope="col" th:text="#{department}">Department</th>
+            <th scope="col" th:text="#{more}">More</th>
         </tr>
         </thead>
         <tbody>
@@ -35,7 +35,7 @@
                 <td th:text="${professor.getLastName()}"></td>
                 <td th:text="${professor.getEmail()}"> </td>
                 <td th:text="${professor.getDepartmentResponse().getName()}"> </td>
-                <td> <a class="btn btn-secondary" th:href="@{/professor/{id}(id=${professor.getId()})}" role="button">Go to</a> </td>
+                <td> <a class="btn btn-secondary" th:href="@{/professor/{id}(id=${professor.getId()})}" role="button" th:text="#{go.to}">Go to</a> </td>
             </tr>
         </div>
         </tbody>
@@ -45,7 +45,7 @@
 
     <ul class="pagination pagination-lg flex-wrap justify-content-center">
         <li th:class="${liPreviousPageLabelStatus}">
-            <a th:class="${aPreviousPageLabelStatus}" th:href="@{/professor/?page={page}(page=${previousPage})}">Previous</a>
+            <a th:class="${aPreviousPageLabelStatus}" th:href="@{/professor/?page={page}(page=${previousPage})}" th:text="#{previous.page}">Previous</a>
         </li>
         <li th:class="${liPreviousPageNumberStatus}">
             <a th:class="${aPreviousPageNumberStatus}" th:href="@{/professor/?page={page}(page=${previousPage})}" th:text="${previousPage}">Previous</a>
@@ -57,7 +57,7 @@
             <a class="page-link" th:href="@{/professor/?page={page}(page=${nextPage})}" th:text="${nextPage}">Previous</a>
         </li>
         <li class="page-item">
-            <a class="page-link" th:href="@{/professor/?page={page}(page=${nextPage})}">Next</a>
+            <a class="page-link" th:href="@{/professor/?page={page}(page=${nextPage})}" th:text="#{next.page}">Next</a>
         </li>
     </ul>
 

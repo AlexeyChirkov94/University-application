@@ -14,15 +14,15 @@
 
 <section layout:fragment="page-content">
 
-    <p class="h1">All courses</p>
+    <p class="h1" th:text="#{all.courses}">All courses</p>
 
     <table class="table table-striped">
         <thead>
         <tr>
-            <th scope="col">Id</th>
-            <th scope="col">Name</th>
-            <th scope="col">Department</th>
-            <th scope="col">More</th>
+            <th scope="col" th:text="#{id}">Id</th>
+            <th scope="col" th:text="#{name}" >Name</th>
+            <th scope="col" th:text="#{department}">Department</th>
+            <th scope="col" th:text="#{more}">More</th>
         </tr>
         </thead>
         <tbody>
@@ -31,7 +31,7 @@
                 <th scope="row" th:text="${course.getId()}"></th>
                 <td th:text="${course.getName()}"> </td>
                 <td th:text="${course.getDepartmentResponse().getName()}"></td>
-                <td> <a class="btn btn-secondary" th:href="@{/course/{id}(id=${course.getId()})}" role="button">Go to</a> </td>
+                <td> <a class="btn btn-secondary" th:href="@{/course/{id}(id=${course.getId()})}" th:text="#{go.to}" role="button">Go to</a> </td>
             </tr>
         </div>
         </tbody>
@@ -41,7 +41,7 @@
 
     <ul class="pagination pagination-lg flex-wrap justify-content-center">
         <li th:class="${liPreviousPageLabelStatus}">
-            <a th:class="${aPreviousPageLabelStatus}" th:href="@{/course/?page={page}(page=${previousPage})}">Previous</a>
+            <a th:class="${aPreviousPageLabelStatus}" th:href="@{/course/?page={page}(page=${previousPage})}" th:text="#{previous.page}">Previous</a>
         </li>
         <li th:class="${liPreviousPageNumberStatus}">
             <a th:class="${aPreviousPageNumberStatus}" th:href="@{/course/?page={page}(page=${previousPage})}" th:text="${previousPage}">Previous</a>
@@ -53,7 +53,7 @@
             <a class="page-link" th:href="@{/course/?page={page}(page=${nextPage})}" th:text="${nextPage}">Previous</a>
         </li>
         <li class="page-item">
-            <a class="page-link" th:href="@{/course/?page={page}(page=${nextPage})}">Next</a>
+            <a class="page-link" th:href="@{/course/?page={page}(page=${nextPage})}" th:text="#{next.page}">Next</a>
         </li>
     </ul>
 

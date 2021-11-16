@@ -56,14 +56,17 @@
     <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
 
       <ul class="nav col-auto col-md-auto mb-2 justify-content-center mb-md-0">
-        <li><a href="/" class="nav-link px-2 link-secondary">Home</a></li>
-        <li><a href="/features" class="nav-link px-2 link-dark">Features</a></li>
-        <li><a href="/about" class="nav-link px-2 link-dark">About used technologies</a></li>
+        <li><a href="/" class="nav-link px-2 link-secondary" th:text="#{home}">Home</a></li>
+        <li><a href="/features" class="nav-link px-2 link-dark" th:text="#{features}">Features</a></li>
+        <li><a href="/about" class="nav-link px-2 link-dark" th:text="#{аbout.used.technologies}">About used technologies</a></li>
       </ul>
 
       <div class="col-auto text-end">
-        <a class="btn btn-outline-success me-2" href="/login" role="button">Login</a>
-        <a class="btn btn-success" href="/registration" role="button">Sign-up</a>
+        <text class="link-secondary" th:text="#{lang}">Lang</text>
+        <a th:href="@{'?lang=en'}" class="link-dark" th:text="#{en}">En</a>
+        <a th:href="@{'?lang=ru'}" class="link-dark me-2" th:text="#{ru}">Ru</a>
+        <a class="btn btn-outline-success me-1" href="/login" role="button" th:text="#{login}">Login</a>
+        <a class="btn btn-success" href="/registration" role="button" th:text="#{sign.up}">Sign-up</a>
       </div>
     </header>
   </div>

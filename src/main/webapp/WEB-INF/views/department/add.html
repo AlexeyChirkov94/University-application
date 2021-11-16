@@ -14,18 +14,18 @@
 
 <section layout:fragment="page-content">
 
-    <h4>Registration of a new department</h4>
+    <h4 th:text="#{registration.new.department}">Registration of a new department</h4>
 
     <br>
 
     <form th:method="POST" th:action="@{/department}" th:object="${department}">
 
         <div class="form-floating mb-3">
-            <input type="text" th:field="*{name}" class="form-control" id="name of department" placeholder="Choose name of new department:">
-            <label for="name of department">Choose name of new department:</label>
+            <input type="text" th:field="*{name}" class="form-control" id="name of department" placeholder="#{choose.name.new.department} + ':'">
+            <label for="name of department" th:text="#{enter.name.new.department} + ':'">Choose name of new department:</label>
         </div>
 
-        <input class="btn btn-success" type="submit" role="button" value="Add new department"/>
+        <input class="btn btn-success" type="submit" role="button" th:value="#{add.new.department}"/>
 
     </form>
 

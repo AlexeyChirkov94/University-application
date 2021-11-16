@@ -14,18 +14,18 @@
 
 <section layout:fragment="page-content">
 
-    <p class="h1">All lessons</p>
+    <p class="h1" th:text="#{all.lessons}">All lessons</p>
 
     <table class="table table-striped">
         <thead>
         <tr>
-            <th scope="col">Id</th>
-            <th scope="col">Date & Time</th>
-            <th scope="col">Course</th>
-            <th scope="col">Form of lesson</th>
-            <th scope="col">Group</th>
-            <th scope="col">Teacher</th>
-            <th scope="col">More</th>
+            <th scope="col" th:text="#{id}">Id</th>
+            <th scope="col" th:text="#{date.and.time}">Date & Time</th>
+            <th scope="col" th:text="#{course}">Course</th>
+            <th scope="col" th:text="#{form.of.lesson}">Form of lesson</th>
+            <th scope="col" th:text="#{group}">Group</th>
+            <th scope="col" th:text="#{teacher}">Teacher</th>
+            <th scope="col" th:text="#{more}">More</th>
         </tr>
         </thead>
         <tbody>
@@ -37,7 +37,7 @@
                 <td th:text="${lesson.getFormOfLessonResponse().getName()}"> </td>
                 <td th:text="${lesson.getGroupResponse().getName()}"> </td>
                 <td th:text="${lesson.getTeacher().getLastName() + ', ' + lesson.getTeacher().getFirstName()}"> </td>
-                <td> <a class="btn btn-secondary" th:href="@{/lesson/{id}(id=${lesson.getId()})}" role="button">Go to</a> </td>
+                <td> <a class="btn btn-secondary" th:href="@{/lesson/{id}(id=${lesson.getId()})}" role="button" th:text="#{go.to}">Go to</a> </td>
             </tr>
         </div>
         </tbody>
@@ -47,7 +47,7 @@
 
     <ul class="pagination pagination-lg flex-wrap justify-content-center">
         <li th:class="${liPreviousPageLabelStatus}">
-            <a th:class="${aPreviousPageLabelStatus}" th:href="@{/lesson/?page={page}(page=${previousPage})}">Previous</a>
+            <a th:class="${aPreviousPageLabelStatus}" th:href="@{/lesson/?page={page}(page=${previousPage})}" th:text="#{previous.page}">Previous</a>
         </li>
         <li th:class="${liPreviousPageNumberStatus}">
             <a th:class="${aPreviousPageNumberStatus}" th:href="@{/lesson/?page={page}(page=${previousPage})}" th:text="${previousPage}">Previous</a>
@@ -59,7 +59,7 @@
             <a class="page-link" th:href="@{/lesson/?page={page}(page=${nextPage})}" th:text="${nextPage}">Previous</a>
         </li>
         <li class="page-item">
-            <a class="page-link" th:href="@{/lesson/?page={page}(page=${nextPage})}">Next</a>
+            <a class="page-link" th:href="@{/lesson/?page={page}(page=${nextPage})}" th:text="#{next.page}">Next</a>
         </li>
     </ul>
 

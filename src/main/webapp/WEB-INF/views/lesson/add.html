@@ -14,7 +14,7 @@
 
 <section layout:fragment="page-content">
 
-    <h4>Registration of a new lesson</h4>
+    <h4 th:text="#{registration.of.new.lesson}">Registration of a new lesson</h4>
 
     <br>
 
@@ -22,22 +22,22 @@
 
         <div class="form-floating mb-3">
             <input type="datetime-local" th:field="*{timeOfStartLesson}" class="form-control" id="timeOfStartLesson">
-            <label for="timeOfStartLesson">Choose date and time of start lesson:</label>
+            <label for="timeOfStartLesson" th:text="#{enter.date.and.time.of.start.new.lesson}">Choose date and time of start lesson:</label>
         </div>
         <select class="form-select  mb-2" th:field="*{courseId}">
-            <option selected="" value="0">Choose course of new lesson:</option>
+            <option selected="" value="0" th:text="#{choose.course.of.new.lesson}">Choose course of new lesson:</option>
             <div th:each="course : ${courses}">
                 <option th:value="${course.getId()}" th:text="${course.getName()}"> Course </option>
             </div>
         </select>
         <select class="form-select  mb-2" th:field="*{groupId}">
-            <option selected="" value="0">Choose group of new lesson:</option>
+            <option selected="" value="0" th:text="#{choose.group.of.new.lesson}">Choose group of new lesson:</option>
             <div th:each="group : ${groups}">
                 <option th:value="${group.getId()}" th:text="${group.getName()}"> Group </option>
             </div>
         </select>
         <select class="form-select  mb-2" th:field="*{teacherId}">
-            <option selected="" value="0">Choose professor of new lesson:</option>
+            <option selected="" value="0" th:text="#{choose.professor.of.new.lesson}">Choose professor of new lesson:</option>
             <div th:each="professor : ${professors}">
                 <option th:value="${professor.getId()}" th:text="${professor.getScienceDegreeResponse() + ', '
             + professor.getLastName() + ' ' + professor.getFirstName() +
@@ -45,13 +45,13 @@
             </div>
         </select>
         <select class="form-select  mb-2" th:field="*{formOfLessonId}">
-            <option selected="" value="0">Choose form of new lesson:</option>
+            <option selected="" value="0" th:text="#{choose.form.of.new.lesson}">Choose form of new lesson:</option>
             <div th:each="formOfLesson : ${formsOfLesson}">
                 <option th:value="${formOfLesson.getId()}" th:text="${formOfLesson.getName()}"> Form Of Lesson </option>
             </div>
         </select>
 
-        <input class="btn btn-success" type="submit" role="button" value="Add new lesson"/>
+        <input class="btn btn-success" type="submit" role="button" th:value="#{add.new.lesson}"/>
 
     </form>
 
