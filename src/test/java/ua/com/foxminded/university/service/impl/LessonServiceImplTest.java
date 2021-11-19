@@ -18,8 +18,7 @@ import ua.com.foxminded.university.entity.Group;
 import ua.com.foxminded.university.entity.Lesson;
 import ua.com.foxminded.university.entity.Professor;
 import ua.com.foxminded.university.entity.Student;
-import ua.com.foxminded.university.mapper.interfaces.LessonRequestMapper;
-import ua.com.foxminded.university.mapper.interfaces.LessonResponseMapper;
+import ua.com.foxminded.university.mapper.LessonMapper;
 import ua.com.foxminded.university.service.validator.LessonValidator;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -53,10 +52,7 @@ class LessonServiceImplTest {
     StudentDao studentDao;
 
     @Mock
-    LessonRequestMapper lessonRequestMapper;
-
-    @Mock
-    LessonResponseMapper lessonResponseMapper;
+    LessonMapper lessonMapper;
 
     @Mock
     LessonValidator lessonValidator;
@@ -128,12 +124,12 @@ class LessonServiceImplTest {
         lessonRequest.setGroupId(0L);
         lessonRequest.setFormOfLessonId(0L);
 
-        when(lessonRequestMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
+        when(lessonMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
         when(lessonDao.save(lesson)).thenReturn(lesson);
 
         lessonService.create(lessonRequest);
 
-        verify(lessonRequestMapper).mapDtoToEntity(lessonRequest);
+        verify(lessonMapper).mapDtoToEntity(lessonRequest);
         verify(lessonDao).save(lesson);
     }
 
@@ -151,7 +147,7 @@ class LessonServiceImplTest {
         lessonRequest.setGroupId(1L);
         lessonRequest.setFormOfLessonId(1L);
 
-        when(lessonRequestMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
+        when(lessonMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
         when(lessonDao.save(lesson)).thenReturn(lesson);
         when(lessonDao.findById(1L)).thenReturn(Optional.of(lesson));
         when(courseDao.findById(1L)).thenReturn(Optional.of(course));
@@ -161,7 +157,7 @@ class LessonServiceImplTest {
 
         lessonService.create(lessonRequest);
 
-        verify(lessonRequestMapper).mapDtoToEntity(lessonRequest);
+        verify(lessonMapper).mapDtoToEntity(lessonRequest);
         verify(lessonDao).save(lesson);
         verify(lessonDao, times(6)).findById(1L);
         verify(courseDao).findById(1L);
@@ -224,12 +220,12 @@ class LessonServiceImplTest {
         lessonRequest.setGroupId(0L);
         lessonRequest.setFormOfLessonId(0L);
 
-        when(lessonRequestMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
+        when(lessonMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
         doNothing().when(lessonDao).update(lesson);
 
         lessonService.edit(lessonRequest);
 
-        verify(lessonRequestMapper).mapDtoToEntity(lessonRequest);
+        verify(lessonMapper).mapDtoToEntity(lessonRequest);
         verify(lessonDao).update(lesson);
     }
 
@@ -247,7 +243,7 @@ class LessonServiceImplTest {
         lessonRequest.setGroupId(1L);
         lessonRequest.setFormOfLessonId(1L);
 
-        when(lessonRequestMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
+        when(lessonMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
         doNothing().when(lessonDao).update(lesson);
         when(lessonDao.findById(1L)).thenReturn(Optional.of(lesson));
         when(courseDao.findById(1L)).thenReturn(Optional.of(course));
@@ -257,7 +253,7 @@ class LessonServiceImplTest {
 
         lessonService.edit(lessonRequest);
 
-        verify(lessonRequestMapper).mapDtoToEntity(lessonRequest);
+        verify(lessonMapper).mapDtoToEntity(lessonRequest);
         verify(lessonDao).update(lesson);
         verify(lessonDao, times(6)).findById(1L);
         verify(courseDao).findById(1L);
@@ -276,13 +272,13 @@ class LessonServiceImplTest {
         lessonRequest.setGroupId(1L);
         lessonRequest.setFormOfLessonId(1L);
 
-        when(lessonRequestMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
+        when(lessonMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
         doNothing().when(lessonDao).update(lesson);
         when(lessonDao.findById(1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> lessonService.edit(lessonRequest)).hasMessage("There no lesson with id: 1");
 
-        verify(lessonRequestMapper).mapDtoToEntity(lessonRequest);
+        verify(lessonMapper).mapDtoToEntity(lessonRequest);
         verify(lessonDao).update(lesson);
         verify(lessonDao).findById(1L);
     }
@@ -297,14 +293,14 @@ class LessonServiceImplTest {
         lessonRequest.setGroupId(1L);
         lessonRequest.setFormOfLessonId(1L);
 
-        when(lessonRequestMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
+        when(lessonMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
         doNothing().when(lessonDao).update(lesson);
         when(lessonDao.findById(1L)).thenReturn(Optional.of(lesson));
         when(courseDao.findById(1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> lessonService.edit(lessonRequest)).hasMessage("There no course with id: 1");
 
-        verify(lessonRequestMapper).mapDtoToEntity(lessonRequest);
+        verify(lessonMapper).mapDtoToEntity(lessonRequest);
         verify(lessonDao).update(lesson);
         verify(lessonDao).findById(1L);
         verify(courseDao).findById(1L);
@@ -321,7 +317,7 @@ class LessonServiceImplTest {
         lessonRequest.setGroupId(1L);
         lessonRequest.setFormOfLessonId(1L);
 
-        when(lessonRequestMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
+        when(lessonMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
         doNothing().when(lessonDao).update(lesson);
         when(lessonDao.findById(1L)).thenReturn(Optional.of(lesson));
         when(courseDao.findById(1L)).thenReturn(Optional.of(course));
@@ -329,7 +325,7 @@ class LessonServiceImplTest {
 
         assertThatThrownBy(() -> lessonService.edit(lessonRequest)).hasMessage("There no group with id: 1");
 
-        verify(lessonRequestMapper).mapDtoToEntity(lessonRequest);
+        verify(lessonMapper).mapDtoToEntity(lessonRequest);
         verify(lessonDao).update(lesson);
         verify(lessonDao, times(3)).findById(1L);
         verify(courseDao).findById(1L);
@@ -349,7 +345,7 @@ class LessonServiceImplTest {
         lessonRequest.setGroupId(1L);
         lessonRequest.setFormOfLessonId(1L);
 
-        when(lessonRequestMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
+        when(lessonMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
         doNothing().when(lessonDao).update(lesson);
         when(lessonDao.findById(1L)).thenReturn(Optional.of(lesson));
         when(courseDao.findById(1L)).thenReturn(Optional.of(course));
@@ -359,7 +355,7 @@ class LessonServiceImplTest {
 
         assertThatThrownBy(() -> lessonService.edit(lessonRequest)).hasMessage("There no form of lesson with id: 1");
 
-        verify(lessonRequestMapper).mapDtoToEntity(lessonRequest);
+        verify(lessonMapper).mapDtoToEntity(lessonRequest);
         verify(lessonDao).update(lesson);
         verify(lessonDao, times(6)).findById(1L);
         verify(courseDao).findById(1L);
@@ -380,7 +376,7 @@ class LessonServiceImplTest {
         lessonRequest.setGroupId(1L);
         lessonRequest.setFormOfLessonId(1L);
 
-        when(lessonRequestMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
+        when(lessonMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
         doNothing().when(lessonDao).update(lesson);
         when(lessonDao.findById(1L)).thenReturn(Optional.of(lesson));
         when(courseDao.findById(1L)).thenReturn(Optional.of(course));
@@ -389,7 +385,7 @@ class LessonServiceImplTest {
 
         assertThatThrownBy(() -> lessonService.edit(lessonRequest)).hasMessage("There no professor with id: 1");
 
-        verify(lessonRequestMapper).mapDtoToEntity(lessonRequest);
+        verify(lessonMapper).mapDtoToEntity(lessonRequest);
         verify(lessonDao).update(lesson);
         verify(lessonDao, times(4)).findById(1L);
         verify(courseDao).findById(1L);
@@ -409,14 +405,14 @@ class LessonServiceImplTest {
         lessonRequest.setGroupId(0L);
         lessonRequest.setFormOfLessonId(0L);
 
-        when(lessonRequestMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
+        when(lessonMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
         doNothing().when(lessonDao).update(lesson);
         when(lessonDao.findById(1L)).thenReturn(Optional.of(lesson));
         when(professorDao.findById(1L)).thenReturn(Optional.of(professor));
 
         lessonService.edit(lessonRequest);
 
-        verify(lessonRequestMapper).mapDtoToEntity(lessonRequest);
+        verify(lessonMapper).mapDtoToEntity(lessonRequest);
         verify(lessonDao).update(lesson);
         verify(lessonDao, times(2)).findById(1L);
         verify(professorDao).findById(1L);
@@ -434,7 +430,7 @@ class LessonServiceImplTest {
         lessonRequest.setGroupId(0L);
         lessonRequest.setFormOfLessonId(0L);
 
-        when(lessonRequestMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
+        when(lessonMapper.mapDtoToEntity(lessonRequest)).thenReturn(lesson);
         doNothing().when(lessonDao).update(lesson);
         when(lessonDao.findById(1L)).thenReturn(Optional.of(lesson));
         when(courseDao.findById(1L)).thenReturn(Optional.of(course));
@@ -442,7 +438,7 @@ class LessonServiceImplTest {
 
         lessonService.edit(lessonRequest);
 
-        verify(lessonRequestMapper).mapDtoToEntity(lessonRequest);
+        verify(lessonMapper).mapDtoToEntity(lessonRequest);
         verify(lessonDao).update(lesson);
         verify(lessonDao, times(4)).findById(1L);
         verify(courseDao).findById(1L);

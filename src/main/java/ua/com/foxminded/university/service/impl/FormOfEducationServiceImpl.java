@@ -9,8 +9,7 @@ import ua.com.foxminded.university.dto.FormOfEducationRequest;
 import ua.com.foxminded.university.dto.FormOfEducationResponse;
 import ua.com.foxminded.university.entity.FormOfEducation;
 import ua.com.foxminded.university.entity.Group;
-import ua.com.foxminded.university.mapper.interfaces.FormOfEducationRequestMapper;
-import ua.com.foxminded.university.mapper.interfaces.FormOfEducationResponseMapper;
+import ua.com.foxminded.university.mapper.FormOfEducationMapper;
 import ua.com.foxminded.university.service.exception.EntityAlreadyExistException;
 import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.interfaces.FormOfEducationService;
@@ -23,18 +22,17 @@ public class FormOfEducationServiceImpl extends AbstractPageableCrudService impl
 
     private final FormOfEducationDao formOfEducationDao;
     private final GroupDao groupDao;
-    private final FormOfEducationRequestMapper formOfEducationRequestMapper;
-    private final FormOfEducationResponseMapper formOfEducationResponseMapper;
+    private final FormOfEducationMapper formOfEducationMapper;
 
     @Override
     public FormOfEducationResponse create(FormOfEducationRequest formOfEducationRequest) {
         if (formOfEducationDao.findByName(formOfEducationRequest.getName()).isPresent()){
             throw new EntityAlreadyExistException("Form of education with same name already exist");
         } else{
-            FormOfEducation formOfEducationBeforeSave = formOfEducationRequestMapper.mapDtoToEntity(formOfEducationRequest);
+            FormOfEducation formOfEducationBeforeSave = formOfEducationMapper.mapDtoToEntity(formOfEducationRequest);
             FormOfEducation formOfEducationAfterSave = formOfEducationDao.save(formOfEducationBeforeSave);
 
-            return formOfEducationResponseMapper.mapEntityToDto(formOfEducationAfterSave);
+            return formOfEducationMapper.mapEntityToDto(formOfEducationAfterSave);
         }
     }
 
@@ -43,7 +41,7 @@ public class FormOfEducationServiceImpl extends AbstractPageableCrudService impl
         FormOfEducation formOfEducation = formOfEducationDao.findById(id)
                 .orElseThrow(() -> new EntityDontExistException("There no form of education with id: " + id));
 
-        return formOfEducationResponseMapper.mapEntityToDto(formOfEducation);
+        return formOfEducationMapper.mapEntityToDto(formOfEducation);
     }
 
     @Override
@@ -52,7 +50,7 @@ public class FormOfEducationServiceImpl extends AbstractPageableCrudService impl
         int pageNumber = parsePageNumber(page, itemsCount, 1);
 
         return formOfEducationDao.findAll(pageNumber, ITEMS_PER_PAGE).stream()
-                .map(formOfEducationResponseMapper::mapEntityToDto)
+                .map(formOfEducationMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
@@ -60,13 +58,13 @@ public class FormOfEducationServiceImpl extends AbstractPageableCrudService impl
     public List<FormOfEducationResponse> findAll() {
 
         return formOfEducationDao.findAll().stream()
-                .map(formOfEducationResponseMapper::mapEntityToDto)
+                .map(formOfEducationMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public void edit(FormOfEducationRequest formOfEducationRequest) {
-        formOfEducationDao.update(formOfEducationRequestMapper.mapDtoToEntity(formOfEducationRequest));
+        formOfEducationDao.update(formOfEducationMapper.mapDtoToEntity(formOfEducationRequest));
     }
 
     @Override

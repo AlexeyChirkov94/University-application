@@ -141,10 +141,10 @@ class LessonsControllerTest {
     @Test
     void editShouldAddLessonToModelAndRenderShowEditLessonHaveNoProfessorAndCourse() throws Exception {
         CourseResponse courseResponse = new CourseResponse();
-        courseResponse.setName("not chosen");
+        courseResponse.setName("");
         List<CourseResponse> availableCourses = Arrays.asList(courseResponse);
         ProfessorResponse professorResponse = new ProfessorResponse();
-        professorResponse.setLastName("not chosen");
+        professorResponse.setLastName("");
         List<ProfessorResponse> availableProfessors = Arrays.asList(professorResponse);
         GroupResponse groupResponse = new GroupResponse();
         List<GroupResponse> allGroups = Arrays.asList(groupResponse);

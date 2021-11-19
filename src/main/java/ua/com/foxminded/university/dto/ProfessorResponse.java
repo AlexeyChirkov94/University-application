@@ -12,6 +12,5 @@ public class ProfessorResponse extends UserResponse {
 
     private DepartmentResponse departmentResponse;
     private ScienceDegreeResponse scienceDegreeResponse;
-    private List<CourseResponse> coursesResponse;
 
 }

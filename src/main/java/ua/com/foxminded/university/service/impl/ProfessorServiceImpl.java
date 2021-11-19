@@ -10,12 +10,10 @@ import ua.com.foxminded.university.dao.interfaces.ProfessorDao;
 import ua.com.foxminded.university.dto.ProfessorRequest;
 import ua.com.foxminded.university.dto.ProfessorResponse;
 import ua.com.foxminded.university.entity.Course;
-import ua.com.foxminded.university.entity.Group;
 import ua.com.foxminded.university.entity.Lesson;
 import ua.com.foxminded.university.entity.Professor;
 import ua.com.foxminded.university.entity.ScienceDegree;
-import ua.com.foxminded.university.mapper.interfaces.ProfessorRequestMapper;
-import ua.com.foxminded.university.mapper.interfaces.ProfessorResponseMapper;
+import ua.com.foxminded.university.mapper.ProfessorMapper;
 import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.interfaces.ProfessorService;
 import ua.com.foxminded.university.service.validator.ScienceDegreeValidator;
@@ -33,21 +31,19 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
     private final LessonDao lessonDao;
     private final CourseDao courseDao;
     private final DepartmentDao departmentDao;
-    private final ProfessorRequestMapper professorRequestMapper;
-    private final ProfessorResponseMapper professorResponseMapper;
+    private final ProfessorMapper professorMapper;
     private final UserValidator userValidator;
 
     public ProfessorServiceImpl(ProfessorDao professorDao, LessonDao lessonDao, CourseDao courseDao, DepartmentDao departmentDao,
                                 PasswordEncoder passwordEncoder, UserValidator userValidator, ScienceDegreeValidator scienceDegreeValidator,
-                                ProfessorRequestMapper professorRequestMapper, ProfessorResponseMapper professorResponseMapper) {
+                                ProfessorMapper professorMapper) {
         super(passwordEncoder, professorDao, userValidator);
         this.professorDao = professorDao;
         this.lessonDao = lessonDao;
         this.courseDao = courseDao;
         this.departmentDao = departmentDao;
         this.scienceDegreeValidator = scienceDegreeValidator;
-        this.professorRequestMapper = professorRequestMapper;
-        this.professorResponseMapper = professorResponseMapper;
+        this.professorMapper = professorMapper;
         this.userValidator = userValidator;
     }
 
@@ -56,7 +52,7 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
         Professor professor = professorDao.findById(id)
                 .orElseThrow(() -> new EntityDontExistException("There no professor with id: " + id));
 
-        return professorResponseMapper.mapEntityToDto(professor);
+        return professorMapper.mapEntityToDto(professor);
     }
 
     @Override
@@ -65,7 +61,7 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
         int pageNumber = parsePageNumber(page, itemsCount, 1);
 
         return professorDao.findAll(pageNumber, ITEMS_PER_PAGE).stream()
-                .map(professorResponseMapper::mapEntityToDto)
+                .map(professorMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
@@ -73,7 +69,7 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
     public List<ProfessorResponse> findAll() {
 
         return professorDao.findAll().stream()
-                .map(professorResponseMapper::mapEntityToDto)
+                .map(professorMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
@@ -84,7 +80,7 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
         userValidator.validate(professorRequest);
         professorRequest.setPassword(passwordEncoder.encode(professorRequest.getPassword()));
 
-        professorDao.update(professorRequestMapper.mapDtoToEntity(professorRequest));
+        professorDao.update(professorMapper.mapDtoToEntity(professorRequest));
 
         if(professorRequest.getDepartmentId() != 0L){
             changeDepartment(professorRequest.getId(), professorRequest.getDepartmentId());
@@ -118,7 +114,7 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
 
     @Override
     public Optional<ProfessorResponse> findByEmail(String email) {
-        return professorDao.findByEmail(email).map(professorResponseMapper::mapEntityToDto);
+        return professorDao.findByEmail(email).map(professorMapper::mapEntityToDto);
     }
 
     @Override
@@ -133,7 +129,7 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
         List<Professor> professors = professorDao.findByCourseId(courseId);
         List<ProfessorResponse> professorResponses = new ArrayList<>();
         for(Professor professor : professors){
-            professorResponses.add(professorResponseMapper.mapEntityToDto(professor));
+            professorResponses.add(professorMapper.mapEntityToDto(professor));
         }
 
         return professorResponses;
@@ -144,7 +140,7 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
         checkThatDepartmentExist(departmentId);
 
         return professorDao.findByDepartmentId(departmentId)
-                .stream().map(professorResponseMapper ::mapEntityToDto)
+                .stream().map(professorMapper ::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
@@ -165,7 +161,7 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
     @Override
     @Transactional(transactionManager = "txManager")
     protected ProfessorResponse registerCertainUser(ProfessorRequest professorRequest) {
-        Professor professorBeforeSave = professorRequestMapper.mapDtoToEntity(professorRequest);
+        Professor professorBeforeSave = professorMapper.mapDtoToEntity(professorRequest);
         Professor professorAfterSave = professorDao.save(professorBeforeSave);
 
         if(professorRequest.getDepartmentId() != 0L){
@@ -176,7 +172,7 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
             changeScienceDegree(professorAfterSave.getId(), professorRequest.getScienceDegreeId());
         }
 
-        return professorResponseMapper.mapEntityToDto(professorAfterSave);
+        return professorMapper.mapEntityToDto(professorAfterSave);
     }
 
     private void checkThatProfessorExist(long professorId){

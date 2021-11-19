@@ -97,8 +97,8 @@ public class LessonsController {
         ProfessorResponse teacher = lessonResponse.getTeacher();
         List<ProfessorResponse> availableTeachers;
         List<CourseResponse> availableCourses;
-        availableTeachers = !course.getName().equals("not chosen") ? professorService.findByCourseId(course.getId()) : professorService.findAll();
-        availableCourses = !teacher.getLastName().equals("not chosen") ? courseService.findByProfessorId(teacher.getId()) : courseService.findAll();
+        availableTeachers = !course.getName().isEmpty() ? professorService.findByCourseId(course.getId()) : professorService.findAll();
+        availableCourses = !teacher.getLastName().isEmpty() ? courseService.findByProfessorId(teacher.getId()) : courseService.findAll();
 
         model.addAttribute("lessonResponse", lessonResponse);
         model.addAttribute("lessonRequest", lessonRequest);

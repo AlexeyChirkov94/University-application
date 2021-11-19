@@ -11,8 +11,7 @@ import ua.com.foxminded.university.dao.interfaces.LessonDao;
 import ua.com.foxminded.university.dto.FormOfLessonRequest;
 import ua.com.foxminded.university.entity.FormOfLesson;
 import ua.com.foxminded.university.entity.Lesson;
-import ua.com.foxminded.university.mapper.interfaces.FormOfLessonRequestMapper;
-import ua.com.foxminded.university.mapper.interfaces.FormOfLessonResponseMapper;
+import ua.com.foxminded.university.mapper.FormOfLessonMapper;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -32,10 +31,7 @@ class FormOfLessonServiceImplTest {
     LessonDao lessonDao;
 
     @Mock
-    FormOfLessonRequestMapper formOfLessonRequestMapper;
-
-    @Mock
-    FormOfLessonResponseMapper formOfLessonResponseMapper;
+    FormOfLessonMapper formOfLessonMapper;
 
     @InjectMocks
     FormOfLessonServiceImpl formOfLessonService;
@@ -116,12 +112,12 @@ class FormOfLessonServiceImplTest {
         FormOfLessonRequest formOfLessonRequest = new FormOfLessonRequest();
         formOfLessonRequest.setId(1L);
 
-        when(formOfLessonRequestMapper.mapDtoToEntity(formOfLessonRequest)).thenReturn(formOfLesson);
+        when(formOfLessonMapper.mapDtoToEntity(formOfLessonRequest)).thenReturn(formOfLesson);
         doNothing().when(formOfLessonDao).update(formOfLesson);
 
         formOfLessonService.edit(formOfLessonRequest);
 
-        verify(formOfLessonRequestMapper).mapDtoToEntity(formOfLessonRequest);
+        verify(formOfLessonMapper).mapDtoToEntity(formOfLessonRequest);
         verify(formOfLessonDao).update(formOfLesson);
     }
 
