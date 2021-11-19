@@ -29,6 +29,7 @@ import java.util.Optional;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -75,11 +76,13 @@ class ProfessorServiceImplTest {
         int newScienceDegreeId = 2;
 
         doNothing().when(scienceDegreeValidator).validate(ScienceDegree.getById(newScienceDegreeId));
+        when(professorDao.findById(professorId)).thenReturn(Optional.of(Professor.builder().withId(professorId).build()));
         doNothing().when(professorDao).changeScienceDegree(professorId, newScienceDegreeId);
 
         professorService.changeScienceDegree(professorId, newScienceDegreeId);
 
         verify(scienceDegreeValidator).validate(ScienceDegree.getById(newScienceDegreeId));
+        verify(professorDao).findById(professorId);
         verify(professorDao).changeScienceDegree(professorId, newScienceDegreeId);
     }
 
@@ -178,12 +181,14 @@ class ProfessorServiceImplTest {
     }
 
     @Test
-    void registerShouldAddProfessorToDBIfArgumentsIsProfessorRequest() {
+    void registerShouldAddProfessorToDBIfArgumentsIsProfessorRequestWithoutDepartmentAndScienceDegree() {
         String email= "Alexey94@gamil.com";
         String password= "12345";
         ProfessorRequest professorRequest = new ProfessorRequest();
         professorRequest.setEmail(email);
         professorRequest.setPassword(password);
+        professorRequest.setDepartmentId(0L);
+        professorRequest.setScienceDegreeId(0);
 
         doNothing().when(userValidator).validate(professorRequest);
         when(professorDao.findByEmail(email)).thenReturn(Optional.empty());
@@ -194,6 +199,45 @@ class ProfessorServiceImplTest {
         verify(userValidator).validate(professorRequest);
         verify(professorDao).findByEmail(email);
         verify(passwordEncoder).encode(password);
+    }
+
+    @Test
+    void registerShouldAddProfessorToDBIfArgumentsIsProfessorRequestWithDepartmentAndScienceDegree() {
+        String email= "Alexey94@gamil.com";
+        String password= "12345";
+        Department department = Department.builder().withId(1L).build();
+        ScienceDegree scienceDegree = ScienceDegree.getById(1);
+        Professor professor = Professor.builder().withId(1L).build();
+        ProfessorRequest professorRequest = new ProfessorRequest();
+        professorRequest.setId(1L);
+        professorRequest.setEmail(email);
+        professorRequest.setPassword(password);
+        professorRequest.setDepartmentId(1L);
+        professorRequest.setScienceDegreeId(1);
+
+        doNothing().when(userValidator).validate(professorRequest);
+        when(professorDao.findByEmail(email)).thenReturn(Optional.empty());
+        when(passwordEncoder.encode(password)).thenReturn(password);
+        when(professorRequestMapper.mapDtoToEntity(professorRequest)).thenReturn(professor);
+        when(professorDao.save(professor)).thenReturn(professor);
+        when(departmentDao.findById(1L)).thenReturn(Optional.of(department));
+        when(professorDao.findById(1L)).thenReturn(Optional.of(professor));
+        doNothing().when(professorDao).changeDepartment(1L, 1L);
+        doNothing().when(scienceDegreeValidator).validate(scienceDegree);
+        doNothing().when(professorDao).changeScienceDegree(1L, 1);
+
+        professorService.register(professorRequest);
+
+        verify(userValidator).validate(professorRequest);
+        verify(professorDao).findByEmail(email);
+        verify(passwordEncoder).encode(password);
+        verify(professorRequestMapper).mapDtoToEntity(professorRequest);
+        verify(professorDao).save(professor);
+        verify(departmentDao).findById(1L);
+        verify(professorDao ,times(2)).findById(1L);
+        verify(professorDao).changeDepartment(1L, 1L);
+        verify(scienceDegreeValidator).validate(scienceDegree);
+        verify(professorDao).changeScienceDegree(1L, 1);
     }
 
     @Test
@@ -269,10 +313,12 @@ class ProfessorServiceImplTest {
     }
 
     @Test
-    void editShouldEditDataOfProfessorIfArgumentNewProfessorRequest() {
+    void editShouldEditDataOfProfessorIfArgumentNewProfessorRequestWithoutDepartmentAndScienceDegree() {
         Professor professor = Professor.builder().withId(1L).build();
         ProfessorRequest professorRequest = new ProfessorRequest();
         professorRequest.setId(1L);
+        professorRequest.setDepartmentId(0L);
+        professorRequest.setScienceDegreeId(0);
 
         when(professorRequestMapper.mapDtoToEntity(professorRequest)).thenReturn(professor);
         doNothing().when(professorDao).update(professor);
@@ -281,6 +327,38 @@ class ProfessorServiceImplTest {
 
         verify(professorRequestMapper).mapDtoToEntity(professorRequest);
         verify(professorDao).update(professor);
+    }
+
+    @Test
+    void editShouldEditDataOfProfessorIfArgumentNewProfessorRequestWithDepartmentAndScienceDegree() {
+        Department department = Department.builder().withId(1L).build();
+        ScienceDegree scienceDegree = ScienceDegree.getById(1);
+
+        Professor professor = Professor.builder().withId(1L).build();
+        ProfessorRequest professorRequest = new ProfessorRequest();
+        professorRequest.setId(1L);
+        professorRequest.setDepartmentId(1L);
+        professorRequest.setScienceDegreeId(1);
+
+        when(professorRequestMapper.mapDtoToEntity(professorRequest)).thenReturn(professor);
+        doNothing().when(professorDao).update(professor);
+
+        when(departmentDao.findById(1L)).thenReturn(Optional.of(department));
+        when(professorDao.findById(1L)).thenReturn(Optional.of(professor));
+        doNothing().when(professorDao).changeDepartment(1L, 1L);
+
+        doNothing().when(scienceDegreeValidator).validate(scienceDegree);
+        doNothing().when(professorDao).changeScienceDegree(1L, 1);
+
+        professorService.edit(professorRequest);
+
+        verify(professorRequestMapper).mapDtoToEntity(professorRequest);
+        verify(professorDao).update(professor);
+        verify(departmentDao).findById(1L);
+        verify(professorDao ,times(2)).findById(1L);
+        verify(professorDao).changeDepartment(1L, 1L);
+        verify(scienceDegreeValidator).validate(scienceDegree);
+        verify(professorDao).changeScienceDegree(1L, 1);
     }
 
     @Test

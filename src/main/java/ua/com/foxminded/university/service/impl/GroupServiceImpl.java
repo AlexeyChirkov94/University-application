@@ -64,12 +64,21 @@ public class GroupServiceImpl extends AbstractPageableCrudService implements Gro
     }
 
     @Override
+    @Transactional(transactionManager = "txManager")
     public GroupResponse create(GroupRequest groupRequest) {
         if (groupDao.findByName(groupRequest.getName()).isPresent()){
             throw new EntityAlreadyExistException("Group with same name already exist");
         } else {
             Group groupBeforeSave = groupRequestMapper.mapDtoToEntity(groupRequest);
             Group groupAfterSave = groupDao.save(groupBeforeSave);
+
+            if(groupRequest.getDepartmentId() != 0L){
+                changeDepartment(groupAfterSave.getId(), groupRequest.getDepartmentId());
+            }
+
+            if(groupRequest.getFormOfEducationId() != 0L){
+                changeFormOfEducation(groupAfterSave.getId(), groupRequest.getFormOfEducationId());
+            }
 
             return groupResponseMapper.mapEntityToDto(groupAfterSave);
         }
@@ -118,8 +127,18 @@ public class GroupServiceImpl extends AbstractPageableCrudService implements Gro
     }
 
     @Override
+    @Transactional(transactionManager = "txManager")
     public void edit(GroupRequest groupRequest) {
+
         groupDao.update(groupRequestMapper.mapDtoToEntity(groupRequest));
+
+        if(groupRequest.getDepartmentId() != 0L){
+            changeDepartment(groupRequest.getId(), groupRequest.getDepartmentId());
+        }
+
+        if(groupRequest.getFormOfEducationId() != 0L){
+            changeFormOfEducation(groupRequest.getId(), groupRequest.getFormOfEducationId());
+        }
     }
 
     @Override

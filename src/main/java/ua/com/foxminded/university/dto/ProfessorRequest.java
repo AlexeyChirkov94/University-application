@@ -10,8 +10,7 @@ import java.util.List;
 @ToString(callSuper=true)
 public class ProfessorRequest extends UserRequest {
 
-    private DepartmentRequest departmentRequest;
-    private ScienceDegreeRequest scienceDegreeRequest;
-    private List<CourseRequest> coursesRequest;
+    private Long departmentId;
+    private Integer scienceDegreeId;
 
 }

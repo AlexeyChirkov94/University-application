@@ -14,7 +14,6 @@ import ua.com.foxminded.university.mapper.interfaces.ProfessorResponseMapper;
 import static java.util.Collections.emptyList;
 import java.util.Arrays;
 import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ProfessorResponseMapperImplTest {
@@ -23,8 +22,10 @@ class ProfessorResponseMapperImplTest {
     ProfessorResponseMapper professorResponseMapper;
     Professor professorWithCourses;
     Professor professorWithNoCourses;
+    Professor emptyProfessorWithNoCourses;
     ProfessorResponse professorResponseWithCourses;
     ProfessorResponse professorResponseWithNoCourses;
+    ProfessorResponse emptyProfessorResponseWithNoCourses;
 
     {
         context = new AnnotationConfigApplicationContext(TestsContextConfiguration.class);
@@ -34,6 +35,7 @@ class ProfessorResponseMapperImplTest {
         courseResponse1.setId(1L);
         courseResponse2.setId(2L);
         List<CourseResponse> coursesResponse = Arrays.asList(courseResponse1, courseResponse2);
+
         professorResponseMapper = context.getBean(ProfessorResponseMapperImpl.class);
         professorWithCourses = Professor.builder().withId(1L).withFirstName("Professor 1")
                 .withScienceDegree(ScienceDegree.GRADUATE).withCourses(courses).build();
@@ -42,36 +44,24 @@ class ProfessorResponseMapperImplTest {
         professorResponseWithCourses.setFirstName("Professor 1");
         professorResponseWithCourses.setScienceDegreeResponse(ScienceDegreeResponse.GRADUATE);
         professorResponseWithCourses.setCoursesResponse(coursesResponse);
-    }
 
-
-
-    @Test
-    void mapDtoToEntityShouldMapDtoToEntityIfArgumentIsProfessorWithCoursesResponseDto() {
-        Professor expected = professorWithCourses;
-        Professor actual = professorResponseMapper.mapDtoToEntity(professorResponseWithCourses);
-
-        assertThat(actual).isEqualTo(expected);
-    }
-
-    @Test
-    void mapDtoToEntityShouldMapDtoToEntityIfArgumentIsProfessorWithNoCoursesResponseDto() {
         professorWithNoCourses = Professor.builder().withId(1L).withFirstName("Professor 1")
-                .withCourses(emptyList()).withScienceDegree(ScienceDegree.GRADUATE).build();
+                .withScienceDegree(ScienceDegree.GRADUATE).build();
         professorResponseWithNoCourses = new ProfessorResponse();
         professorResponseWithNoCourses.setId(1L);
         professorResponseWithNoCourses.setFirstName("Professor 1");
+        professorResponseWithNoCourses.setCoursesResponse(emptyList());
         professorResponseWithNoCourses.setScienceDegreeResponse(ScienceDegreeResponse.GRADUATE);
 
-        Professor expected = professorWithNoCourses;
-        Professor actual = professorResponseMapper.mapDtoToEntity(professorResponseWithNoCourses);
-
-        assertThat(actual).isEqualTo(expected);
-    }
-
-    @Test
-    void mapDtoToEntityShouldReturnNullIfArgumentNull() {
-        assertThat(professorResponseMapper.mapDtoToEntity(null)).isNull();
+        emptyProfessorWithNoCourses = Professor.builder().withId(0L).build();
+        emptyProfessorResponseWithNoCourses = new ProfessorResponse();
+        emptyProfessorResponseWithNoCourses.setId(0L);
+        emptyProfessorResponseWithNoCourses.setFirstName("");
+        emptyProfessorResponseWithNoCourses.setLastName("");
+        emptyProfessorResponseWithNoCourses.setEmail("");
+        emptyProfessorResponseWithNoCourses.setPassword("");
+        emptyProfessorResponseWithNoCourses.setScienceDegreeResponse(ScienceDegreeResponse.GRADUATE);
+        emptyProfessorResponseWithNoCourses.setCoursesResponse(emptyList());
     }
 
     @Test
@@ -84,16 +74,16 @@ class ProfessorResponseMapperImplTest {
 
     @Test
     void mapEntityToDtoShouldMapEntityToDtoIfArgumentIsProfessorWithNoCoursesEntity() {
-        professorResponseWithNoCourses = new ProfessorResponse();
-        professorResponseWithNoCourses.setId(1L);
-        professorResponseWithNoCourses.setFirstName("Professor 1");
-        professorResponseWithNoCourses.setCoursesResponse(emptyList());
-        professorResponseWithNoCourses.setScienceDegreeResponse(ScienceDegreeResponse.GRADUATE);
-        professorWithNoCourses = Professor.builder().withId(1L).withFirstName("Professor 1")
-                .withScienceDegree(ScienceDegree.GRADUATE).build();
-
         ProfessorResponse expected = professorResponseWithNoCourses;
         ProfessorResponse actual = professorResponseMapper.mapEntityToDto(professorWithNoCourses);
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void mapEntityToDtoShouldMapEntityToDtoIfArgumentIsProfessorWithNoCoursesEntityWhichNotFoundedInDB() {
+        ProfessorResponse expected = emptyProfessorResponseWithNoCourses;
+        ProfessorResponse actual = professorResponseMapper.mapEntityToDto(emptyProfessorWithNoCourses);
 
         assertThat(actual).isEqualTo(expected);
     }

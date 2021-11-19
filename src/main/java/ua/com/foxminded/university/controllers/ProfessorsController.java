@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import ua.com.foxminded.university.dto.CourseResponse;
+import ua.com.foxminded.university.dto.LessonResponse;
 import ua.com.foxminded.university.dto.ProfessorRequest;
 import ua.com.foxminded.university.dto.ProfessorResponse;
 import ua.com.foxminded.university.dto.ScienceDegreeResponse;
@@ -21,9 +22,14 @@ import ua.com.foxminded.university.service.exception.EntityAlreadyExistException
 import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.exception.ValidateException;
 import ua.com.foxminded.university.service.interfaces.CourseService;
+import ua.com.foxminded.university.service.interfaces.DepartmentService;
+import ua.com.foxminded.university.service.interfaces.LessonService;
 import ua.com.foxminded.university.service.interfaces.ProfessorService;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
+
+import static ua.com.foxminded.university.controllers.ControllersUtility.getStringDateTimes;
 import static ua.com.foxminded.university.controllers.ControllersUtility.setPagesValueAndStatus;
 
 @AllArgsConstructor
@@ -33,6 +39,8 @@ public class ProfessorsController {
 
     private final ProfessorService professorService;
     private final CourseService courseService;
+    private final DepartmentService departmentService;
+    private final LessonService lessonService;
 
     @GetMapping()
     public String showAll(Model model, @RequestParam(value="page", required = false) String page){
@@ -50,7 +58,10 @@ public class ProfessorsController {
     }
 
     @GetMapping("/new")
-    public String newProfessor(@ModelAttribute("professor") ProfessorRequest professorRequest) {
+    public String newProfessor(Model model, @ModelAttribute("professor") ProfessorRequest professorRequest) {
+
+        model.addAttribute("scienceDegrees", ScienceDegreeResponse.values());
+        model.addAttribute("departments", departmentService.findAll());
         return "/professor/add";
     }
 
@@ -62,14 +73,20 @@ public class ProfessorsController {
 
     @GetMapping("/{id}/edit")
     public String edit(Model model, @PathVariable("id") long id) {
+        ProfessorResponse professorResponse = professorService.findById(id);
+        ProfessorRequest professorRequest = new ProfessorRequest();
+        professorRequest.setFirstName(professorResponse.getFirstName());
+        professorRequest.setLastName(professorResponse.getLastName());
+        professorRequest.setEmail(professorResponse.getEmail());
+
         List<CourseResponse> professorsCourses = courseService.findByProfessorId(id);
         List<CourseResponse> anotherCourses = courseService.findAll();
         anotherCourses.removeAll(professorsCourses);
-        ProfessorResponse professor = professorService.findById(id);
 
-        model.addAttribute("professor", professor);
-        model.addAttribute("ScienceDegree", professor.getScienceDegreeResponse());
+        model.addAttribute("professorResponse", professorResponse);
+        model.addAttribute("professorRequest", professorRequest);
         model.addAttribute("ScienceDegrees", ScienceDegreeResponse.values());
+        model.addAttribute("departments", departmentService.findAll());
         model.addAttribute("professorsCourses", professorsCourses);
         model.addAttribute("anotherCourses", anotherCourses);
         return "/professor/edit";
@@ -81,11 +98,15 @@ public class ProfessorsController {
         return "redirect:/professor";
     }
 
-    @PostMapping("/{id}/assign/scienceDegree")
-    public String changeScienceDegree(Model model, @PathVariable("id") long professorId, @RequestParam Integer idNewScienceDegree) {
-        model.addAttribute("idNewScienceDegree", idNewScienceDegree);
-        professorService.changeScienceDegree(professorId, idNewScienceDegree);
-        return "redirect:/professor/" + professorId + "/edit";
+    @GetMapping("/{id}/timetable")
+    public String timetable(Model model, @PathVariable("id") long id) {
+        List<LessonResponse> lessons = lessonService.formTimeTableForProfessor(id);
+        Map<Long, String> stringDateTimes = getStringDateTimes(lessons);
+
+        model.addAttribute("professor", professorService.findById(id));
+        model.addAttribute("lessons", lessons);
+        model.addAttribute("stringDateTimes", stringDateTimes);
+        return "/professor/timetable";
     }
 
     @PostMapping("/{id}/assign/course")

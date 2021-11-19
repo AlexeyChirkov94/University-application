@@ -26,22 +26,6 @@ public class LessonResponseMapperImpl implements LessonResponseMapper {
     }
 
     @Override
-    public Lesson mapDtoToEntity(LessonResponse dto) {
-        if (dto == null) {
-            return null;
-        } else {
-            return Lesson.builder()
-                    .withId(dto.getId())
-                    .withCourse(courseResponseMapper.mapDtoToEntity(dto.getCourseResponse()))
-                    .withTimeOfStartLesson(dto.getTimeOfStartLesson())
-                    .withGroup(groupResponseMapper.mapDtoToEntity(dto.getGroupResponse()))
-                    .withTeacher(professorResponseMapper.mapDtoToEntity(dto.getTeacher()))
-                    .withFormOfLesson(formOfLessonResponseMapper.mapDtoToEntity(dto.getFormOfLessonResponse()))
-                    .build();
-        }
-    }
-
-    @Override
     public LessonResponse mapEntityToDto(Lesson entity) {
         LessonResponse lessonResponse = new LessonResponse();
         if (entity == null) {

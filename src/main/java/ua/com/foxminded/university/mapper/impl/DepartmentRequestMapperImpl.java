@@ -20,17 +20,4 @@ public class DepartmentRequestMapperImpl implements DepartmentRequestMapper {
         }
     }
 
-    @Override
-    public DepartmentRequest mapEntityToDto(Department entity) {
-        if (entity == null) {
-            return null;
-        } else {
-            DepartmentRequest departmentRequest = new DepartmentRequest();
-            departmentRequest.setId(entity.getId());
-            departmentRequest.setName(entity.getName());
-
-            return departmentRequest;
-        }
-    }
-
 }

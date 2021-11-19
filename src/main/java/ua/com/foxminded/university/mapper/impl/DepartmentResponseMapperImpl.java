@@ -9,25 +9,13 @@ import ua.com.foxminded.university.mapper.interfaces.DepartmentResponseMapper;
 public class DepartmentResponseMapperImpl implements DepartmentResponseMapper {
 
     @Override
-    public Department mapDtoToEntity(DepartmentResponse dto) {
-        if (dto == null) {
-            return null;
-        } else {
-            return Department.builder()
-                    .withId(dto.getId())
-                    .withName(dto.getName())
-                    .build();
-        }
-    }
-
-    @Override
     public DepartmentResponse mapEntityToDto(Department entity) {
         DepartmentResponse departmentResponse = new DepartmentResponse();
         if (entity == null) {
             return null;
         } else if (entity.getId() == 0L){
             departmentResponse.setId(0L);
-            departmentResponse.setName("not chosen");
+            departmentResponse.setName("");
         } else {
             departmentResponse.setId(entity.getId());
             departmentResponse.setName(entity.getName());

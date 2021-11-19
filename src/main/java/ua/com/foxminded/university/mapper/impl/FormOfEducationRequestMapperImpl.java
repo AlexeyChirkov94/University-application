@@ -20,17 +20,4 @@ public class FormOfEducationRequestMapperImpl implements FormOfEducationRequestM
         }
     }
 
-    @Override
-    public FormOfEducationRequest mapEntityToDto(FormOfEducation entity) {
-        if (entity == null) {
-            return null;
-        } else {
-            FormOfEducationRequest formOfEducationRequest = new FormOfEducationRequest();
-            formOfEducationRequest.setId(entity.getId());
-            formOfEducationRequest.setName(entity.getName());
-
-            return formOfEducationRequest;
-        }
-    }
-
 }

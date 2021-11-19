@@ -9,7 +9,6 @@ import ua.com.foxminded.university.entity.ScienceDegree;
 import ua.com.foxminded.university.mapper.interfaces.ScienceDegreeResponseMapper;
 import static org.assertj.core.api.Assertions.assertThat;
 
-
 class ScienceDegreeResponseMapperImplTest {
 
     ApplicationContext context;
@@ -22,19 +21,6 @@ class ScienceDegreeResponseMapperImplTest {
         scienceDegreeResponseMapper = context.getBean(ScienceDegreeResponseMapperImpl.class);
         scienceDegree = ScienceDegree.GRADUATE;
         scienceDegreeResponse = ScienceDegreeResponse.GRADUATE;
-    }
-
-    @Test
-    void mapDtoToEntityShouldMapDtoToEntityIfArgumentIsFormOfLessonResponseDto() {
-        ScienceDegree expected = scienceDegree;
-        ScienceDegree actual = scienceDegreeResponseMapper.mapDtoToEntity(scienceDegreeResponse);
-
-        assertThat(actual).isEqualTo(expected);
-    }
-
-    @Test
-    void mapDtoToEntityShouldReturnNullIfArgumentNull() {
-        assertThat(scienceDegreeResponseMapper.mapDtoToEntity(null)).isNull();
     }
 
     @Test

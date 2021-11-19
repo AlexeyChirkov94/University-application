@@ -21,18 +21,4 @@ public class FormOfLessonRequestMapperImpl implements FormOfLessonRequestMapper 
         }
     }
 
-    @Override
-    public FormOfLessonRequest mapEntityToDto(FormOfLesson entity) {
-        if (entity == null) {
-            return null;
-        } else {
-            FormOfLessonRequest formOfLessonRequest = new FormOfLessonRequest();
-            formOfLessonRequest.setId(entity.getId());
-            formOfLessonRequest.setName(entity.getName());
-            formOfLessonRequest.setDuration(entity.getDuration());
-
-            return formOfLessonRequest;
-        }
-    }
-
 }

@@ -53,6 +53,7 @@
                     </div>
                 </div>
             </li>
+            <li class="list-group-item"><a class="btn btn-success" th:href="@{/group/{id}/timetable(id=${group.getId()})}" role="button" th:text="#{show.timetable}">Show timetable</a></li>
             <li class="list-group-item"><a class="btn btn-info" th:href="@{/group/{id}/edit(id=${group.getId()})}" role="button" th:text="#{edit}">Edit</a></li>
             <li class="list-group-item">
                 <form th:method="DELETE" th:action="@{/group/{id}(id=${group.getId()})}">

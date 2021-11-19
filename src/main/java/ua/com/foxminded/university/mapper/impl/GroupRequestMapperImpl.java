@@ -27,24 +27,7 @@ public class GroupRequestMapperImpl implements GroupRequestMapper {
             return Group.builder()
                     .withId(dto.getId())
                     .withName(dto.getName())
-                    .withDepartment(departmentRequestMapper.mapDtoToEntity(dto.getDepartmentRequest()))
-                    .withFormOfEducation(formOfEducationRequestMapper.mapDtoToEntity(dto.getFormOfEducationRequest()))
                     .build();
-        }
-    }
-
-    @Override
-    public GroupRequest mapEntityToDto(Group entity) {
-        if (entity == null) {
-            return null;
-        } else {
-            GroupRequest groupRequest = new GroupRequest();
-            groupRequest.setId(entity.getId());
-            groupRequest.setName(entity.getName());
-            groupRequest.setDepartmentRequest(departmentRequestMapper.mapEntityToDto(entity.getDepartment()));
-            groupRequest.setFormOfEducationRequest(formOfEducationRequestMapper.mapEntityToDto(entity.getFormOfEducation()));
-
-            return groupRequest;
         }
     }
 

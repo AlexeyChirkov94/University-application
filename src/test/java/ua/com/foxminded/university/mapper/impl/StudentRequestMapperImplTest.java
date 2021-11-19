@@ -7,7 +7,6 @@ import ua.com.foxminded.university.TestsContextConfiguration;
 import ua.com.foxminded.university.dto.StudentRequest;
 import ua.com.foxminded.university.entity.Student;
 import ua.com.foxminded.university.mapper.interfaces.StudentRequestMapper;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 class StudentRequestMapperImplTest {
@@ -36,19 +35,6 @@ class StudentRequestMapperImplTest {
     @Test
     void mapDtoToEntityShouldReturnNullIfArgumentNull() {
         assertThat(studentRequestMapper.mapDtoToEntity(null)).isNull();
-    }
-
-    @Test
-    void mapEntityToDtoShouldMapEntityToDtoIfArgumentIsFormOfStudentEntity() {
-        StudentRequest expected = studentRequest;
-        StudentRequest actual = studentRequestMapper.mapEntityToDto(student);
-
-        assertThat(actual).isEqualTo(expected);
-    }
-
-    @Test
-    void mapEntityToDtoShouldShouldReturnNullIfArgumentNull() {
-        assertThat(studentRequestMapper.mapEntityToDto(null)).isNull();
     }
 
 }

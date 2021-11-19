@@ -23,6 +23,7 @@
             <li class="list-group-item" th:text="#{email} + ': ' + ${student.getEmail()}">email</li>
             <li class="list-group-item" th:text="#{group} + ': ' + ${student.getGroupResponse().getName()} +
                             ' (ID: ' + ${student.getGroupResponse().getId()} + ')'">group</li>
+            <li class="list-group-item"><a class="btn btn-success" th:href="@{/student/{id}/timetable(id=${student.getId()})}" role="button" th:text="#{show.timetable}">Show timetable</a></li>
             <li class="list-group-item"><a class="btn btn-info" th:href="@{/student/{id}/edit(id=${student.getId()})}" role="button" th:text="#{edit}">Edit</a></li>
             <li class="list-group-item">
                 <form th:method="DELETE" th:action="@{/student/{id}(id=${student.getId()})}">

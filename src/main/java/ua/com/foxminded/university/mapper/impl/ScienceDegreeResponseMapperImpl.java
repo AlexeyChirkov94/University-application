@@ -9,15 +9,6 @@ import ua.com.foxminded.university.mapper.interfaces.ScienceDegreeResponseMapper
 public class ScienceDegreeResponseMapperImpl implements ScienceDegreeResponseMapper {
 
     @Override
-    public ScienceDegree mapDtoToEntity(ScienceDegreeResponse dto) {
-        if (dto == null) {
-            return null;
-        } else {
-            return ScienceDegree.getById(dto.getId());
-        }
-    }
-
-    @Override
     public ScienceDegreeResponse mapEntityToDto(ScienceDegree entity) {
         if (entity == null) {
             return null;

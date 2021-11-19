@@ -13,16 +13,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-import ua.com.foxminded.university.dto.GroupResponse;
+import ua.com.foxminded.university.dto.LessonResponse;
 import ua.com.foxminded.university.dto.StudentRequest;
 import ua.com.foxminded.university.dto.StudentResponse;
 import ua.com.foxminded.university.service.exception.EntityAlreadyExistException;
 import ua.com.foxminded.university.service.exception.EntityDontExistException;
+import ua.com.foxminded.university.service.exception.TimeTableStudentWithoutGroupException;
 import ua.com.foxminded.university.service.exception.ValidateException;
 import ua.com.foxminded.university.service.interfaces.GroupService;
+import ua.com.foxminded.university.service.interfaces.LessonService;
 import ua.com.foxminded.university.service.interfaces.StudentService;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
+
+import static ua.com.foxminded.university.controllers.ControllersUtility.getStringDateTimes;
 import static ua.com.foxminded.university.controllers.ControllersUtility.setPagesValueAndStatus;
 
 @AllArgsConstructor
@@ -32,6 +37,7 @@ public class StudentsController {
 
     private final StudentService studentService;
     private final GroupService groupService;
+    private final LessonService lessonService;
 
     @GetMapping()
     public String showAll(Model model, @RequestParam(value="page", required = false) String page){
@@ -48,7 +54,9 @@ public class StudentsController {
     }
 
     @GetMapping("/new")
-    public String newStudent(@ModelAttribute("student") StudentRequest studentRequest) {
+    public String newStudent(Model model, @ModelAttribute("student") StudentRequest studentRequest) {
+
+        model.addAttribute("groups", groupService.findAll());
         return "/student/add";
     }
 
@@ -61,31 +69,34 @@ public class StudentsController {
 
     @GetMapping("/{id}/edit")
     public String edit(Model model, @PathVariable("id") long id) {
-        StudentResponse student = studentService.findById(id);
-        long studentGroupId = student.getGroupResponse().getId();
-        GroupResponse studentGroup;
+        StudentResponse studentResponse = studentService.findById(id);
+        StudentRequest studentRequest = new StudentRequest();
+        studentRequest.setFirstName(studentResponse.getFirstName());
+        studentRequest.setLastName(studentResponse.getLastName());
+        studentRequest.setEmail(studentResponse.getEmail());
 
-        if(studentGroupId == 0){
-            studentGroup = new GroupResponse();
-            studentGroup.setId(0L);
-            studentGroup.setName("not appointed");
-        } else {
-            studentGroup = groupService.findById(studentGroupId);
-        }
-
-        List<GroupResponse> anotherGroups = groupService.findAll();
-        anotherGroups.remove(studentGroup);
-
-        model.addAttribute("student", student);
-        model.addAttribute("studentGroup", studentGroup);
-        model.addAttribute("anotherGroups", anotherGroups);
+        model.addAttribute("studentResponse", studentResponse);
+        model.addAttribute("studentRequest", studentRequest);
+        model.addAttribute("groups", groupService.findAll());
         return "/student/edit";
     }
 
     @PatchMapping("/{id}")
     public String update(@ModelAttribute("student") StudentRequest studentRequest) {
-                studentService.edit(studentRequest);
+        studentService.edit(studentRequest);
         return "redirect:/student";
+    }
+
+
+    @GetMapping("/{id}/timetable")
+    public String timetable(Model model, @PathVariable("id") long id) {
+        List<LessonResponse> lessons = lessonService.formTimeTableForStudent(id);
+        Map<Long, String> stringDateTimes = getStringDateTimes(lessons);
+
+        model.addAttribute("student", studentService.findById(id));
+        model.addAttribute("lessons", lessons);
+        model.addAttribute("stringDateTimes", stringDateTimes);
+        return "/student/timetable";
     }
 
     @PatchMapping("/{id}/remove/group")
@@ -97,7 +108,7 @@ public class StudentsController {
     @PostMapping("/{id}/assign/group")
     public String enterGroup(Model model, @PathVariable("id") long studentId, @RequestParam Integer idNewGroup) {
         model.addAttribute("idNewGroup", idNewGroup);
-        studentService.enterGroup(studentId, idNewGroup);
+        studentService.changeGroup(studentId, idNewGroup);
         return "redirect:/student/" + studentId + "/edit";
     }
 
@@ -105,6 +116,15 @@ public class StudentsController {
     public String delete(@PathVariable("id") long id) {
         studentService.deleteById(id);
         return "redirect:/student";
+    }
+
+    @ExceptionHandler(TimeTableStudentWithoutGroupException.class)
+    public ModelAndView timetableException(HttpServletRequest request, Exception ex) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("exception", ex);
+        modelAndView.setViewName("errors handling/timetable show error");
+
+        return modelAndView;
     }
 
     @ExceptionHandler(ValidateException.class)

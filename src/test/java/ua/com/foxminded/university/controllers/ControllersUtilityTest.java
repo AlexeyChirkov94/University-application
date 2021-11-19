@@ -76,7 +76,7 @@ class ControllersUtilityTest {
         Map<Long, String> expected = new HashMap<>();
         expected.put(1L, "2020 JANUARY 10 10:10");
         expected.put(2L, "2020 JANUARY 10 08:08");
-        expected.put(3L, "not appointed");
+        expected.put(3L, "");
 
         assertThat(actual).isEqualTo(expected);
     }

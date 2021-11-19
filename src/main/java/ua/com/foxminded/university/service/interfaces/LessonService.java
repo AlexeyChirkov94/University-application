@@ -20,6 +20,8 @@ public interface LessonService {
 
     List<LessonResponse> formTimeTableForGroup(long groupId);
 
+    List<LessonResponse> formTimeTableForStudent(long studentId);
+
     List<LessonResponse> formTimeTableForProfessor(long professorId);
 
 }

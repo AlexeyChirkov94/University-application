@@ -9,6 +9,6 @@ import lombok.ToString;
 @ToString(callSuper=true)
 public class StudentRequest extends UserRequest {
 
-    private GroupRequest groupRequest;
+    private Long groupId;
 
 }

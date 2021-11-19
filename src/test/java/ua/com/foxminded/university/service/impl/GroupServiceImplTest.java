@@ -12,6 +12,7 @@ import ua.com.foxminded.university.dao.interfaces.GroupDao;
 import ua.com.foxminded.university.dao.interfaces.LessonDao;
 import ua.com.foxminded.university.dao.interfaces.StudentDao;
 import ua.com.foxminded.university.dto.GroupRequest;
+import ua.com.foxminded.university.dto.GroupResponse;
 import ua.com.foxminded.university.entity.Department;
 import ua.com.foxminded.university.entity.FormOfEducation;
 import ua.com.foxminded.university.entity.Group;
@@ -19,11 +20,14 @@ import ua.com.foxminded.university.entity.Lesson;
 import ua.com.foxminded.university.entity.Student;
 import ua.com.foxminded.university.mapper.interfaces.GroupRequestMapper;
 import ua.com.foxminded.university.mapper.interfaces.GroupResponseMapper;
+import ua.com.foxminded.university.service.exception.EntityAlreadyExistException;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -166,16 +170,55 @@ class GroupServiceImplTest {
     }
 
     @Test
-    void registerShouldAddGroupToDBIfArgumentsIsGroupRequest() {
+    void createShouldAddGroupToDBIfArgumentsIsGroupRequestWithDepartmentAndFormOfEducation() {
         String groupName= "Group of Math";
+        Department department = Department.builder().withId(1L).withName("Dep").build();
+        FormOfEducation formOfEducation = FormOfEducation.builder().withId(1L).withName("full-time").build();
+        Group group = Group.builder().withName(groupName).withId(1L).build();
         GroupRequest groupRequest = new GroupRequest();
         groupRequest.setName(groupName);
+        groupRequest.setDepartmentId(1L);
+        groupRequest.setFormOfEducationId(1L);
 
         when(groupDao.findByName(groupName)).thenReturn(Optional.empty());
+        when(groupRequestMapper.mapDtoToEntity(groupRequest)).thenReturn(group);
+        when(groupDao.save(group)).thenReturn(group);
+        when(groupDao.findById(1L)).thenReturn(Optional.of(group));
+        when(departmentDao.findById(1L)).thenReturn(Optional.of(department));
+        doNothing().when(groupDao).changeDepartment(1L, 1L);
+        when(formOfEducationDao.findById(1L)).thenReturn(Optional.of(formOfEducation));
+        doNothing().when(groupDao).changeFormOfEducation(1L, 1L);
 
         groupService.create(groupRequest);
 
         verify(groupDao).findByName(groupName);
+        verify(groupRequestMapper).mapDtoToEntity(groupRequest);
+        verify(groupDao).save(group);
+        verify(groupDao, times(2)).findById(1L);
+        verify(departmentDao).findById(1L);
+        verify(groupDao).changeDepartment(1L, 1L);
+        verify(formOfEducationDao).findById(1L);
+        verify(groupDao).findByName(groupName);
+    }
+
+    @Test
+    void createShouldAddGroupToDBIfArgumentsIsGroupRequestWithoutDepartmentAndFormOfEducation() {
+        String groupName= "Group of Math";
+        Group group = Group.builder().withName(groupName).withId(1L).build();
+        GroupRequest groupRequest = new GroupRequest();
+        groupRequest.setName(groupName);
+        groupRequest.setDepartmentId(0L);
+        groupRequest.setFormOfEducationId(0L);
+
+        when(groupDao.findByName(groupName)).thenReturn(Optional.empty());
+        when(groupRequestMapper.mapDtoToEntity(groupRequest)).thenReturn(group);
+        when(groupDao.save(group)).thenReturn(group);
+
+        groupService.create(groupRequest);
+
+        verify(groupDao).findByName(groupName);
+        verify(groupRequestMapper).mapDtoToEntity(groupRequest);
+        verify(groupDao).save(group);
     }
 
     @Test
@@ -268,10 +311,43 @@ class GroupServiceImplTest {
     }
 
     @Test
-    void editShouldEditDataOfGroupIfArgumentNewGroupRequest() {
+    void editShouldEditDataOfGroupIfArgumentNewGroupRequestWithDepartmentAndFormOfEducation() {
+        String groupName= "Group of Math";
+        Department department = Department.builder().withId(1L).withName("Dep").build();
+        FormOfEducation formOfEducation = FormOfEducation.builder().withId(1L).withName("full-time").build();
+        Group group = Group.builder().withName(groupName).withId(1L).build();
+        GroupRequest groupRequest = new GroupRequest();
+        groupRequest.setId(1L);
+        groupRequest.setName(groupName);
+        groupRequest.setDepartmentId(1L);
+        groupRequest.setFormOfEducationId(1L);
+
+        when(groupRequestMapper.mapDtoToEntity(groupRequest)).thenReturn(group);
+        doNothing().when(groupDao).update(group);
+        when(groupDao.findById(1L)).thenReturn(Optional.of(group));
+        when(departmentDao.findById(1L)).thenReturn(Optional.of(department));
+        doNothing().when(groupDao).changeDepartment(1L, 1L);
+        when(formOfEducationDao.findById(1L)).thenReturn(Optional.of(formOfEducation));
+        doNothing().when(groupDao).changeFormOfEducation(1L, 1L);
+
+        groupService.edit(groupRequest);
+
+        verify(groupRequestMapper).mapDtoToEntity(groupRequest);
+        verify(groupDao).update(group);
+        verify(groupDao ,times(2)).findById(1L);
+        verify(departmentDao).findById(1L);
+        verify(groupDao).changeDepartment(1L, 1L);
+        verify(formOfEducationDao).findById(1L);
+        verify(groupDao).changeFormOfEducation(1L, 1L);
+    }
+
+    @Test
+    void editShouldEditDataOfGroupIfArgumentNewGroupRequestWithoutDepartmentAndFormOfEducation() {
         Group group = Group.builder().withId(1L).build();
         GroupRequest groupRequest = new GroupRequest();
         groupRequest.setId(1L);
+        groupRequest.setDepartmentId(0L);
+        groupRequest.setFormOfEducationId(0L);
 
         when(groupRequestMapper.mapDtoToEntity(groupRequest)).thenReturn(group);
         doNothing().when(groupDao).update(group);

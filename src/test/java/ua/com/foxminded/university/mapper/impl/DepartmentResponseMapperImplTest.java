@@ -14,34 +14,35 @@ class DepartmentResponseMapperImplTest {
     ApplicationContext context;
     DepartmentResponseMapper departmentResponseMapper;
     Department department;
+    Department emptyDepartment;
     DepartmentResponse departmentResponse;
+    DepartmentResponse emptyDepartmentResponse;
 
     {
         context = new AnnotationConfigApplicationContext(TestsContextConfiguration.class);
         departmentResponseMapper = context.getBean(DepartmentResponseMapperImpl.class);
         department = Department.builder().withId(1L).withName("Dep 1").build();
+        emptyDepartment = Department.builder().withId(0L).build();
         departmentResponse = new DepartmentResponse();
         departmentResponse.setId(1L);
         departmentResponse.setName("Dep 1");
-    }
-
-    @Test
-    void mapDtoToEntityShouldMapDtoToEntityIfArgumentIsDepartmentResponseDto() {
-        Department expected = department;
-        Department actual = departmentResponseMapper.mapDtoToEntity(departmentResponse);
-
-        assertThat(actual).isEqualTo(expected);
-    }
-
-    @Test
-    void mapDtoToEntityShouldReturnNullIfArgumentNull() {
-        assertThat(departmentResponseMapper.mapDtoToEntity(null)).isNull();
+        emptyDepartmentResponse = new DepartmentResponse();
+        emptyDepartmentResponse.setId(0L);
+        emptyDepartmentResponse.setName("");
     }
 
     @Test
     void mapEntityToDtoShouldMapEntityToDtoIfArgumentIsDepartmentEntity() {
         DepartmentResponse expected = departmentResponse;
         DepartmentResponse actual = departmentResponseMapper.mapEntityToDto(department);
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void mapEntityToDtoShouldMapEntityToDtoIfArgumentIsDepartmentEntityWhichNotFoundedInDB() {
+        DepartmentResponse expected = emptyDepartmentResponse;
+        DepartmentResponse actual = departmentResponseMapper.mapEntityToDto(emptyDepartment);
 
         assertThat(actual).isEqualTo(expected);
     }

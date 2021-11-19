@@ -21,25 +21,32 @@
 
     <form th:method="POST" th:action="@{/student}" th:object="${student}">
 
-        <div class="form-floating mb-3">
+        <div class="form-floating mb-2">
             <input type="text" th:field="*{firstName}" class="form-control" id="firstName" placeholder="First name">
             <label for="firstName" th:text="#{enter.first.name}">Enter first name:</label>
         </div>
 
-        <div class="form-floating mb-3">
+        <div class="form-floating mb-2">
             <input type="text" th:field="*{lastName}" class="form-control" id="lastName" placeholder="Last name">
             <label for="lastName" th:text="#{enter.last.name}">Enter last name:</label>
         </div>
 
-        <div class="form-floating mb-3">
+        <div class="form-floating mb-2">
             <input type="text" th:field="*{email}" class="form-control" id="email" placeholder="name@example.com">
             <label for="email" th:text="#{enter.email}">Enter email:</label>
         </div>
 
-        <div class="form-floating mb-3">
+        <div class="form-floating mb-2">
             <input type="password" th:field="*{password}" class="form-control" id="floatingPassword" placeholder="Password">
             <label for="floatingPassword" th:text="#{enter.password}">Enter password:</label>
         </div>
+
+        <select class="form-select  mb-2" th:field="*{groupId}">
+            <option selected="" value="0" th:text="#{choose.group.of.new.student}">Choose group of new student:</option>
+            <div th:each="group : ${groups}">
+                <option th:value="${group.getId()}" th:text="${group.getName()}"> group </option>
+            </div>
+        </select>
 
         <input class="btn btn-success" type="submit" role="button" th:value="#{add.new.student}"/>
 

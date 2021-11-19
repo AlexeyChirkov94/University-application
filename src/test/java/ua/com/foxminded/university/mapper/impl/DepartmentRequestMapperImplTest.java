@@ -38,17 +38,4 @@ class DepartmentRequestMapperImplTest {
         assertThat(departmentRequestMapper.mapDtoToEntity(null)).isNull();
     }
 
-    @Test
-    void mapEntityToDtoShouldMapEntityToDtoIfArgumentIsDepartmentEntity() {
-        DepartmentRequest expected = departmentRequest;
-        DepartmentRequest actual = departmentRequestMapper.mapEntityToDto(department);
-
-        assertThat(actual).isEqualTo(expected);
-    }
-
-    @Test
-    void mapEntityToDtoShouldShouldReturnNullIfArgumentNull() {
-        assertThat(departmentRequestMapper.mapEntityToDto(null)).isNull();
-    }
-
 }

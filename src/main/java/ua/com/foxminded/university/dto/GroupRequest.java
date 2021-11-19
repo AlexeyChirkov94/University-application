@@ -7,7 +7,7 @@ public class GroupRequest {
 
     private Long id;
     private String name;
-    private DepartmentRequest departmentRequest;
-    private FormOfEducationRequest formOfEducationRequest;
+    private Long departmentId;
+    private Long formOfEducationId;
 
 }

@@ -28,24 +28,6 @@ public class ProfessorResponseMapperImpl implements ProfessorResponseMapper {
     }
 
     @Override
-    public Professor mapDtoToEntity(ProfessorResponse dto) {
-        if (dto == null) {
-            return null;
-        } else {
-            return Professor.builder()
-                    .withId(dto.getId())
-                    .withFirstName(dto.getFirstName())
-                    .withLastName(dto.getLastName())
-                    .withEmail(dto.getEmail())
-                    .withPassword(dto.getPassword())
-                    .withDepartment(departmentResponseMapper.mapDtoToEntity(dto.getDepartmentResponse()))
-                    .withScienceDegree(scienceDegreeResponseMapper.mapDtoToEntity(dto.getScienceDegreeResponse()))
-                    .withCourses(getCourses(dto))
-                    .build();
-        }
-    }
-
-    @Override
     public ProfessorResponse mapEntityToDto(Professor entity) {
         ProfessorResponse professorResponse = new ProfessorResponse();
         if (entity == null) {
@@ -53,12 +35,12 @@ public class ProfessorResponseMapperImpl implements ProfessorResponseMapper {
         } else if (entity.getId() == 0L) {
             professorResponse.setId(0L);
             professorResponse.setFirstName("");
-            professorResponse.setLastName("not chosen");
+            professorResponse.setLastName("");
             professorResponse.setEmail("");
             professorResponse.setPassword("");
             professorResponse.setDepartmentResponse(departmentResponseMapper.mapEntityToDto(entity.getDepartment()));
             professorResponse.setScienceDegreeResponse(scienceDegreeResponseMapper.mapEntityToDto(entity.getScienceDegree()));
-            professorResponse.setCoursesResponse(getCoursesResponse(entity));
+            professorResponse.setCoursesResponse(emptyList());
         } else {
             professorResponse.setId(entity.getId());
             professorResponse.setFirstName(entity.getFirstName());
@@ -71,19 +53,6 @@ public class ProfessorResponseMapperImpl implements ProfessorResponseMapper {
         }
 
         return professorResponse;
-    }
-
-    private List<Course> getCourses(ProfessorResponse dto){
-        List<Course> courses = new ArrayList<>();
-        if (dto.getCoursesResponse() == null) {
-        return emptyList();
-        } else{
-                List<CourseResponse> courseResponses = dto.getCoursesResponse();
-                for (CourseResponse courseResponse : courseResponses) {
-                    courses.add(courseResponseMapper.mapDtoToEntity(courseResponse));
-                }
-            return courses;
-        }
     }
 
     private List<CourseResponse> getCoursesResponse(Professor entity){
