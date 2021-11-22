@@ -13,8 +13,7 @@ import ua.com.foxminded.university.entity.Course;
 import ua.com.foxminded.university.entity.Department;
 import ua.com.foxminded.university.entity.Group;
 import ua.com.foxminded.university.entity.Professor;
-import ua.com.foxminded.university.mapper.interfaces.DepartmentRequestMapper;
-import ua.com.foxminded.university.mapper.interfaces.DepartmentResponseMapper;
+import ua.com.foxminded.university.mapper.DepartmentMapper;
 import ua.com.foxminded.university.service.exception.EntityAlreadyExistException;
 import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.interfaces.DepartmentService;
@@ -29,18 +28,17 @@ public class DepartmentServiceImpl extends AbstractPageableCrudService implement
     private final ProfessorDao professorDao;
     private final CourseDao courseDao;
     private final GroupDao groupDao;
-    private final DepartmentRequestMapper departmentRequestMapper;
-    private final DepartmentResponseMapper departmentResponseMapper;
+    private final DepartmentMapper departmentMapper;
 
     @Override
     public DepartmentResponse create(DepartmentRequest departmentRequest) {
         if (departmentDao.findByName(departmentRequest.getName()).isPresent()){
             throw new EntityAlreadyExistException("Department with same name already exist");
         } else {
-            Department departmentBeforeSave = departmentRequestMapper.mapDtoToEntity(departmentRequest);
+            Department departmentBeforeSave = departmentMapper.mapDtoToEntity(departmentRequest);
             Department departmentAfterSave = departmentDao.save(departmentBeforeSave);
 
-            return departmentResponseMapper.mapEntityToDto(departmentAfterSave);
+            return departmentMapper.mapEntityToDto(departmentAfterSave);
         }
     }
 
@@ -49,7 +47,7 @@ public class DepartmentServiceImpl extends AbstractPageableCrudService implement
         Department department = departmentDao.findById(id)
                 .orElseThrow(() -> new EntityDontExistException("There no department with id: " + id));
 
-        return departmentResponseMapper.mapEntityToDto(department);
+        return departmentMapper.mapEntityToDto(department);
     }
 
     @Override
@@ -58,7 +56,7 @@ public class DepartmentServiceImpl extends AbstractPageableCrudService implement
         int pageNumber = parsePageNumber(page, itemsCount, 1);
 
         return departmentDao.findAll(pageNumber, ITEMS_PER_PAGE).stream()
-                .map(departmentResponseMapper::mapEntityToDto)
+                .map(departmentMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
@@ -66,13 +64,13 @@ public class DepartmentServiceImpl extends AbstractPageableCrudService implement
     public List<DepartmentResponse> findAll() {
 
         return departmentDao.findAll().stream()
-                .map(departmentResponseMapper::mapEntityToDto)
+                .map(departmentMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public void edit(DepartmentRequest departmentRequest) {
-        departmentDao.update(departmentRequestMapper.mapDtoToEntity(departmentRequest));
+        departmentDao.update(departmentMapper.mapDtoToEntity(departmentRequest));
     }
 
     @Override

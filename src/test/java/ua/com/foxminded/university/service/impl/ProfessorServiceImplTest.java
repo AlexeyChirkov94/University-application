@@ -19,8 +19,7 @@ import ua.com.foxminded.university.entity.Department;
 import ua.com.foxminded.university.entity.Lesson;
 import ua.com.foxminded.university.entity.Professor;
 import ua.com.foxminded.university.entity.ScienceDegree;
-import ua.com.foxminded.university.mapper.interfaces.ProfessorRequestMapper;
-import ua.com.foxminded.university.mapper.interfaces.ProfessorResponseMapper;
+import ua.com.foxminded.university.mapper.ProfessorMapper;
 import ua.com.foxminded.university.service.validator.ScienceDegreeValidator;
 import ua.com.foxminded.university.service.validator.UserValidator;
 import java.util.Arrays;
@@ -62,10 +61,7 @@ class ProfessorServiceImplTest {
     PasswordEncoder passwordEncoder;
 
     @Mock
-    ProfessorRequestMapper professorRequestMapper;
-
-    @Mock
-    ProfessorResponseMapper professorResponseMapper;
+    ProfessorMapper professorMapper;
 
     @InjectMocks
     ProfessorServiceImpl professorService;
@@ -135,12 +131,12 @@ class ProfessorServiceImplTest {
         professorResponse.setId(1L);
         List<ProfessorResponse> professorResponses = Arrays.asList(professorResponse);
 
-        when(professorResponseMapper.mapEntityToDto(professors.get(0))).thenReturn(professorResponse);
+        when(professorMapper.mapEntityToDto(professors.get(0))).thenReturn(professorResponse);
         when(professorDao.findByCourseId(courseId)).thenReturn(professors);
 
         assertThat(professorService.findByCourseId(courseId)).isEqualTo(professorResponses);
 
-        verify(professorResponseMapper).mapEntityToDto(professors.get(0));
+        verify(professorMapper).mapEntityToDto(professors.get(0));
         verify(professorDao).findByCourseId(courseId);
     }
 
@@ -218,7 +214,7 @@ class ProfessorServiceImplTest {
         doNothing().when(userValidator).validate(professorRequest);
         when(professorDao.findByEmail(email)).thenReturn(Optional.empty());
         when(passwordEncoder.encode(password)).thenReturn(password);
-        when(professorRequestMapper.mapDtoToEntity(professorRequest)).thenReturn(professor);
+        when(professorMapper.mapDtoToEntity(professorRequest)).thenReturn(professor);
         when(professorDao.save(professor)).thenReturn(professor);
         when(departmentDao.findById(1L)).thenReturn(Optional.of(department));
         when(professorDao.findById(1L)).thenReturn(Optional.of(professor));
@@ -231,7 +227,7 @@ class ProfessorServiceImplTest {
         verify(userValidator).validate(professorRequest);
         verify(professorDao).findByEmail(email);
         verify(passwordEncoder).encode(password);
-        verify(professorRequestMapper).mapDtoToEntity(professorRequest);
+        verify(professorMapper).mapDtoToEntity(professorRequest);
         verify(professorDao).save(professor);
         verify(departmentDao).findById(1L);
         verify(professorDao ,times(2)).findById(1L);
@@ -320,12 +316,12 @@ class ProfessorServiceImplTest {
         professorRequest.setDepartmentId(0L);
         professorRequest.setScienceDegreeId(0);
 
-        when(professorRequestMapper.mapDtoToEntity(professorRequest)).thenReturn(professor);
+        when(professorMapper.mapDtoToEntity(professorRequest)).thenReturn(professor);
         doNothing().when(professorDao).update(professor);
 
         professorService.edit(professorRequest);
 
-        verify(professorRequestMapper).mapDtoToEntity(professorRequest);
+        verify(professorMapper).mapDtoToEntity(professorRequest);
         verify(professorDao).update(professor);
     }
 
@@ -340,7 +336,7 @@ class ProfessorServiceImplTest {
         professorRequest.setDepartmentId(1L);
         professorRequest.setScienceDegreeId(1);
 
-        when(professorRequestMapper.mapDtoToEntity(professorRequest)).thenReturn(professor);
+        when(professorMapper.mapDtoToEntity(professorRequest)).thenReturn(professor);
         doNothing().when(professorDao).update(professor);
 
         when(departmentDao.findById(1L)).thenReturn(Optional.of(department));
@@ -352,7 +348,7 @@ class ProfessorServiceImplTest {
 
         professorService.edit(professorRequest);
 
-        verify(professorRequestMapper).mapDtoToEntity(professorRequest);
+        verify(professorMapper).mapDtoToEntity(professorRequest);
         verify(professorDao).update(professor);
         verify(departmentDao).findById(1L);
         verify(professorDao ,times(2)).findById(1L);

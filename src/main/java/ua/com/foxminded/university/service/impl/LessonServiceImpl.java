@@ -13,16 +13,11 @@ import ua.com.foxminded.university.dto.LessonRequest;
 import ua.com.foxminded.university.dto.LessonResponse;
 import ua.com.foxminded.university.entity.Lesson;;
 import ua.com.foxminded.university.entity.Student;
-import ua.com.foxminded.university.mapper.interfaces.CourseRequestMapper;
-import ua.com.foxminded.university.mapper.interfaces.LessonRequestMapper;
-import ua.com.foxminded.university.mapper.interfaces.LessonResponseMapper;
-import ua.com.foxminded.university.mapper.interfaces.ProfessorRequestMapper;
+import ua.com.foxminded.university.mapper.LessonMapper;
 import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.exception.TimeTableStudentWithoutGroupException;
 import ua.com.foxminded.university.service.interfaces.LessonService;
 import ua.com.foxminded.university.service.validator.LessonValidator;
-
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,15 +32,14 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
     private final GroupDao groupDao;
     private final StudentDao studentDao;
     private final LessonValidator lessonValidator;
-    private final LessonRequestMapper lessonRequestMapper;
-    private final LessonResponseMapper lessonResponseMapper;
+    private final LessonMapper lessonMapper;
 
     @Override
     @Transactional(transactionManager = "txManager")
     public List<LessonResponse> formTimeTableForGroup(long groupId) {
         checkThatGroupExist(groupId);
 
-        return lessonDao.findByGroupId(groupId).stream().map(lessonResponseMapper::mapEntityToDto)
+        return lessonDao.findByGroupId(groupId).stream().map(lessonMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
@@ -59,7 +53,7 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
         if(groupId == 0L){
             throw new TimeTableStudentWithoutGroupException("Student with id: " + studentId + " not a member of any group");
         }
-        return lessonDao.findByGroupId(groupId).stream().map(lessonResponseMapper::mapEntityToDto)
+        return lessonDao.findByGroupId(groupId).stream().map(lessonMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
@@ -68,7 +62,7 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
     public List<LessonResponse> formTimeTableForProfessor(long professorId) {
         checkThatProfessorExist(professorId);
 
-        return lessonDao.findByProfessorId(professorId).stream().map(lessonResponseMapper::mapEntityToDto)
+        return lessonDao.findByProfessorId(professorId).stream().map(lessonMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
@@ -76,7 +70,7 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
     @Transactional(transactionManager = "txManager")
     public LessonResponse create(LessonRequest lessonRequest) {
 
-        Lesson lessonBeforeSave = lessonRequestMapper.mapDtoToEntity(lessonRequest);
+        Lesson lessonBeforeSave = lessonMapper.mapDtoToEntity(lessonRequest);
         Lesson lessonAfterSave = lessonDao.save(lessonBeforeSave);
 
         if(lessonRequest.getCourseId() != 0L){
@@ -92,7 +86,7 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
             changeFormOfLesson(lessonAfterSave.getId(), lessonRequest.getFormOfLessonId());
         }
 
-        return lessonResponseMapper.mapEntityToDto(lessonAfterSave);
+        return lessonMapper.mapEntityToDto(lessonAfterSave);
     }
 
     @Override
@@ -100,7 +94,7 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
         Lesson lesson = lessonDao.findById(id)
                 .orElseThrow(() -> new EntityDontExistException("There no lesson with id: " + id));
 
-        return lessonResponseMapper.mapEntityToDto(lesson);
+        return lessonMapper.mapEntityToDto(lesson);
     }
 
     @Override
@@ -109,7 +103,7 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
         int pageNumber = parsePageNumber(page, itemsCount, 1);
 
         return lessonDao.findAll(pageNumber, ITEMS_PER_PAGE).stream()
-                .map(lessonResponseMapper::mapEntityToDto)
+                .map(lessonMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
@@ -117,7 +111,7 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
     public List<LessonResponse> findAll() {
 
         return lessonDao.findAll().stream()
-                .map(lessonResponseMapper::mapEntityToDto)
+                .map(lessonMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
@@ -125,7 +119,7 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
     @Transactional(transactionManager = "txManager")
     public void edit(LessonRequest lessonRequest) {
 
-        lessonDao.update(lessonRequestMapper.mapDtoToEntity(lessonRequest));
+        lessonDao.update(lessonMapper.mapDtoToEntity(lessonRequest));
 
         if(lessonRequest.getCourseId() != 0L){
             changeCourse(lessonRequest.getId(), lessonRequest.getCourseId());

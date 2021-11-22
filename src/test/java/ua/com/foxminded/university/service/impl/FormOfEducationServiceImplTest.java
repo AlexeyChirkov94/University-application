@@ -11,8 +11,7 @@ import ua.com.foxminded.university.dao.interfaces.GroupDao;
 import ua.com.foxminded.university.dto.FormOfEducationRequest;
 import ua.com.foxminded.university.entity.FormOfEducation;
 import ua.com.foxminded.university.entity.Group;
-import ua.com.foxminded.university.mapper.interfaces.FormOfEducationRequestMapper;
-import ua.com.foxminded.university.mapper.interfaces.FormOfEducationResponseMapper;
+import ua.com.foxminded.university.mapper.FormOfEducationMapper;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -32,10 +31,7 @@ class FormOfEducationServiceImplTest {
     GroupDao groupDao;
 
     @Mock
-    FormOfEducationRequestMapper formOfEducationRequestMapper;
-
-    @Mock
-    FormOfEducationResponseMapper formOfEducationResponseMapper;
+    FormOfEducationMapper formOfEducationMapper;
 
     @InjectMocks
     FormOfEducationServiceImpl formOfEducationService;
@@ -117,12 +113,12 @@ class FormOfEducationServiceImplTest {
         FormOfEducationRequest formOfEducationRequest = new FormOfEducationRequest();
         formOfEducationRequest.setId(1L);
 
-        when(formOfEducationRequestMapper.mapDtoToEntity(formOfEducationRequest)).thenReturn(formOfEducation);
+        when(formOfEducationMapper.mapDtoToEntity(formOfEducationRequest)).thenReturn(formOfEducation);
         doNothing().when(formOfEducationDao).update(formOfEducation);
 
         formOfEducationService.edit(formOfEducationRequest);
 
-        verify(formOfEducationRequestMapper).mapDtoToEntity(formOfEducationRequest);
+        verify(formOfEducationMapper).mapDtoToEntity(formOfEducationRequest);
         verify(formOfEducationDao).update(formOfEducation);
     }
 

@@ -14,7 +14,6 @@ public class Professor extends User {
 
     Department department;
     ScienceDegree scienceDegree;
-    List<Course> courses;
 
     public ScienceDegree getScienceDegree() {
         return (scienceDegree == null) ? ScienceDegree.GRADUATE : scienceDegree;
@@ -22,11 +21,10 @@ public class Professor extends User {
 
     @Builder(setterPrefix = "with")
     protected Professor(Long id, String email, String password, String firstName, String lastName, Department department,
-                     ScienceDegree scienceDegree, List<Course> courses) {
+                     ScienceDegree scienceDegree) {
         super(id, email, password, firstName, lastName);
         this.department = department;
         this.scienceDegree = scienceDegree;
-        this.courses = courses;
     }
 
 }

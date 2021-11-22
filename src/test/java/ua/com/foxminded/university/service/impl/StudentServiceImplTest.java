@@ -12,8 +12,7 @@ import ua.com.foxminded.university.dao.interfaces.StudentDao;
 import ua.com.foxminded.university.dto.StudentRequest;
 import ua.com.foxminded.university.entity.Group;
 import ua.com.foxminded.university.entity.Student;
-import ua.com.foxminded.university.mapper.interfaces.StudentRequestMapper;
-import ua.com.foxminded.university.mapper.interfaces.StudentResponseMapper;
+import ua.com.foxminded.university.mapper.StudentMapper;
 import ua.com.foxminded.university.service.validator.UserValidator;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.Arrays;
@@ -38,10 +37,7 @@ class StudentServiceImplTest {
     PasswordEncoder passwordEncoder;
 
     @Mock
-    StudentRequestMapper studentRequestMapper;
-
-    @Mock
-    StudentResponseMapper studentResponseMapper;
+    StudentMapper studentMapper;
 
     @InjectMocks
     StudentServiceImpl studentService;
@@ -151,7 +147,7 @@ class StudentServiceImplTest {
         doNothing().when(userValidator).validate(studentRequest);
         when(studentDao.findByEmail(email)).thenReturn(Optional.empty());
         when(passwordEncoder.encode(password)).thenReturn(password);
-        when(studentRequestMapper.mapDtoToEntity(studentRequest)).thenReturn(student);
+        when(studentMapper.mapDtoToEntity(studentRequest)).thenReturn(student);
         when(studentDao.save(student)).thenReturn(student);
         when(studentDao.findById(1L)).thenReturn(Optional.of(student));
         when(groupDao.findById(1L)).thenReturn(Optional.of(group));
@@ -162,7 +158,7 @@ class StudentServiceImplTest {
         verify(userValidator).validate(studentRequest);
         verify(studentDao).findByEmail(email);
         verify(passwordEncoder).encode(password);
-        verify(studentRequestMapper).mapDtoToEntity(studentRequest);
+        verify(studentMapper).mapDtoToEntity(studentRequest);
         verify(studentDao).save(student);
         verify(studentDao).findById(1L);
         verify(groupDao).findById(1L);
@@ -182,7 +178,7 @@ class StudentServiceImplTest {
         doNothing().when(userValidator).validate(studentRequest);
         when(studentDao.findByEmail(email)).thenReturn(Optional.empty());
         when(passwordEncoder.encode(password)).thenReturn(password);
-        when(studentRequestMapper.mapDtoToEntity(studentRequest)).thenReturn(student);
+        when(studentMapper.mapDtoToEntity(studentRequest)).thenReturn(student);
         when(studentDao.save(student)).thenReturn(student);
 
         studentService.register(studentRequest);
@@ -190,7 +186,7 @@ class StudentServiceImplTest {
         verify(userValidator).validate(studentRequest);
         verify(studentDao).findByEmail(email);
         verify(passwordEncoder).encode(password);
-        verify(studentRequestMapper).mapDtoToEntity(studentRequest);
+        verify(studentMapper).mapDtoToEntity(studentRequest);
         verify(studentDao).save(student);
     }
 
@@ -278,7 +274,7 @@ class StudentServiceImplTest {
         studentRequest.setPassword(password);
         studentRequest.setGroupId(1L);
 
-        when(studentRequestMapper.mapDtoToEntity(studentRequest)).thenReturn(student);
+        when(studentMapper.mapDtoToEntity(studentRequest)).thenReturn(student);
         doNothing().when(studentDao).update(student);
         when(studentDao.findById(1L)).thenReturn(Optional.of(student));
         when(groupDao.findById(1L)).thenReturn(Optional.of(group));
@@ -286,7 +282,7 @@ class StudentServiceImplTest {
 
         studentService.edit(studentRequest);
 
-        verify(studentRequestMapper).mapDtoToEntity(studentRequest);
+        verify(studentMapper).mapDtoToEntity(studentRequest);
         verify(studentDao).update(student);
         verify(studentDao).findById(1L);
         verify(groupDao).findById(1L);
@@ -300,12 +296,12 @@ class StudentServiceImplTest {
         studentRequest.setId(1L);
         studentRequest.setGroupId(0L);
 
-        when(studentRequestMapper.mapDtoToEntity(studentRequest)).thenReturn(student);
+        when(studentMapper.mapDtoToEntity(studentRequest)).thenReturn(student);
         doNothing().when(studentDao).update(student);
 
         studentService.edit(studentRequest);
 
-        verify(studentRequestMapper).mapDtoToEntity(studentRequest);
+        verify(studentMapper).mapDtoToEntity(studentRequest);
         verify(studentDao).update(student);
     }
 

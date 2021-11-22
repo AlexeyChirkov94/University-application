@@ -12,16 +12,12 @@ import ua.com.foxminded.university.dao.interfaces.GroupDao;
 import ua.com.foxminded.university.dao.interfaces.LessonDao;
 import ua.com.foxminded.university.dao.interfaces.StudentDao;
 import ua.com.foxminded.university.dto.GroupRequest;
-import ua.com.foxminded.university.dto.GroupResponse;
 import ua.com.foxminded.university.entity.Department;
 import ua.com.foxminded.university.entity.FormOfEducation;
 import ua.com.foxminded.university.entity.Group;
 import ua.com.foxminded.university.entity.Lesson;
 import ua.com.foxminded.university.entity.Student;
-import ua.com.foxminded.university.mapper.interfaces.GroupRequestMapper;
-import ua.com.foxminded.university.mapper.interfaces.GroupResponseMapper;
-import ua.com.foxminded.university.service.exception.EntityAlreadyExistException;
-
+import ua.com.foxminded.university.mapper.GroupMapper;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -47,10 +43,7 @@ class GroupServiceImplTest {
     DepartmentDao departmentDao;
 
     @Mock
-    GroupRequestMapper groupRequestMapper;
-
-    @Mock
-    GroupResponseMapper groupResponseMapper;
+    GroupMapper groupMapper;
 
     @Mock
     FormOfEducationDao formOfEducationDao;
@@ -181,7 +174,7 @@ class GroupServiceImplTest {
         groupRequest.setFormOfEducationId(1L);
 
         when(groupDao.findByName(groupName)).thenReturn(Optional.empty());
-        when(groupRequestMapper.mapDtoToEntity(groupRequest)).thenReturn(group);
+        when(groupMapper.mapDtoToEntity(groupRequest)).thenReturn(group);
         when(groupDao.save(group)).thenReturn(group);
         when(groupDao.findById(1L)).thenReturn(Optional.of(group));
         when(departmentDao.findById(1L)).thenReturn(Optional.of(department));
@@ -192,7 +185,7 @@ class GroupServiceImplTest {
         groupService.create(groupRequest);
 
         verify(groupDao).findByName(groupName);
-        verify(groupRequestMapper).mapDtoToEntity(groupRequest);
+        verify(groupMapper).mapDtoToEntity(groupRequest);
         verify(groupDao).save(group);
         verify(groupDao, times(2)).findById(1L);
         verify(departmentDao).findById(1L);
@@ -211,13 +204,13 @@ class GroupServiceImplTest {
         groupRequest.setFormOfEducationId(0L);
 
         when(groupDao.findByName(groupName)).thenReturn(Optional.empty());
-        when(groupRequestMapper.mapDtoToEntity(groupRequest)).thenReturn(group);
+        when(groupMapper.mapDtoToEntity(groupRequest)).thenReturn(group);
         when(groupDao.save(group)).thenReturn(group);
 
         groupService.create(groupRequest);
 
         verify(groupDao).findByName(groupName);
-        verify(groupRequestMapper).mapDtoToEntity(groupRequest);
+        verify(groupMapper).mapDtoToEntity(groupRequest);
         verify(groupDao).save(group);
     }
 
@@ -322,7 +315,7 @@ class GroupServiceImplTest {
         groupRequest.setDepartmentId(1L);
         groupRequest.setFormOfEducationId(1L);
 
-        when(groupRequestMapper.mapDtoToEntity(groupRequest)).thenReturn(group);
+        when(groupMapper.mapDtoToEntity(groupRequest)).thenReturn(group);
         doNothing().when(groupDao).update(group);
         when(groupDao.findById(1L)).thenReturn(Optional.of(group));
         when(departmentDao.findById(1L)).thenReturn(Optional.of(department));
@@ -332,7 +325,7 @@ class GroupServiceImplTest {
 
         groupService.edit(groupRequest);
 
-        verify(groupRequestMapper).mapDtoToEntity(groupRequest);
+        verify(groupMapper).mapDtoToEntity(groupRequest);
         verify(groupDao).update(group);
         verify(groupDao ,times(2)).findById(1L);
         verify(departmentDao).findById(1L);
@@ -349,12 +342,12 @@ class GroupServiceImplTest {
         groupRequest.setDepartmentId(0L);
         groupRequest.setFormOfEducationId(0L);
 
-        when(groupRequestMapper.mapDtoToEntity(groupRequest)).thenReturn(group);
+        when(groupMapper.mapDtoToEntity(groupRequest)).thenReturn(group);
         doNothing().when(groupDao).update(group);
 
         groupService.edit(groupRequest);
 
-        verify(groupRequestMapper).mapDtoToEntity(groupRequest);
+        verify(groupMapper).mapDtoToEntity(groupRequest);
         verify(groupDao).update(group);
     }
 

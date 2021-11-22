@@ -13,8 +13,7 @@ import ua.com.foxminded.university.dto.GroupResponse;
 import ua.com.foxminded.university.entity.Group;
 import ua.com.foxminded.university.entity.Lesson;
 import ua.com.foxminded.university.entity.Student;
-import ua.com.foxminded.university.mapper.interfaces.GroupRequestMapper;
-import ua.com.foxminded.university.mapper.interfaces.GroupResponseMapper;
+import ua.com.foxminded.university.mapper.GroupMapper;
 import ua.com.foxminded.university.service.exception.EntityAlreadyExistException;
 import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.interfaces.GroupService;
@@ -30,8 +29,7 @@ public class GroupServiceImpl extends AbstractPageableCrudService implements Gro
     private final FormOfEducationDao formOfEducationDao;
     private final DepartmentDao departmentDao;
     private final LessonDao lessonDao;
-    private final GroupRequestMapper groupRequestMapper;
-    private final GroupResponseMapper groupResponseMapper;
+    private final GroupMapper groupMapper;
 
     @Override
     @Transactional(transactionManager = "txManager")
@@ -69,7 +67,7 @@ public class GroupServiceImpl extends AbstractPageableCrudService implements Gro
         if (groupDao.findByName(groupRequest.getName()).isPresent()){
             throw new EntityAlreadyExistException("Group with same name already exist");
         } else {
-            Group groupBeforeSave = groupRequestMapper.mapDtoToEntity(groupRequest);
+            Group groupBeforeSave = groupMapper.mapDtoToEntity(groupRequest);
             Group groupAfterSave = groupDao.save(groupBeforeSave);
 
             if(groupRequest.getDepartmentId() != 0L){
@@ -80,7 +78,7 @@ public class GroupServiceImpl extends AbstractPageableCrudService implements Gro
                 changeFormOfEducation(groupAfterSave.getId(), groupRequest.getFormOfEducationId());
             }
 
-            return groupResponseMapper.mapEntityToDto(groupAfterSave);
+            return groupMapper.mapEntityToDto(groupAfterSave);
         }
     }
 
@@ -89,14 +87,14 @@ public class GroupServiceImpl extends AbstractPageableCrudService implements Gro
         Group group = groupDao.findById(id)
                 .orElseThrow(() -> new EntityDontExistException("There no group with id: " + id));
 
-        return groupResponseMapper.mapEntityToDto(group);
+        return groupMapper.mapEntityToDto(group);
     }
 
     @Override
     public List<GroupResponse> findByFormOfEducation(long formOfEducationId) {
         checkThatFormOfEducationExist(formOfEducationId);
 
-        return groupDao.findByFormOfEducation(formOfEducationId).stream().map(groupResponseMapper::mapEntityToDto)
+        return groupDao.findByFormOfEducation(formOfEducationId).stream().map(groupMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
@@ -104,7 +102,7 @@ public class GroupServiceImpl extends AbstractPageableCrudService implements Gro
     public List<GroupResponse> findByDepartmentId(long departmentId) {
         checkThatDepartmentExist(departmentId);
 
-        return groupDao.findByDepartmentId(departmentId).stream().map(groupResponseMapper::mapEntityToDto)
+        return groupDao.findByDepartmentId(departmentId).stream().map(groupMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
@@ -114,7 +112,7 @@ public class GroupServiceImpl extends AbstractPageableCrudService implements Gro
         int pageNumber = parsePageNumber(page, itemsCount, 1);
 
         return groupDao.findAll(pageNumber, ITEMS_PER_PAGE).stream()
-                .map(groupResponseMapper::mapEntityToDto)
+                .map(groupMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
@@ -122,7 +120,7 @@ public class GroupServiceImpl extends AbstractPageableCrudService implements Gro
     public List<GroupResponse> findAll() {
 
         return groupDao.findAll().stream()
-                .map(groupResponseMapper::mapEntityToDto)
+                .map(groupMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
@@ -130,7 +128,7 @@ public class GroupServiceImpl extends AbstractPageableCrudService implements Gro
     @Transactional(transactionManager = "txManager")
     public void edit(GroupRequest groupRequest) {
 
-        groupDao.update(groupRequestMapper.mapDtoToEntity(groupRequest));
+        groupDao.update(groupMapper.mapDtoToEntity(groupRequest));
 
         if(groupRequest.getDepartmentId() != 0L){
             changeDepartment(groupRequest.getId(), groupRequest.getDepartmentId());

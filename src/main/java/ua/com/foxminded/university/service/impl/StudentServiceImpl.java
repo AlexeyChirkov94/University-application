@@ -8,8 +8,7 @@ import ua.com.foxminded.university.dao.interfaces.StudentDao;
 import ua.com.foxminded.university.dto.StudentRequest;
 import ua.com.foxminded.university.dto.StudentResponse;
 import ua.com.foxminded.university.entity.Student;
-import ua.com.foxminded.university.mapper.interfaces.StudentRequestMapper;
-import ua.com.foxminded.university.mapper.interfaces.StudentResponseMapper;
+import ua.com.foxminded.university.mapper.StudentMapper;
 import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.interfaces.StudentService;
 import ua.com.foxminded.university.service.validator.UserValidator;
@@ -23,18 +22,16 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
     private final StudentDao studentDao;
     private final GroupDao groupDao;
     private final UserValidator userValidator;
-    private final StudentRequestMapper studentRequestMapper;
-    private final StudentResponseMapper studentResponseMapper;
+    private final StudentMapper studentMapper;
 
 
     public StudentServiceImpl(StudentDao studentDao,GroupDao groupDao, PasswordEncoder passwordEncoder, UserValidator userValidator,
-                              StudentRequestMapper studentRequestMapper, StudentResponseMapper studentResponseMapper) {
+                              StudentMapper studentMapper) {
         super(passwordEncoder, studentDao, userValidator);
         this.studentDao = studentDao;
         this.groupDao = groupDao;
         this.userValidator = userValidator;
-        this.studentRequestMapper = studentRequestMapper;
-        this.studentResponseMapper = studentResponseMapper;
+        this.studentMapper = studentMapper;
     }
 
     @Override
@@ -42,7 +39,7 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
         Student student = studentDao.findById(id)
                 .orElseThrow(() -> new EntityDontExistException("There no student with id: " + id));
 
-        return studentResponseMapper.mapEntityToDto(student);
+        return studentMapper.mapEntityToDto(student);
     }
 
     @Override
@@ -51,7 +48,7 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
         int pageNumber = parsePageNumber(page, itemsCount, 1);
 
         return studentDao.findAll(pageNumber, ITEMS_PER_PAGE).stream()
-                .map(studentResponseMapper::mapEntityToDto)
+                .map(studentMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
@@ -59,7 +56,7 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
     public List<StudentResponse> findAll() {
 
         return studentDao.findAll().stream()
-                .map(studentResponseMapper::mapEntityToDto)
+                .map(studentMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
@@ -67,7 +64,7 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
     public List<StudentResponse> findByGroupId(long groupId) {
 
         return studentDao.findByGroupId(groupId).stream()
-                .map(studentResponseMapper::mapEntityToDto)
+                .map(studentMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
@@ -77,7 +74,7 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
         userValidator.validate(studentRequest);
         studentRequest.setPassword(passwordEncoder.encode(studentRequest.getPassword()));
 
-        studentDao.update(studentRequestMapper.mapDtoToEntity(studentRequest));
+        studentDao.update(studentMapper.mapDtoToEntity(studentRequest));
 
         if(studentRequest.getGroupId() != 0L){
             changeGroup(studentRequest.getId(), studentRequest.getGroupId());
@@ -95,7 +92,7 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
 
     @Override
     public Optional<StudentResponse> findByEmail(String email) {
-        return studentDao.findByEmail(email).map(studentResponseMapper::mapEntityToDto);
+        return studentDao.findByEmail(email).map(studentMapper::mapEntityToDto);
     }
 
     @Override
@@ -123,14 +120,14 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
     @Override
     @Transactional(transactionManager = "txManager")
     protected StudentResponse registerCertainUser(StudentRequest studentRequest) {
-        Student studentBeforeSave = studentRequestMapper.mapDtoToEntity(studentRequest);
+        Student studentBeforeSave = studentMapper.mapDtoToEntity(studentRequest);
         Student studentAfterSave = studentDao.save(studentBeforeSave);
 
         if(studentRequest.getGroupId() != 0L){
             changeGroup(studentAfterSave.getId(), studentRequest.getGroupId());
         }
 
-        return studentResponseMapper.mapEntityToDto(studentAfterSave);
+        return studentMapper.mapEntityToDto(studentAfterSave);
     }
 
 }

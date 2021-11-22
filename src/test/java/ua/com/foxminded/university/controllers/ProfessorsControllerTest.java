@@ -187,7 +187,6 @@ public class ProfessorsControllerTest {
         professorResponse.setLastName("Chirkov");
         professorResponse.setEmail("chirkov@gamil.com");
         professorResponse.setPassword("1234");
-        professorResponse.setCoursesResponse(professorCourses);
         professorResponse.setScienceDegreeResponse(ScienceDegreeResponse.GRADUATE);
 
         ProfessorRequest professorRequest = new ProfessorRequest();

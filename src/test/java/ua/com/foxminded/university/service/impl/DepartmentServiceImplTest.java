@@ -15,8 +15,7 @@ import ua.com.foxminded.university.entity.Course;
 import ua.com.foxminded.university.entity.Department;
 import ua.com.foxminded.university.entity.Group;
 import ua.com.foxminded.university.entity.Professor;
-import ua.com.foxminded.university.mapper.interfaces.DepartmentRequestMapper;
-import ua.com.foxminded.university.mapper.interfaces.DepartmentResponseMapper;
+import ua.com.foxminded.university.mapper.DepartmentMapper;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -41,10 +40,7 @@ class DepartmentServiceImplTest {
     GroupDao groupDao;
 
     @Mock
-    DepartmentRequestMapper departmentRequestMapper;
-
-    @Mock
-    DepartmentResponseMapper departmentResponseMapper;
+    DepartmentMapper departmentMapper;
 
     @InjectMocks
     DepartmentServiceImpl departmentService;
@@ -125,12 +121,12 @@ class DepartmentServiceImplTest {
         DepartmentRequest departmentRequest = new DepartmentRequest();
         departmentRequest.setId(1L);
 
-        when(departmentRequestMapper.mapDtoToEntity(departmentRequest)).thenReturn(department);
+        when(departmentMapper.mapDtoToEntity(departmentRequest)).thenReturn(department);
         doNothing().when(departmentDao).update(department);
 
         departmentService.edit(departmentRequest);
 
-        verify(departmentRequestMapper).mapDtoToEntity(departmentRequest);
+        verify(departmentMapper).mapDtoToEntity(departmentRequest);
         verify(departmentDao).update(department);
     }
 

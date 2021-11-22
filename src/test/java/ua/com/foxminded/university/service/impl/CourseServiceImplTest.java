@@ -15,8 +15,7 @@ import ua.com.foxminded.university.entity.Course;
 import ua.com.foxminded.university.entity.Department;
 import ua.com.foxminded.university.entity.Lesson;
 import ua.com.foxminded.university.entity.Professor;
-import ua.com.foxminded.university.mapper.interfaces.CourseRequestMapper;
-import ua.com.foxminded.university.mapper.interfaces.CourseResponseMapper;
+import ua.com.foxminded.university.mapper.CourseMapper;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -42,10 +41,8 @@ class CourseServiceImplTest {
     LessonDao lessonDao;
 
     @Mock
-    CourseRequestMapper courseRequestMapper;
+    CourseMapper courseMapper;
 
-    @Mock
-    CourseResponseMapper courseResponseMapper;
 
     @InjectMocks
     CourseServiceImpl courseService;
@@ -196,7 +193,7 @@ class CourseServiceImplTest {
         Course courseBeforeSave = Course.builder().withName("Math").build();
         Course courseAfterSave = Course.builder().withId(1L).withName("Math").build();
 
-        when(courseRequestMapper.mapDtoToEntity(courseRequest)).thenReturn(courseBeforeSave);
+        when(courseMapper.mapDtoToEntity(courseRequest)).thenReturn(courseBeforeSave);
         when(courseDao.save(courseBeforeSave)).thenReturn(courseAfterSave);
         when(courseDao.findByName("Math")).thenReturn(Optional.empty());
         when(courseDao.findById(1L)).thenReturn(Optional.of(courseAfterSave));
@@ -205,13 +202,14 @@ class CourseServiceImplTest {
 
         courseService.create(courseRequest);
 
-        verify(courseRequestMapper).mapDtoToEntity(courseRequest);
+        verify(courseMapper).mapDtoToEntity(courseRequest);
+        verify(courseMapper).mapEntityToDto(courseAfterSave);
         verify(courseDao).save(courseBeforeSave);
         verify(courseDao).findByName("Math");
         verify(courseDao).findById(1L);
         verify(departmentDao).findById(1L);
         verify(courseDao).changeDepartment(1L, 1L);
-        verifyNoMoreInteractions(courseRequestMapper);
+        verifyNoMoreInteractions(courseMapper);
         verifyNoMoreInteractions(courseDao);
         verifyNoMoreInteractions(departmentDao);
     }
@@ -294,12 +292,12 @@ class CourseServiceImplTest {
         courseRequest.setId(1L);
         courseRequest.setDepartmentId(0L);
 
-        when(courseRequestMapper.mapDtoToEntity(courseRequest)).thenReturn(course);
+        when(courseMapper.mapDtoToEntity(courseRequest)).thenReturn(course);
         doNothing().when(courseDao).update(course);
 
         courseService.edit(courseRequest);
 
-        verify(courseRequestMapper).mapDtoToEntity(courseRequest);
+        verify(courseMapper).mapDtoToEntity(courseRequest);
         verify(courseDao).update(course);
     }
 
@@ -311,7 +309,7 @@ class CourseServiceImplTest {
         courseRequest.setId(1L);
         courseRequest.setDepartmentId(1L);
 
-        when(courseRequestMapper.mapDtoToEntity(courseRequest)).thenReturn(course);
+        when(courseMapper.mapDtoToEntity(courseRequest)).thenReturn(course);
         doNothing().when(courseDao).update(course);
         when(courseDao.findById(1L)).thenReturn(Optional.of(course));
         when(departmentDao.findById(1L)).thenReturn(Optional.of(department));
@@ -319,12 +317,12 @@ class CourseServiceImplTest {
 
         courseService.edit(courseRequest);
 
-        verify(courseRequestMapper).mapDtoToEntity(courseRequest);
+        verify(courseMapper).mapDtoToEntity(courseRequest);
         verify(courseDao).update(course);
         verify(courseDao).findById(1L);
         verify(departmentDao).findById(1L);
         verify(courseDao).changeDepartment(1L, 1L);
-        verifyNoMoreInteractions(courseRequestMapper);
+        verifyNoMoreInteractions(courseMapper);
         verifyNoMoreInteractions(courseDao);
         verifyNoMoreInteractions(departmentDao);
     }
@@ -336,18 +334,18 @@ class CourseServiceImplTest {
         courseRequest.setId(1L);
         courseRequest.setDepartmentId(1L);
 
-        when(courseRequestMapper.mapDtoToEntity(courseRequest)).thenReturn(course);
+        when(courseMapper.mapDtoToEntity(courseRequest)).thenReturn(course);
         doNothing().when(courseDao).update(course);
         when(courseDao.findById(1L)).thenReturn(Optional.of(course));
         when(departmentDao.findById(1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> courseService.edit(courseRequest)).hasMessage("There no department with id: 1");
 
-        verify(courseRequestMapper).mapDtoToEntity(courseRequest);
+        verify(courseMapper).mapDtoToEntity(courseRequest);
         verify(courseDao).update(course);
         verify(courseDao).findById(1L);
         verify(departmentDao).findById(1L);
-        verifyNoMoreInteractions(courseRequestMapper);
+        verifyNoMoreInteractions(courseMapper);
         verifyNoMoreInteractions(courseDao);
         verifyNoMoreInteractions(departmentDao);
     }
