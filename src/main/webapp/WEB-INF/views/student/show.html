@@ -24,12 +24,18 @@
             <li class="list-group-item" th:text="#{group} + ': ' + ${student.getGroupResponse().getName()} +
                             ' (ID: ' + ${student.getGroupResponse().getId()} + ')'">group</li>
             <li class="list-group-item"><a class="btn btn-success" th:href="@{/student/{id}/timetable(id=${student.getId()})}" role="button" th:text="#{show.timetable}">Show timetable</a></li>
-            <li class="list-group-item"><a class="btn btn-info" th:href="@{/student/{id}/edit(id=${student.getId()})}" role="button" th:text="#{edit}">Edit</a></li>
-            <li class="list-group-item">
-                <form th:method="DELETE" th:action="@{/student/{id}(id=${student.getId()})}">
-                    <input class="btn btn-danger" type="submit" th:value="#{delete}"/>
-                </form>
-            </li>
+            <div sec:authorize="hasAuthority('WRITE_PRIVILEGE')">
+                <li class="list-group-item"><a class="btn btn-info" th:href="@{/student/{id}/edit(id=${student.getId()})}" role="button" th:text="#{edit}">Edit</a></li>
+
+            </div>
+            <div sec:authorize="hasAuthority('DELETE_PRIVILEGE')">
+                <li class="list-group-item">
+                    <form th:method="DELETE" th:action="@{/student/{id}(id=${student.getId()})}">
+                        <input class="btn btn-danger" type="submit" th:value="#{delete}"/>
+                    </form>
+                </li>
+            </div>
+
         </ul>
     </div>
 

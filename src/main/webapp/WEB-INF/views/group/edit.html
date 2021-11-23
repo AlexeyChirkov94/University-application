@@ -49,6 +49,8 @@
 
     <h4 th:text="#{students.of.group}">Group students</h4>
     <h6 th:text="#{current.students} + ': '">Current students:</h6>
+
+    <div th:if="${studentsCurrentGroup.size > 0}">
     <table class="table table-striped">
         <thead>
         <tr>
@@ -76,6 +78,10 @@
         </div>
         </tbody>
     </table>
+    </div>
+    <div th:unless="${studentsCurrentGroup.size > 0}">
+        <text th:text="#{group.have.no.students}"> This group have no students yet </text>
+    </div>
     <br>
 
     <h6 th:text="#{management} + ':'">Management:</h6>
@@ -91,6 +97,7 @@
         </select>
         <button class="btn btn-success" type="submit" th:text="#{add.student.to.group}">Add student to group</button>
     </form>
+    <div th:if="${studentsCurrentGroup.size > 0}">
     <form method="post" th:action="@{/group/{id}/remove/student/(id=${groupResponse.getId()})}">
         <select class="form-select  mb-2" name="idRemovingStudent">
             <option selected="" disabled="" value="" th:text="#{choose.student.for.removing.from.group}">Choose student for removing from group:</option>
@@ -102,6 +109,7 @@
         </select>
         <button class="btn btn-danger" type="submit" th:text="#{remove.student.from.group}">Remove student from group</button>
     </form>
+    </div>
     <br>
 
 </section>

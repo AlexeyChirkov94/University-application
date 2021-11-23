@@ -1,4 +1,4 @@
-package ua.com.foxminded.university.config;
+package ua.com.foxminded.university.configuration;
 
 import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
@@ -14,7 +14,7 @@ public class WebApplicationInitializer extends AbstractAnnotationConfigDispatche
 
     @Override
     protected Class<?>[] getServletConfigClasses() {
-        return new Class[] {WebMvcConfiguration.class};
+        return new Class[] {WebApplicationConfiguration.class};
     }
 
     @Override

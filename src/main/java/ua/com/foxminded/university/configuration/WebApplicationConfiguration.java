@@ -1,4 +1,4 @@
-package ua.com.foxminded.university.config;
+package ua.com.foxminded.university.configuration;
 
 import lombok.AllArgsConstructor;
 import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
@@ -17,6 +17,7 @@ import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
+import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.spring5.view.ThymeleafViewResolver;
@@ -26,7 +27,7 @@ import java.util.Locale;
 @ComponentScan(basePackages = "ua.com.foxminded.university")
 @EnableWebMvc
 @AllArgsConstructor
-public class WebMvcConfiguration implements WebMvcConfigurer {
+public class WebApplicationConfiguration implements WebMvcConfigurer {
 
     private ApplicationContext applicationContext;
 
@@ -49,6 +50,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     public SpringTemplateEngine templateEngine() {
         SpringTemplateEngine templateEngine = new SpringTemplateEngine();
         templateEngine.addDialect(new LayoutDialect());
+        templateEngine.addDialect(new SpringSecurityDialect());
         templateEngine.setTemplateResolver(templateResolver());
         templateEngine.setEnableSpringELCompiler(true);
         return templateEngine;
@@ -96,6 +98,10 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/").setViewName("index");
+        registry.addViewController("/features").setViewName("featuresView");
+        registry.addViewController("/about").setViewName("aboutView");
+        registry.addViewController("/registration").setViewName("registrationView");
+        registry.addViewController("/login").setViewName("loginView");
     }
 
     @Override

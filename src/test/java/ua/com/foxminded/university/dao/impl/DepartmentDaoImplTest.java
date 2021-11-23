@@ -6,13 +6,11 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import ua.com.foxminded.university.TestsContextConfiguration;
 import ua.com.foxminded.university.dao.interfaces.DepartmentDao;
 import ua.com.foxminded.university.entity.Department;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ua.com.foxminded.university.testUtils.TestUtility.assertDepartments;
-import static ua.com.foxminded.university.testUtils.TestUtility.assertUsers;
 
 class DepartmentDaoImplTest {
 

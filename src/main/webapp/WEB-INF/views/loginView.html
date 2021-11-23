@@ -14,18 +14,27 @@
 
 <section layout:fragment="page-content">
 
+    <div class="row">
+
+        <div class="col-3">
+        </div>
+        <div class="col-6">
             <main class="form-signin text-center justify-content-center">
-                <form>
+                <form method="post" action="/perform_login" class="mb-2">
                     <img class="mb-7" src="../../resources/png/university-logo.png" alt="" width="50" height="50">
                     <h1 class="h3 mb-3 fw-normal" th:text="#{please.sign.in}"> Please sign in </h1>
 
+                    <div class="form-signin text-center justify-content-center" th:if="${param.error}">
+                        <h6 class="text-danger" th:text="#{invalid.email.or.password}">Invalid email or password</h6>
+                    </div>
+
                     <div class="form-floating mb-3">
-                        <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
-                        <label for="floatingInput" th:text="#{email.address}">Email address</label>
+                        <input type="email" class="form-control" name='username' id="email" placeholder="name@example.com">
+                        <label for="email" th:text="#{email.address}">Email address</label>
                     </div>
                     <div class="form-floating mb-3">
-                        <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
-                        <label for="floatingPassword" th:text="#{password}">Password</label>
+                        <input type="password" class="form-control" name='password' id="password" placeholder="Password">
+                        <label for="password" th:text="#{password}">Password</label>
                     </div>
 
                     <div class="checkbox mb-3">
@@ -33,9 +42,14 @@
                             <input type="checkbox" value="remember-me" th:text="#{remember.me}">
                         </label>
                     </div>
-                    <button class="w-100 btn btn-lg btn-success" type="submit" th:text="#{sign.in}">Sign in</button>
+                    <button class="w-100 btn btn-lg btn-success" name="submit" type="submit" value="submit" th:text="#{sign.in}">Sign in</button>
                 </form>
             </main>
+        </div>
+        <div class="col-3">
+        </div>
+
+    </div>
 
 </section>
 

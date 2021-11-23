@@ -10,8 +10,9 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import ua.com.foxminded.university.config.PersistenceContext;
-import ua.com.foxminded.university.config.WebMvcConfiguration;
+import ua.com.foxminded.university.configuration.PersistenceContext;
+import ua.com.foxminded.university.configuration.WebApplicationConfiguration;
+import ua.com.foxminded.university.configuration.WebSecurityConfiguration;
 import ua.com.foxminded.university.service.interfaces.CourseService;
 import ua.com.foxminded.university.service.interfaces.DepartmentService;
 import ua.com.foxminded.university.service.interfaces.FormOfEducationService;
@@ -28,7 +29,7 @@ import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.
 @Configuration
 @ComponentScan(basePackages = "ua.com.foxminded.university",
         excludeFilters = @ComponentScan.Filter(type= FilterType.ASSIGNABLE_TYPE,
-                value= {WebMvcConfiguration.class, PersistenceContext.class}))
+                value= {PersistenceContext.class, WebApplicationConfiguration.class, WebSecurityConfiguration.class}))
 public class TestsContextConfiguration implements WebMvcConfigurer {
 
     @Bean

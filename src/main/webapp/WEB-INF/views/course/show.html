@@ -26,7 +26,7 @@
                 <div class="row justify-content-left">
                     <div class="col-2" th:text="#{teachers.of.course} + ':'">Teachers of course: </div>
                     <div class="col-10">
-
+                        <div th:if="${teachersOfCourse.size > 0}">
                         <table class="table table-striped">
                             <thead>
                             <tr>
@@ -49,18 +49,24 @@
                             </div>
                             </tbody>
                         </table>
-
+                        </div>
+                        <div th:unless="${teachersOfCourse.size > 0}">
+                            <text th:text="#{course.have.no.teachers}"> This course have no teachers yet </text>
+                        </div>
                     </div>
                 </div>
             </li>
-
-            <li class="list-group-item"><a class="btn btn-info" th:href="@{/course/{id}/edit(id=${course.getId()})}" role="button" th:text="#{edit}">Edit</a></li>
-            <li class="list-group-item">
-                <form th:method="DELETE" th:action="@{/course/{id}(id=${course.getId()})}">
-                    <input class="btn btn-danger" type="submit" th:value="#{delete}"/>
-                    <text th:text="#{course.delete.warning}">Be careful, all lessons of this course will lose course</text>
-                </form>
-            </li>
+            <div sec:authorize="hasAuthority('WRITE_PRIVILEGE')">
+                <li class="list-group-item"><a class="btn btn-info" th:href="@{/course/{id}/edit(id=${course.getId()})}" role="button" th:text="#{edit}">Edit</a></li>
+            </div>
+            <div sec:authorize="hasAuthority('DELETE_PRIVILEGE')">
+                <li class="list-group-item">
+                    <form th:method="DELETE" th:action="@{/course/{id}(id=${course.getId()})}">
+                        <input class="btn btn-danger" type="submit" th:value="#{delete}"/>
+                        <text th:text="#{course.delete.warning}">Be careful, all lessons of this course will lose course</text>
+                    </form>
+                </li>
+            </div>
         </ul>
     </div>
 

@@ -34,6 +34,8 @@
 
     <h4 th:text="#{professors.of.department}">Professors of department</h4>
     <h6 th:text="#{current.professors} + ':'">Current professors:</h6>
+
+    <div th:if="${departmentProfessors.size > 0}">
     <table class="table table-striped">
         <thead>
         <tr>
@@ -61,6 +63,10 @@
         </div>
         </tbody>
     </table>
+    </div>
+    <div th:unless="${departmentProfessors.size > 0}">
+        <text th:text="#{department.have.no.professors}"> This department have no professors yet </text>
+    </div>
     <br>
 
     <h6 th:text="#{management} + ':'">Management:</h6>
@@ -76,6 +82,7 @@
         </select>
         <button class="btn btn-success" type="submit" th:text="#{add.professor.to.department}">Add professor to department</button>
     </form>
+    <div th:if="${departmentProfessors.size > 0}">
     <form method="post" th:action="@{/department/{id}/remove/professor/(id=${departmentRequest.getId()})}" class="mb-2">
         <select class="form-select  mb-2" name="idRemovingProfessor">
             <option selected="" disabled="" value="" th:text="#{choose.professor.for.removing.from.department}">Choose professor for removing from department:</option>
@@ -88,12 +95,15 @@
         </select>
         <button class="btn btn-danger" type="submit" th:text="#{remove.professor.from.department}">Remove professor from this department</button>
     </form>
+    </div>
 
     <hr>
     <br>
 
     <h4 th:text="#{courses.of.department}">Department courses</h4>
     <h6 th:text="#{current.courses} + ':'">Current courses:</h6>
+
+    <div th:if="${departmentCourses.size > 0}">
     <table class="table table-striped">
         <thead>
         <tr>
@@ -117,6 +127,10 @@
         </div>
         </tbody>
     </table>
+    </div>
+    <div th:unless="${departmentCourses.size > 0}">
+        <text th:text="#{department.have.no.courses}"> This department have no courses yet </text>
+    </div>
     <br>
 
     <h6 th:text="#{management} + ':'">Management:</h6>
@@ -131,6 +145,7 @@
         </select>
         <button class="btn btn-success" type="submit" th:text="#{add.course.to.department}">Add course to department</button>
     </form>
+    <div th:if="${departmentCourses.size > 0}">
     <form method="post" th:action="@{/department/{id}/remove/course/(id=${departmentRequest.getId()})}" class="mb-2">
         <select class="form-select  mb-2" name="idRemovingCourse">
             <option selected="" disabled="" value="" th:text="#{choose.course.for.removing.from.department}">Choose course for removing from department:</option>
@@ -141,12 +156,15 @@
         </select>
         <button class="btn btn-danger" type="submit" th:text="#{remove.course.from.department}">Remove course from this department</button>
     </form>
+    </div>
 
     <hr>
     <br>
 
     <h4 th:text="#{groups.of.department}">Department groups</h4>
     <h6 th:text="#{current.groups} + ':'">Current groups:</h6>
+
+    <div th:if="${departmentGroups.size > 0}">
     <table class="table table-striped">
         <thead>
         <tr>
@@ -172,6 +190,10 @@
         </div>
         </tbody>
     </table>
+    </div>
+    <div th:unless="${departmentGroups.size > 0}">
+        <text th:text="#{department.have.no.groups}"> This department have no groups yet </text>
+    </div>
     <br>
 
     <h6 th:text="#{management} + ':'">Management:</h6>
@@ -186,6 +208,7 @@
         </select>
         <button class="btn btn-success" type="submit" th:text="#{add.group.to.department}">Add group to department</button>
     </form>
+    <div th:if="${departmentGroups.size > 0}">
     <form method="post" th:action="@{/department/{id}/remove/group/(id=${departmentRequest.getId()})}" class="mb-2">
         <select class="form-select  mb-2" name="idRemovingGroup">
             <option selected="" disabled="" value="" th:text="#{choose.group.for.removing.from.department}">Choose group for removing from department:</option>
@@ -196,6 +219,7 @@
         </select>
         <button class="btn btn-danger" type="submit" th:text="#{remove.group.from.department}">Remove group from this department</button>
     </form>
+    </div>
 
 </section>
 

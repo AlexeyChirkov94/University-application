@@ -1,4 +1,8 @@
 drop table if exists "PROFESSOR_COURSE" CASCADE;
+drop table if exists "ROLE_PRIVILEGE" CASCADE;
+drop table if exists "USER_ROLE" CASCADE;
+drop table if exists "USERSROLES" CASCADE;
+drop table if exists "PRIVILEGES" CASCADE;
 drop table if exists "USERS" CASCADE;
 drop table if exists "LESSONS" CASCADE;
 drop table if exists "FORMSOFLESSON" CASCADE;
@@ -54,6 +58,32 @@ create table USERS
     group_id bigint references GROUPS(id),
     department_id bigint references DEPARTMENTS(id),
     scienceDegree_id int
+
+);
+
+create table USERSROLES
+(
+    id serial primary key,
+    name varchar(50)
+
+);
+
+create table PRIVILEGES
+(
+    id serial primary key,
+    name varchar(50)
+);
+
+create table USER_ROLE
+(
+    user_id bigint references users(id),
+    role_id bigint references USERSROLES(id)
+);
+
+create table ROLE_PRIVILEGE
+(
+    role_id bigint references USERSROLES(id),
+    privilege_id bigint references PRIVILEGES(id)
 
 );
 

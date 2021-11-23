@@ -14,7 +14,7 @@
   <properties>
     <junit.jupiter.version>5.4.0</junit.jupiter.version>
     <org.springframework.version>5.3.9</org.springframework.version>
-    <org.springframework.security.version>5.5.0</org.springframework.security.version>
+    <org.springframework.security.version>5.6.0</org.springframework.security.version>
     <org.assertj.version>3.16.1</org.assertj.version>
     <org.apache.maven.plugins.version>2.22.1</org.apache.maven.plugins.version>
     <org.jacoco.version>0.8.7</org.jacoco.version>
@@ -27,6 +27,7 @@
     <org.projectlombok.version>1.18.22</org.projectlombok.version>
     <org.thymeleaf.version>3.0.12.RELEASE</org.thymeleaf.version>
     <thymeleaf.layout.version>3.0.0</thymeleaf.layout.version>
+    <thymeleaf.extras.springsecurity5.version>3.0.4.RELEASE</thymeleaf.extras.springsecurity5.version>
     <javax.servlet.version>4.0.1</javax.servlet.version>
     <org.hibernate.version>6.1.6.Final</org.hibernate.version>
     <org.webjars.version>5.1.0</org.webjars.version>
@@ -45,7 +46,22 @@
       <artifactId>spring-context</artifactId>
       <version>${org.springframework.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-core</artifactId>
+      <version>${org.springframework.security.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-config</artifactId>
+      <version>${org.springframework.security.version}</version>
+    </dependency>
 
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-web</artifactId>
+      <version>${org.springframework.security.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-web</artifactId>
@@ -72,6 +88,11 @@
       <artifactId>thymeleaf-layout-dialect</artifactId>
       <version>${thymeleaf.layout.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.thymeleaf.extras</groupId>
+      <artifactId>thymeleaf-extras-springsecurity5</artifactId>
+      <version>${thymeleaf.extras.springsecurity5.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>org.springframework</groupId>
@@ -93,12 +114,6 @@
       <artifactId>h2</artifactId>
       <version>${com.h2database.version}</version>
       <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-core</artifactId>
-      <version>${org.springframework.security.version}</version>
     </dependency>
 
     <dependency>
@@ -252,6 +267,10 @@
         <configuration>
           <excludes>
             <exclude>ua/com/foxminded/university/Application.class</exclude>
+            <exclude>ua/com/foxminded/university/dao/domain/Page.class</exclude>
+            <exclude>ua/com/foxminded/university/configuration/**</exclude>
+            <exclude>ua/com/foxminded/university/dto/**</exclude>
+            <exclude>ua/com/foxminded/university/entity/**</exclude>
           </excludes>
         </configuration>
         <executions>
@@ -280,7 +299,7 @@
                     <limit>
                       <counter>COMPLEXITY</counter>
                       <value>COVEREDRATIO</value>
-                      <minimum>0.005</minimum>
+                      <minimum>0.9</minimum>
                     </limit>
                   </limits>
                 </rule>

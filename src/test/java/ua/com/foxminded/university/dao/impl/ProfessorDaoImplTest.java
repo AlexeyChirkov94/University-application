@@ -6,8 +6,10 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import ua.com.foxminded.university.TestsContextConfiguration;
 import ua.com.foxminded.university.dao.interfaces.DepartmentDao;
 import ua.com.foxminded.university.dao.interfaces.ProfessorDao;
+import ua.com.foxminded.university.dao.interfaces.RoleDao;
 import ua.com.foxminded.university.entity.Department;
 import ua.com.foxminded.university.entity.Professor;
+import ua.com.foxminded.university.entity.Role;
 import ua.com.foxminded.university.entity.ScienceDegree;
 import java.util.Arrays;
 import java.util.List;
@@ -21,12 +23,14 @@ class ProfessorDaoImplTest {
     ApplicationContext context;
     ProfessorDao professorDao;
     DepartmentDao departmentDao;
+    RoleDao roleDao;
     Department departmentForTest;
 
     {
         context = new AnnotationConfigApplicationContext(TestsContextConfiguration.class);
         professorDao = context.getBean(ProfessorDaoImpl.class);
         departmentDao = context.getBean(DepartmentDaoImpl.class);
+        roleDao = context.getBean(RoleDaoImpl.class);
         departmentForTest = Department.builder().withId(0L).build();
     }
 
@@ -219,6 +223,35 @@ class ProfessorDaoImplTest {
                 .build();
         Professor actualAfterChanging = professorDao.findById(10L).get();
         assertUsers(actualAfterChanging, expectedAfterChanging);
+    }
+
+    @Test
+    void addRoleToUserShouldAddRoleToProfessorsIfArgumentIsIdOfProfessorAndIdOfRole(){
+
+        List<Role> expectedListOfRoleBeforeAdding  = Arrays.asList(Role.builder().withId(2L).withName("ROLE_PROFESSOR").build());
+        List<Role> actualListOfRoleBeforeAdding = roleDao.findByUserId(7L);
+        assertThat(actualListOfRoleBeforeAdding).isEqualTo(expectedListOfRoleBeforeAdding);
+
+        professorDao.addRoleToUser(7L, 3L);
+
+        List<Role> expectedListOfRoleAfterAdding  = Arrays.asList(Role.builder().withId(2L).withName("ROLE_PROFESSOR").build(),
+                Role.builder().withId(3L).withName("ROLE_ADMIN").build());
+        List<Role> actualListOfRoleAfterAdding = roleDao.findByUserId(7L);
+        assertThat(actualListOfRoleAfterAdding).isEqualTo(expectedListOfRoleAfterAdding);
+    }
+
+    @Test
+    void removeRoleFromUserShouldRemoveRoleFromProfessorsIfArgumentIsIdOfProfessorAndIdOfRole(){
+
+        List<Role> expectedListOfRoleBeforeAdding  = Arrays.asList(Role.builder().withId(2L).withName("ROLE_PROFESSOR").build());
+        List<Role> actualListOfRoleBeforeAdding = roleDao.findByUserId(7L);
+        assertThat(actualListOfRoleBeforeAdding).isEqualTo(expectedListOfRoleBeforeAdding);
+
+        professorDao.removeRoleFromUser(7L, 2L);
+
+        List<Role> expectedListOfRoleAfterAdding  = Arrays.asList();
+        List<Role> actualListOfRoleAfterAdding = roleDao.findByUserId(7L);
+        assertThat(actualListOfRoleAfterAdding).isEqualTo(expectedListOfRoleAfterAdding);
     }
 
 }

@@ -9,4 +9,8 @@ public interface UserDao<U extends User> extends CrudPageableDao<U>{
 
     U save(U user);
 
+    void addRoleToUser(long userId, long addingRoleId);
+
+    void removeRoleFromUser(long userId, long removingRoleId);
+
 }

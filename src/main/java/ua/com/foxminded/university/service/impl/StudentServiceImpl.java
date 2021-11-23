@@ -4,9 +4,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.interfaces.GroupDao;
+import ua.com.foxminded.university.dao.interfaces.RoleDao;
 import ua.com.foxminded.university.dao.interfaces.StudentDao;
 import ua.com.foxminded.university.dto.StudentRequest;
 import ua.com.foxminded.university.dto.StudentResponse;
+import ua.com.foxminded.university.entity.Role;
 import ua.com.foxminded.university.entity.Student;
 import ua.com.foxminded.university.mapper.StudentMapper;
 import ua.com.foxminded.university.service.exception.EntityDontExistException;
@@ -24,10 +26,9 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
     private final UserValidator userValidator;
     private final StudentMapper studentMapper;
 
-
     public StudentServiceImpl(StudentDao studentDao,GroupDao groupDao, PasswordEncoder passwordEncoder, UserValidator userValidator,
-                              StudentMapper studentMapper) {
-        super(passwordEncoder, studentDao, userValidator);
+                              StudentMapper studentMapper, RoleDao roleDao) {
+        super(passwordEncoder, studentDao, roleDao, userValidator);
         this.studentDao = studentDao;
         this.groupDao = groupDao;
         this.userValidator = userValidator;
@@ -85,6 +86,7 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
     @Override
     public boolean deleteById(long id) {
         if(studentDao.findById(id).isPresent()){
+            removeAllRolesFromUser(id);
             return studentDao.deleteById(id);
         }
         return false;
@@ -92,7 +94,15 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
 
     @Override
     public Optional<StudentResponse> findByEmail(String email) {
-        return studentDao.findByEmail(email).map(studentMapper::mapEntityToDto);
+        Optional<Student> studentOptional = studentDao.findByEmail(email);
+
+        if(studentOptional.isPresent()){
+            StudentResponse studentResponse = studentMapper.mapEntityToDto(studentOptional.get());
+            studentResponse.setRoles(roleDao.findByUserId(studentResponse.getId()));
+            return Optional.of(studentResponse);
+        }
+
+        return studentOptional.map(studentMapper::mapEntityToDto);
     }
 
     @Override
@@ -122,9 +132,17 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
     protected StudentResponse registerCertainUser(StudentRequest studentRequest) {
         Student studentBeforeSave = studentMapper.mapDtoToEntity(studentRequest);
         Student studentAfterSave = studentDao.save(studentBeforeSave);
+        long studentId = studentAfterSave.getId();
 
         if(studentRequest.getGroupId() != 0L){
-            changeGroup(studentAfterSave.getId(), studentRequest.getGroupId());
+            changeGroup(studentId, studentRequest.getGroupId());
+        }
+
+        if(roleDao.findByUserId(studentId).size() == 0) {
+            Role studentRole = roleDao.findByName("ROLE_STUDENT")
+                    .orElseThrow(() -> new EntityDontExistException("ROLE_STUDENT not initialized"));
+
+            addRoleToUser(studentId, studentRole.getId());
         }
 
         return studentMapper.mapEntityToDto(studentAfterSave);

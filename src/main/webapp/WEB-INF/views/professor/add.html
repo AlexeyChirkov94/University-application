@@ -48,7 +48,7 @@
         </select>
 
         <select class="form-select  mb-2" th:field="*{scienceDegreeId}">
-            <option selected="" value="" th:text="#{choose.science.degree.of.new.professor}">Choose Science Degree of new professor:</option>
+            <option selected="" value="0" th:text="#{choose.science.degree.of.new.professor}">Choose Science Degree of new professor:</option>
             <div th:each="scienceDegree : ${scienceDegrees}">
                 <option th:value="${scienceDegree.getId()}" th:text="${scienceDegree}"> ScienceDegree </option>
             </div>

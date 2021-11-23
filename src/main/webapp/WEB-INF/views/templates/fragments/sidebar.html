@@ -90,15 +90,15 @@
 
 <main>
 
-  <div class="flex-shrink-0 p-3 bg-white" style="width: 280px;">
-    <a href="/" class="d-flex align-items-center pb-3 mb-3 link-dark text-decoration-none border-bottom">
+  <div  class="flex-shrink-0 p-3 bg-white" style="width: 280px;">
+    <a th:href="@{/}" class="d-flex align-items-center pb-3 mb-3 link-dark text-decoration-none border-bottom">
       <img width = "30px" src = "../../../resources/png/university-logo.png">
-
       <span class="fs-5 fw-semibold" th:text="#{project.name}">My University</span>
     </a>
-    <ul class="list-unstyled ps-0">
 
+    <ul class="list-unstyled ps-0">
       <li class="mb-1">
+        <div sec:authorize="hasAuthority('WRITE_PRIVILEGE')">
         <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
                 data-bs-target="#department-collapse" aria-expanded="false" th:text="#{departments}">
           Departments
@@ -109,9 +109,15 @@
             <li><a href="/department/new" class="link-dark rounded" th:text="#{add.new}">Add new</a></li>
           </ul>
         </div>
+        </div>
+        <div sec:authorize="hasRole('ROLE_STUDENT')">
+          <a class="btn btn-toggle align-items-center" href="/department" role="button" th:text="#{departments}">Edit</a>
+        </div>
       </li>
 
+
       <li class="mb-1">
+        <div sec:authorize="hasAuthority('WRITE_PRIVILEGE')">
         <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
                 data-bs-target="#course-collapse" aria-expanded="false" th:text="#{courses}">
           Courses
@@ -122,9 +128,14 @@
             <li><a href="/course/new" class="link-dark rounded" th:text="#{add.new}">Add new</a></li>
           </ul>
         </div>
+        </div>
+        <div sec:authorize="hasRole('ROLE_STUDENT')">
+          <a class="btn btn-toggle align-items-center" href="/course" role="button" th:text="#{courses}">Edit</a>
+        </div>
       </li>
 
       <li class="mb-1">
+        <div sec:authorize="hasAuthority('WRITE_PRIVILEGE')">
         <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
                 data-bs-target="#group-collapse" aria-expanded="false" th:text="#{groups}">
           Groups
@@ -135,9 +146,14 @@
             <li><a href="/group/new" class="link-dark rounded" th:text="#{add.new}">Add new</a></li>
           </ul>
         </div>
+        </div>
+        <div sec:authorize="hasRole('ROLE_STUDENT')">
+          <a class="btn btn-toggle align-items-center" href="/group" role="button" th:text="#{groups}">Edit</a>
+        </div>
       </li>
 
       <li class="mb-1">
+        <div sec:authorize="hasAuthority('WRITE_PRIVILEGE')">
         <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
                 data-bs-target="#professor-collapse" aria-expanded="false" th:text="#{professors}">
           Professors
@@ -148,9 +164,14 @@
             <li><a href="/professor/new" class="link-dark rounded" th:text="#{add.new}">Add new</a></li>
           </ul>
         </div>
+        </div>
+        <div sec:authorize="hasRole('ROLE_STUDENT')">
+          <a class="btn btn-toggle align-items-center" href="/professor" role="button" th:text="#{professors}">Edit</a>
+        </div>
       </li>
 
       <li class="mb-1">
+        <div sec:authorize="hasAuthority('WRITE_PRIVILEGE')">
         <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
                 data-bs-target="#student-collapse" aria-expanded="false" th:text="#{students}">
           Students
@@ -161,9 +182,14 @@
             <li><a href="/student/new" class="link-dark rounded" th:text="#{add.new}">Add new</a></li>
           </ul>
         </div>
+        </div>
+        <div sec:authorize="hasRole('ROLE_STUDENT')">
+          <a class="btn btn-toggle align-items-center" href="/student" role="button" th:text="#{students}">Edit</a>
+        </div>
       </li>
 
       <li class="mb-1">
+        <div sec:authorize="hasAuthority('WRITE_PRIVILEGE')">
         <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
                 data-bs-target="#lesson-collapse" aria-expanded="false" th:text="#{lessons}">
           Lessons
@@ -174,9 +200,14 @@
             <li><a href="/lesson/new" class="link-dark rounded" th:text="#{add.new}">Add new</a></li>
           </ul>
         </div>
+        </div>
+        <div sec:authorize="hasRole('ROLE_STUDENT')">
+          <a class="btn btn-toggle align-items-center" href="/lesson" role="button" th:text="#{lessons}">Edit</a>
+        </div>
       </li>
 
       <li class="mb-1">
+        <div sec:authorize="hasAuthority('WRITE_PRIVILEGE')">
         <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
                 data-bs-target="#formOfLesson-collapse" aria-expanded="false" th:text="#{forms.of.lesson}">
           Forms of lesson
@@ -187,9 +218,14 @@
             <li><a href="/lesson/type/new" class="link-dark rounded" th:text="#{add.new}">Add new</a></li>
           </ul>
         </div>
+        </div>
+        <div sec:authorize="hasRole('ROLE_STUDENT')">
+          <a class="btn btn-toggle align-items-center" href="/lesson/type" role="button" th:text="#{forms.of.lesson}">Edit</a>
+        </div>
       </li>
 
       <li class="mb-1">
+        <div sec:authorize="hasAuthority('WRITE_PRIVILEGE')">
         <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
                 data-bs-target="#formOfEducation-collapse" aria-expanded="false" th:text="#{forms.of.education}">
           Forms of education
@@ -199,6 +235,10 @@
             <li><a href="/education/form" class="link-dark rounded" th:text="#{show.all}">Show All</a></li>
             <li><a href="/education/form/new" class="link-dark rounded" th:text="#{add.new}">Add new</a></li>
           </ul>
+        </div>
+        </div>
+        <div sec:authorize="hasRole('ROLE_STUDENT')">
+          <a class="btn btn-toggle align-items-center" href="/education/form" role="button" th:text="#{forms.of.education}">Edit</a>
         </div>
       </li>
 
@@ -213,7 +253,7 @@
           <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
             <li><a href="#" class="link-dark rounded" th:text="#{profile}">Profile</a></li>
             <li><a href="#" class="link-dark rounded" th:text="#{settings}">Settings</a></li>
-            <li><a href="#" class="link-dark rounded" th:text="#{sign.out}">Sign out</a></li>
+            <li><a href="/perform_logout" class="link-dark rounded" th:text="#{sign.out}">Sign out</a></li>
           </ul>
         </div>
       </li>
