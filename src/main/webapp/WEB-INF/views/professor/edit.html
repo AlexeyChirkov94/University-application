@@ -69,6 +69,8 @@
 
     <h4 th:text="#{course.list.of.professor}">Course list of professor</h4>
     <h6 th:text="#{current.course.list} + ': '">Current course list:</h6>
+
+    <div th:if="${professorsCourses.size > 0}">
     <table class="table table-striped">
         <thead>
         <tr>
@@ -94,6 +96,10 @@
         </div>
         </tbody>
     </table>
+    </div>
+    <div th:unless="${professorsCourses.size > 0}">
+        <text th:text="#{professor.have.no.courses}"> This professor have no courses for teaching yet </text>
+    </div>
     <br>
 
     <h6 th:text="#{management} + ':'">Management:</h6>
@@ -106,6 +112,7 @@
         </select>
         <button class="btn btn-success" type="submit" th:text="#{add.course.to.list}">Add course</button>
     </form>
+    <div th:if="${professorsCourses.size > 0}">
     <form method="post" th:action="@{/professor/{id}/remove/course/(id=${professorResponse.getId()})}">
         <select class="form-select  mb-2" name="idOfRemovingCourse">
             <option selected="" disabled="" value="" th:text="#{choose.course.for.removing.from.list}">Choose removing course:</option>
@@ -115,6 +122,7 @@
         </select>
         <button class="btn btn-danger" type="submit" th:text="#{remove.course.from.list}">Remove course</button>
     </form>
+    </div>
     <br>
 
 </section>

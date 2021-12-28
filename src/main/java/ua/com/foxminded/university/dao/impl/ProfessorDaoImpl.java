@@ -40,6 +40,8 @@ public class ProfessorDaoImpl extends AbstractPageableCrudDaoImpl<Professor> imp
     private static final String FIND_BY_DEPARTMENT_ID = FIND_QUERY + "where u.department_id = ? order by u.id";
     private static final String CHANGE_SCIENCE_DEGREE_QUERY = "UPDATE users SET sciencedegree_id = ? WHERE id = ?";
     private static final String CHANGE_DEPARTMENT_QUERY = "UPDATE users SET department_id = ? WHERE id = ?";
+    private static final String ADD_ROLE_TO_USER_QUERY = "INSERT INTO user_role (user_id, role_id) VALUES(?, ?)";
+    private static final String REMOVE_ROLE_FROM_USER_QUERY = "DELETE FROM user_role WHERE user_id = ? AND role_id = ?";
 
     private static final RowMapper<Professor> ROW_MAPPER = (rs, rowNum) ->
         Professor.builder()
@@ -68,6 +70,16 @@ public class ProfessorDaoImpl extends AbstractPageableCrudDaoImpl<Professor> imp
             log.info("Email not registered: " + email);
             return Optional.empty();
         }
+    }
+
+    @Override
+    public void addRoleToUser(long userId, long addingRoleId) {
+        jdbcTemplate.update(ADD_ROLE_TO_USER_QUERY, userId, addingRoleId);
+    }
+
+    @Override
+    public void removeRoleFromUser(long userId, long removingRoleId) {
+        jdbcTemplate.update(REMOVE_ROLE_FROM_USER_QUERY, userId, removingRoleId);
     }
 
     @Override

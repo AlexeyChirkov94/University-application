@@ -34,6 +34,8 @@ public class StudentDaoImpl extends AbstractPageableCrudDaoImpl<Student> impleme
     private static final String FIND_BY_EMAIL_QUERY = FIND_QUERY + "WHERE u.email= ? and type = 'student'";
     private static final String CHANGE_GROUP_QUERY = "UPDATE users SET group_id = ? WHERE id = ?";
     private static final String LEAVE_GROUP_QUERY = "UPDATE users SET group_id = null WHERE id = ?";
+    private static final String ADD_ROLE_TO_USER_QUERY = "INSERT INTO user_role (user_id, role_id) VALUES(?, ?)";
+    private static final String REMOVE_ROLE_FROM_USER_QUERY = "DELETE FROM user_role WHERE user_id = ? AND role_id = ?";
     private static final RowMapper<Student> ROW_MAPPER = (rs, rowNum) ->
         Student.builder()
                 .withId(rs.getLong("id"))
@@ -61,6 +63,16 @@ public class StudentDaoImpl extends AbstractPageableCrudDaoImpl<Student> impleme
             log.info("Email not registered: " + email);
             return Optional.empty();
         }
+    }
+
+    @Override
+    public void addRoleToUser(long userId, long addingRoleId) {
+        jdbcTemplate.update(ADD_ROLE_TO_USER_QUERY, userId, addingRoleId);
+    }
+
+    @Override
+    public void removeRoleFromUser(long userId, long removingRoleId) {
+        jdbcTemplate.update(REMOVE_ROLE_FROM_USER_QUERY, userId, removingRoleId);
     }
 
     @Override

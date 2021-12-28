@@ -29,12 +29,17 @@
             <li class="list-group-item" th:text="#{teacher} + ': ' + ${lesson.getTeacher().getScienceDegreeResponse()} + ', '
             + ${lesson.getTeacher().getLastName()} + ' ' + ${lesson.getTeacher().getFirstName()} +
                             ' (ID: ' + ${lesson.getTeacher().getId()} + ')'">Group</li>
-            <li class="list-group-item"><a class="btn btn-info" th:href="@{/lesson/{id}/edit(id=${lesson.getId()})}" role="button" th:text="#{edit}">Edit</a></li>
-            <li class="list-group-item">
-                <form th:method="DELETE" th:action="@{/lesson/{id}(id=${lesson.getId()})}">
-                    <input class="btn btn-danger" type="submit" th:value="#{delete}"/>
-                </form>
-            </li>
+            <div sec:authorize="hasAuthority('WRITE_PRIVILEGE')">
+                <li class="list-group-item"><a class="btn btn-info" th:href="@{/lesson/{id}/edit(id=${lesson.getId()})}" role="button" th:text="#{edit}">Edit</a></li>
+
+            </div>
+            <div sec:authorize="hasAuthority('DELETE_PRIVILEGE')">
+                <li class="list-group-item">
+                    <form th:method="DELETE" th:action="@{/lesson/{id}(id=${lesson.getId()})}">
+                        <input class="btn btn-danger" type="submit" th:value="#{delete}"/>
+                    </form>
+                </li>
+            </div>
         </ul>
     </div>
 

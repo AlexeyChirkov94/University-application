@@ -6,7 +6,9 @@ import ua.com.foxminded.university.entity.FormOfEducation;
 import ua.com.foxminded.university.entity.FormOfLesson;
 import ua.com.foxminded.university.entity.Group;
 import ua.com.foxminded.university.entity.Lesson;
+import ua.com.foxminded.university.entity.Privilege;
 import ua.com.foxminded.university.entity.Professor;
+import ua.com.foxminded.university.entity.Role;
 import ua.com.foxminded.university.entity.Student;
 import ua.com.foxminded.university.entity.User;
 import java.util.List;
@@ -35,6 +37,28 @@ public class TestUtility {
         assertThat(actual.size()).isEqualTo(expected.size());
         for(int i = 0; i < actual.size(); i++){
             assertDepartments(actual.get(i), expected.get(i));
+        }
+    }
+
+    public static void assertRoles(Role actual, Role expected) {
+        assertThat(actual.getName()).isEqualTo(expected.getName());
+    }
+
+    public static void assertRoles(List<Role> actual, List<Role> expected) {
+        assertThat(actual.size()).isEqualTo(expected.size());
+        for(int i = 0; i < actual.size(); i++){
+            assertRoles(actual.get(i), expected.get(i));
+        }
+    }
+
+    public static void assertPrivileges(Privilege actual, Privilege expected) {
+        assertThat(actual.getName()).isEqualTo(expected.getName());
+    }
+
+    public static void assertPrivileges(List<Privilege> actual, List<Privilege> expected) {
+        assertThat(actual.size()).isEqualTo(expected.size());
+        for(int i = 0; i < actual.size(); i++){
+            assertPrivileges(actual.get(i), expected.get(i));
         }
     }
 

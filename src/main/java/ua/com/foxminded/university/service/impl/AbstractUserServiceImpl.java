@@ -1,35 +1,25 @@
 package ua.com.foxminded.university.service.impl;
 
+import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
+import ua.com.foxminded.university.dao.interfaces.RoleDao;
 import ua.com.foxminded.university.dao.interfaces.UserDao;
 import ua.com.foxminded.university.dto.UserRequest;
 import ua.com.foxminded.university.dto.UserResponse;
-import ua.com.foxminded.university.entity.User;
 import ua.com.foxminded.university.service.exception.EntityAlreadyExistException;
+import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.interfaces.UserService;
 import ua.com.foxminded.university.service.validator.UserValidator;
-import java.util.Optional;
 
+@AllArgsConstructor
 public abstract class AbstractUserServiceImpl<REQUEST extends UserRequest, RESPONSE extends UserResponse>
         extends AbstractPageableCrudService implements UserService<REQUEST, RESPONSE> {
 
     protected final PasswordEncoder passwordEncoder;
     protected final UserDao userDao;
+    protected final RoleDao roleDao;
     protected final UserValidator userValidator;
-
-    public AbstractUserServiceImpl(PasswordEncoder passwordEncoder, UserDao userDao, UserValidator userValidator) {
-        this.passwordEncoder = passwordEncoder;
-        this.userDao = userDao;
-        this.userValidator = userValidator;
-    }
-
-    @Override
-    public boolean login(String email, String password){
-        Optional<User> user = userDao.findByEmail(email);
-        return user.map(User::getPassword)
-                .filter(passwordFromDB -> passwordEncoder.matches(password, passwordFromDB))
-                .isPresent();
-    }
 
     @Override
     public RESPONSE register(REQUEST userDto) {
@@ -39,6 +29,38 @@ public abstract class AbstractUserServiceImpl<REQUEST extends UserRequest, RESPO
         } else {
             userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
             return registerCertainUser(userDto);
+        }
+    }
+
+    @Transactional(transactionManager = "txManager")
+    public void addRoleToUser (long userId, long addingRoleId) {
+        checkThatUserExist(userId);
+        checkThatRoleExist(addingRoleId);
+        userDao.addRoleToUser(userId, addingRoleId);
+    }
+
+    @Transactional(transactionManager = "txManager")
+    public void removeRoleFromUser(long userId, long removingRoleId) {
+        checkThatUserExist(userId);
+        checkThatRoleExist(removingRoleId);
+        userDao.removeRoleFromUser(userId, removingRoleId);
+    }
+
+    @Transactional(transactionManager = "txManager")
+    protected void removeAllRolesFromUser(long userId){
+        checkThatUserExist(userId);
+        roleDao.findByUserId(userId).forEach(role -> userDao.removeRoleFromUser(userId, role.getId()));
+    }
+
+    protected void checkThatUserExist(long userId){
+        if (!userDao.findById(userId).isPresent()) {
+            throw new EntityDontExistException("There no user with id: " + userId);
+        }
+    }
+
+    protected void checkThatRoleExist(long roleId){
+        if (!roleDao.findById(roleId).isPresent()) {
+            throw new EntityDontExistException("There no role with id: " + roleId);
         }
     }
 

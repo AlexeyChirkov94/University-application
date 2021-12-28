@@ -26,7 +26,7 @@
                 <div class="row justify-content-left">
                     <div class="col-2" th:text="#{students.of.group} + ':'"> Students of group: </div>
                     <div class="col-10">
-
+                        <div th:if="${studentsOfGroup.size > 0}">
                         <table class="table table-striped">
                             <thead>
                             <tr>
@@ -49,18 +49,26 @@
                             </div>
                             </tbody>
                         </table>
-
+                        </div>
+                        <div th:unless="${studentsOfGroup.size > 0}">
+                            <text th:text="#{group.have.no.students}"> This group have no students yet </text>
+                        </div>
                     </div>
                 </div>
             </li>
             <li class="list-group-item"><a class="btn btn-success" th:href="@{/group/{id}/timetable(id=${group.getId()})}" role="button" th:text="#{show.timetable}">Show timetable</a></li>
-            <li class="list-group-item"><a class="btn btn-info" th:href="@{/group/{id}/edit(id=${group.getId()})}" role="button" th:text="#{edit}">Edit</a></li>
-            <li class="list-group-item">
-                <form th:method="DELETE" th:action="@{/group/{id}(id=${group.getId()})}">
-                    <input class="btn btn-danger" type="submit" th:value="#{delete}"/>
-                    <text th:text="#{group.delete.warning}">Be careful, all students will be remove from group, and lessons of this group will lose group</text>
-                </form>
-            </li>
+
+            <div sec:authorize="hasAuthority('WRITE_PRIVILEGE')">
+                <li class="list-group-item"><a class="btn btn-info" th:href="@{/group/{id}/edit(id=${group.getId()})}" role="button" th:text="#{edit}">Edit</a></li>
+            </div>
+            <div sec:authorize="hasAuthority('DELETE_PRIVILEGE')">
+                <li class="list-group-item">
+                    <form th:method="DELETE" th:action="@{/group/{id}(id=${group.getId()})}">
+                        <input class="btn btn-danger" type="submit" th:value="#{delete}"/>
+                        <text th:text="#{group.delete.warning}">Be careful, all students will be remove from group, and lessons of this group will lose group</text>
+                    </form>
+                </li>
+            </div>
         </ul>
     </div>
 

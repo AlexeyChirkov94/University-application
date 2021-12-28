@@ -7,9 +7,9 @@ import lombok.NonNull;
 import lombok.ToString;
 import java.util.List;
 
-@ToString(callSuper=true)
+@ToString(callSuper = true)
 @Getter()
-@EqualsAndHashCode(callSuper=true)
+@EqualsAndHashCode(callSuper = true)
 public class Professor extends User {
 
     Department department;

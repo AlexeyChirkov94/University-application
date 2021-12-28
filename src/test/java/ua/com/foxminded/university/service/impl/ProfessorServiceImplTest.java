@@ -12,17 +12,20 @@ import ua.com.foxminded.university.dao.interfaces.DepartmentDao;
 import ua.com.foxminded.university.dao.interfaces.GroupDao;
 import ua.com.foxminded.university.dao.interfaces.LessonDao;
 import ua.com.foxminded.university.dao.interfaces.ProfessorDao;
+import ua.com.foxminded.university.dao.interfaces.RoleDao;
 import ua.com.foxminded.university.dto.ProfessorRequest;
 import ua.com.foxminded.university.dto.ProfessorResponse;
 import ua.com.foxminded.university.entity.Course;
 import ua.com.foxminded.university.entity.Department;
 import ua.com.foxminded.university.entity.Lesson;
 import ua.com.foxminded.university.entity.Professor;
+import ua.com.foxminded.university.entity.Role;
 import ua.com.foxminded.university.entity.ScienceDegree;
 import ua.com.foxminded.university.mapper.ProfessorMapper;
 import ua.com.foxminded.university.service.validator.ScienceDegreeValidator;
 import ua.com.foxminded.university.service.validator.UserValidator;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -31,7 +34,6 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 
 @ExtendWith( MockitoExtension.class)
 class ProfessorServiceImplTest {
@@ -50,6 +52,9 @@ class ProfessorServiceImplTest {
 
     @Mock
     DepartmentDao departmentDao;
+
+    @Mock
+    RoleDao roleDao;
 
     @Mock
     UserValidator userValidator;
@@ -118,7 +123,7 @@ class ProfessorServiceImplTest {
         when(professorDao.findById(professorId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> professorService.removeDepartmentFromProfessor(professorId))
-                .hasMessage("There no professor with id: 1");
+                .hasMessage("There no user with id: 1");
 
         verify(professorDao).findById(professorId);
     }
@@ -168,8 +173,24 @@ class ProfessorServiceImplTest {
     @Test
     void findByEmailShouldReturnOptionalOfProfessorResponseIfArgumentIsEmail() {
         String email= "Alexey94@gamil.com";
+        Professor professor = Professor.builder().withId(1L).build();
+        ProfessorResponse professorResponse = new ProfessorResponse();
+        professorResponse.setId(1L);
 
         when(professorDao.findByEmail(email)).thenReturn(Optional.of(Professor.builder().withId(1L).build()));
+        when(professorMapper.mapEntityToDto(professor)).thenReturn(professorResponse);
+
+        professorService.findByEmail(email);
+
+        verify(professorDao).findByEmail(email);
+        verify(professorMapper).mapEntityToDto(professor);
+    }
+
+    @Test
+    void findByEmailShouldReturnOptionalOfEmptyProfessorResponseIfEmailNotRegistered() {
+        String email= "Alexey94@gamil.com";
+
+        when(professorDao.findByEmail(email)).thenReturn(Optional.empty());
 
         professorService.findByEmail(email);
 
@@ -180,7 +201,10 @@ class ProfessorServiceImplTest {
     void registerShouldAddProfessorToDBIfArgumentsIsProfessorRequestWithoutDepartmentAndScienceDegree() {
         String email= "Alexey94@gamil.com";
         String password= "12345";
+        List<Role> professorRole = Collections.singletonList(Role.builder().withName("ROLE_PROFESSOR").build());
+        Professor professor = Professor.builder().withId(1L).build();
         ProfessorRequest professorRequest = new ProfessorRequest();
+        professorRequest.setId(1L);
         professorRequest.setEmail(email);
         professorRequest.setPassword(password);
         professorRequest.setDepartmentId(0L);
@@ -189,12 +213,89 @@ class ProfessorServiceImplTest {
         doNothing().when(userValidator).validate(professorRequest);
         when(professorDao.findByEmail(email)).thenReturn(Optional.empty());
         when(passwordEncoder.encode(password)).thenReturn(password);
+        when(professorMapper.mapDtoToEntity(professorRequest)).thenReturn(professor);
+        when(professorDao.save(professor)).thenReturn(professor);
+        when(roleDao.findByUserId(1L)).thenReturn(professorRole);
 
         professorService.register(professorRequest);
 
         verify(userValidator).validate(professorRequest);
         verify(professorDao).findByEmail(email);
         verify(passwordEncoder).encode(password);
+        verify(professorMapper).mapDtoToEntity(professorRequest);
+        verify(professorDao).save(professor);
+        verify(roleDao).findByUserId(1L);
+    }
+
+    @Test
+    void registerWithAddingDefaultRoleShouldAddProfessorToDBAndAddRoleToProfessorIfArgumentsIsProfessorRequestWithoutDepartmentAndScienceDegree() {
+        String email= "Alexey94@gamil.com";
+        String password= "12345";
+        List<Role> professorRole = Collections.emptyList();
+        Role defaultRole = Role.builder().withId(3L).withName("ROLE_PROFESSOR").build();
+        Professor professor = Professor.builder().withId(1L).build();
+        ProfessorRequest professorRequest = new ProfessorRequest();
+        professorRequest.setId(1L);
+        professorRequest.setEmail(email);
+        professorRequest.setPassword(password);
+        professorRequest.setDepartmentId(0L);
+        professorRequest.setScienceDegreeId(0);
+
+        doNothing().when(userValidator).validate(professorRequest);
+        when(professorDao.findByEmail(email)).thenReturn(Optional.empty());
+        when(passwordEncoder.encode(password)).thenReturn(password);
+        when(professorMapper.mapDtoToEntity(professorRequest)).thenReturn(professor);
+        when(professorDao.save(professor)).thenReturn(professor);
+        when(roleDao.findByUserId(1L)).thenReturn(professorRole);
+        when(roleDao.findByName("ROLE_PROFESSOR")).thenReturn(Optional.of(defaultRole));
+        when(professorDao.findById(1L)).thenReturn(Optional.of(professor));
+        when(roleDao.findById(3L)).thenReturn(Optional.of(defaultRole));
+
+        professorService.register(professorRequest);
+
+        verify(userValidator).validate(professorRequest);
+        verify(professorDao).findByEmail(email);
+        verify(passwordEncoder).encode(password);
+        verify(professorMapper).mapDtoToEntity(professorRequest);
+        verify(professorDao).save(professor);
+        verify(roleDao).findByUserId(1L);
+        verify(roleDao).findByUserId(1L);
+        verify(roleDao).findByName("ROLE_PROFESSOR");
+        verify(professorDao).findById(1L);
+        verify(roleDao).findById(3L);
+    }
+
+    @Test
+    void registerWithAddingDefaultRoleShouldThrowExceptionIfDefaultRoleNotExist() {
+        String email= "Alexey94@gamil.com";
+        String password= "12345";
+        List<Role> professorRole = Collections.emptyList();
+        Professor professor = Professor.builder().withId(1L).build();
+        ProfessorRequest professorRequest = new ProfessorRequest();
+        professorRequest.setId(1L);
+        professorRequest.setEmail(email);
+        professorRequest.setPassword(password);
+        professorRequest.setDepartmentId(0L);
+        professorRequest.setScienceDegreeId(0);
+
+        doNothing().when(userValidator).validate(professorRequest);
+        when(professorDao.findByEmail(email)).thenReturn(Optional.empty());
+        when(passwordEncoder.encode(password)).thenReturn(password);
+        when(professorMapper.mapDtoToEntity(professorRequest)).thenReturn(professor);
+        when(professorDao.save(professor)).thenReturn(professor);
+        when(roleDao.findByUserId(1L)).thenReturn(professorRole);
+        when(roleDao.findByName("ROLE_PROFESSOR")).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> professorService.register(professorRequest)).hasMessage("ROLE_PROFESSOR not initialized");
+
+        verify(userValidator).validate(professorRequest);
+        verify(professorDao).findByEmail(email);
+        verify(passwordEncoder).encode(password);
+        verify(professorMapper).mapDtoToEntity(professorRequest);
+        verify(professorDao).save(professor);
+        verify(roleDao).findByUserId(1L);
+        verify(roleDao).findByUserId(1L);
+        verify(roleDao).findByName("ROLE_PROFESSOR");
     }
 
     @Test
@@ -203,6 +304,7 @@ class ProfessorServiceImplTest {
         String password= "12345";
         Department department = Department.builder().withId(1L).build();
         ScienceDegree scienceDegree = ScienceDegree.getById(1);
+        List<Role> professorRole = Collections.singletonList(Role.builder().withName("ROLE_PROFESSOR").build());
         Professor professor = Professor.builder().withId(1L).build();
         ProfessorRequest professorRequest = new ProfessorRequest();
         professorRequest.setId(1L);
@@ -218,6 +320,7 @@ class ProfessorServiceImplTest {
         when(professorDao.save(professor)).thenReturn(professor);
         when(departmentDao.findById(1L)).thenReturn(Optional.of(department));
         when(professorDao.findById(1L)).thenReturn(Optional.of(professor));
+        when(roleDao.findByUserId(1L)).thenReturn(professorRole);
         doNothing().when(professorDao).changeDepartment(1L, 1L);
         doNothing().when(scienceDegreeValidator).validate(scienceDegree);
         doNothing().when(professorDao).changeScienceDegree(1L, 1);
@@ -231,6 +334,7 @@ class ProfessorServiceImplTest {
         verify(professorDao).save(professor);
         verify(departmentDao).findById(1L);
         verify(professorDao ,times(2)).findById(1L);
+        verify(roleDao).findByUserId(1L);
         verify(professorDao).changeDepartment(1L, 1L);
         verify(scienceDegreeValidator).validate(scienceDegree);
         verify(professorDao).changeScienceDegree(1L, 1);
@@ -338,11 +442,9 @@ class ProfessorServiceImplTest {
 
         when(professorMapper.mapDtoToEntity(professorRequest)).thenReturn(professor);
         doNothing().when(professorDao).update(professor);
-
         when(departmentDao.findById(1L)).thenReturn(Optional.of(department));
         when(professorDao.findById(1L)).thenReturn(Optional.of(professor));
         doNothing().when(professorDao).changeDepartment(1L, 1L);
-
         doNothing().when(scienceDegreeValidator).validate(scienceDegree);
         doNothing().when(professorDao).changeScienceDegree(1L, 1);
 
@@ -366,8 +468,11 @@ class ProfessorServiceImplTest {
         Lesson lesson1 = Lesson.builder().withId(1L).build();
         Lesson lesson2 = Lesson.builder().withId(2L).build();
         List<Lesson> professorLessons = Arrays.asList(lesson1, lesson2);
+        List<Role> professorRoles = Collections.singletonList(Role.builder().withId(2L).withName("ROLE_PROFESSOR").build());
 
         when(professorDao.findById(professorId)).thenReturn(Optional.of(Professor.builder().withId(professorId).build()));
+        when(roleDao.findByUserId(professorId)).thenReturn(professorRoles);
+        doNothing().when(professorDao).removeRoleFromUser(1L, 2L);
         when(professorDao.deleteById(professorId)).thenReturn(true);
         when(courseDao.findByProfessorId(1L)).thenReturn(professorCourses);
         doNothing().when(courseDao).removeCourseFromProfessorCourseList(1L, 1L);
@@ -378,7 +483,9 @@ class ProfessorServiceImplTest {
 
         professorService.deleteById(professorId);
 
-        verify(professorDao).findById(professorId);
+        verify(professorDao, times(2)).findById(professorId);
+        verify(roleDao).findByUserId(professorId);
+        verify(professorDao).removeRoleFromUser(1L, 2L);
         verify(professorDao).deleteById(professorId);
         verify(courseDao).findByProfessorId(1L);
         verify(courseDao).removeCourseFromProfessorCourseList(1L, 1L);
@@ -397,6 +504,34 @@ class ProfessorServiceImplTest {
         professorService.deleteById(professorId);
 
         verify(professorDao).findById(professorId);
+    }
+
+    @Test
+    void removeRoleFromUserShouldRemoveRoleFromUserIfArgumentIsIdOfUserAndIdOfRole(){
+        long professorId = 1L;
+        long roleId = 2L;
+
+        when(professorDao.findById(professorId)).thenReturn(Optional.of(Professor.builder().withId(professorId).build()));
+        when(roleDao.findById(roleId)).thenReturn(Optional.of(Role.builder().withId(roleId).build()));
+
+        professorService.removeRoleFromUser(professorId, roleId);
+
+        verify(professorDao).findById(professorId);
+        verify(roleDao).findById(roleId);
+    }
+
+    @Test
+    void removeRoleFromUserShouldTrowExceptionIfRoleNotExist(){
+        long professorId = 1L;
+        long roleId = 2L;
+
+        when(professorDao.findById(professorId)).thenReturn(Optional.of(Professor.builder().withId(professorId).build()));
+        when(roleDao.findById(roleId)).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> professorService.removeRoleFromUser(professorId, roleId)).hasMessage("There no role with id: 2");
+
+        verify(professorDao).findById(professorId);
+        verify(roleDao).findById(roleId);
     }
 
 }

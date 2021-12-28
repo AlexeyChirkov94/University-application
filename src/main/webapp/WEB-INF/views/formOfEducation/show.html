@@ -25,7 +25,7 @@
                 <div class="row justify-content-left">
                     <div class="col-2" th:text="#{groups.of.current.form.of.education}"> Groups of form of education: </div>
                     <div class="col-10">
-
+                        <div th:if="${formOfEducationGroups.size > 0}">
                         <table class="table table-striped">
                             <thead>
                             <tr>
@@ -46,18 +46,27 @@
                             </div>
                             </tbody>
                         </table>
+                        </div>
+                        <div th:unless="${formOfEducationGroups.size > 0}">
+                            <text th:text="#{form.of.education.have.no.groups}"> This form of education have no groups yet </text>
+                        </div>
 
                     </div>
                 </div>
             </li>
+            <div sec:authorize="hasAuthority('WRITE_PRIVILEGE')">
+                <li class="list-group-item"><a class="btn btn-info" th:href="@{/education/form/{id}/edit(id=${formOfEducation.getId()})}" role="button" th:text="#{edit}">Edit</a></li>
 
-            <li class="list-group-item"><a class="btn btn-info" th:href="@{/education/form/{id}/edit(id=${formOfEducation.getId()})}" role="button" th:text="#{edit}">Edit</a></li>
-            <li class="list-group-item">
-                <form th:method="DELETE" th:action="@{/education/form/{id}(id=${formOfEducation.getId()})}">
-                    <input class="btn btn-danger" type="submit" th:value="#{delete}"/>
-                    <text th:text="#{form.of.education.delete.warning}">Be careful, all groups with current form of education will lose form of education</text>
-                </form>
-            </li>
+            </div>
+            <div sec:authorize="hasAuthority('DELETE_PRIVILEGE')">
+                <li class="list-group-item">
+                    <form th:method="DELETE" th:action="@{/education/form/{id}(id=${formOfEducation.getId()})}">
+                        <input class="btn btn-danger" type="submit" th:value="#{delete}"/>
+                        <text th:text="#{form.of.education.delete.warning}">Be careful, all groups with current form of education will lose form of education</text>
+                    </form>
+                </li>
+            </div>
+
         </ul>
     </div>
 

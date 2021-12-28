@@ -33,6 +33,8 @@
 
     <h4 th:text="#{groups.of.current.form.of.education}">Groups current form of education</h4>
     <h6 th:text="#{current.groups} + ':'">Current groups:</h6>
+
+    <div th:if="${formOfEducationGroups.size > 0}">
     <table class="table table-striped">
         <thead>
         <tr>
@@ -58,6 +60,10 @@
         </div>
         </tbody>
     </table>
+    </div>
+    <div th:unless="${formOfEducationGroups.size > 0}">
+        <text th:text="#{form.of.education.have.no.groups}"> This form of education have no groups yet </text>
+    </div>
     <br>
 
     <h6 th:text="#{management} + ':'">Management:</h6>
@@ -73,6 +79,7 @@
         </select>
         <button class="btn btn-success" type="submit" th:text="#{add.group.to.form.of.education}">Add group to current from of education course</button>
     </form>
+    <div th:if="${formOfEducationGroups.size > 0}">
     <form method="post" th:action="@{/education/form/{id}/remove/group/(id=${formOfEducationRequest.getId()})}" class="mb-2">
         <select class="form-select  mb-2" name="idRemovingGroup">
             <option selected="" disabled="" value="" th:text="#{choose.group.for.removing.from.form.of.education}">Choose group for removing to this form of education::</option>
@@ -84,6 +91,7 @@
         </select>
         <button class="btn btn-danger" type="submit" th:text="#{remove.group.from.form.of.education}">Remove group to current from of education course</button>
     </form>
+    </div>
 
 </section>
 

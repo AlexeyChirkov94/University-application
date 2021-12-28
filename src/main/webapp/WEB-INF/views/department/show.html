@@ -25,29 +25,34 @@
                 <div class="row justify-content-left">
                     <div class="col-2" th:text="#{professors.of.department} + ':' "> Professors of department: </div>
                     <div class="col-10">
-                        <table class="table table-striped">
-                            <thead>
-                            <tr>
-                                <th scope="col" th:text="#{id}">Id</th>
-                                <th scope="col" th:text="#{first.name}">First name</th>
-                                <th scope="col" th:text="#{last.name}">Last name</th>
-                                <th scope="col" th:text="#{email}">Email</th>
-                                <th scope="col" th:text="#{more}">More</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <div th:each="professor : ${professors}">
+                        <div th:if="${professors.size > 0}">
+                            <table class="table table-striped">
+                                <thead>
                                 <tr>
-                                    <th scope="row" th:text="${professor.getId()}"></th>
-                                    <td th:text="${professor.getFirstName()}"> </td>
-                                    <td th:text="${professor.getLastName()}"></td>
-                                    <td th:text="${professor.getEmail()}"> </td>
-                                    <td> <a class="btn btn-secondary" th:href="@{/professor/{id}(id=${professor.getId()})}" role="button"
-                                            th:text="#{go.to}">Go to</a> </td>
+                                    <th scope="col" th:text="#{id}">Id</th>
+                                    <th scope="col" th:text="#{first.name}">First name</th>
+                                    <th scope="col" th:text="#{last.name}">Last name</th>
+                                    <th scope="col" th:text="#{email}">Email</th>
+                                    <th scope="col" th:text="#{more}">More</th>
                                 </tr>
-                            </div>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                <div th:each="professor : ${professors}">
+                                    <tr>
+                                        <th scope="row" th:text="${professor.getId()}"></th>
+                                        <td th:text="${professor.getFirstName()}"> </td>
+                                        <td th:text="${professor.getLastName()}"></td>
+                                        <td th:text="${professor.getEmail()}"> </td>
+                                        <td> <a class="btn btn-secondary" th:href="@{/professor/{id}(id=${professor.getId()})}" role="button"
+                                                th:text="#{go.to}">Go to</a> </td>
+                                    </tr>
+                                </div>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div th:unless="${professors.size > 0}">
+                            <text th:text="#{department.have.no.professors}"> This department have no professors yet </text>
+                        </div>
                     </div>
                 </div>
             </li>
@@ -56,6 +61,7 @@
                 <div class="row justify-content-left">
                     <div class="col-2" th:text="#{courses.of.department} + ':' "> Courses of department: </div>
                     <div class="col-10">
+                        <div th:if="${courses.size > 0}">
                         <table class="table table-striped">
                             <thead>
                             <tr>
@@ -75,6 +81,10 @@
                             </div>
                             </tbody>
                         </table>
+                        </div>
+                        <div th:unless="${courses.size > 0}">
+                            <text th:text="#{department.have.no.courses}"> This department have no courses yet </text>
+                        </div>
                     </div>
                 </div>
             </li>
@@ -83,6 +93,7 @@
                 <div class="row justify-content-left">
                     <div class="col-2" th:text="#{groups.of.department} + ':' "> Groups of department: </div>
                     <div class="col-10">
+                        <div th:if="${courses.size > 0}">
                         <table class="table table-striped">
                             <thead>
                             <tr>
@@ -104,19 +115,27 @@
                             </div>
                             </tbody>
                         </table>
+                        </div>
+                        <div th:unless="${groups.size > 0}">
+                            <text th:text="#{department.have.no.groups}"> This department have no groups yet </text>
+                        </div>
                     </div>
                 </div>
             </li>
 
-
+            <div sec:authorize="hasAuthority('WRITE_PRIVILEGE')">
             <li class="list-group-item"><a class="btn btn-info" th:href="@{/department/{id}/edit(id=${department.getId()})}"
                                            role="button" th:text="#{edit}">Edit</a></li>
+            </div>
+
+            <div sec:authorize="hasAuthority('DELETE_PRIVILEGE')">
             <li class="list-group-item">
                 <form th:method="DELETE" th:action="@{/department/{id}(id=${department.getId()})}">
                     <input class="btn btn-danger" type="submit" th:value="#{delete}"/>
                     <text th:text="#{department.delete.warning}">Be careful! All professors of this department lose their department, same about courses and groups!</text>
                 </form>
             </li>
+            </div>
         </ul>
     </div>
 

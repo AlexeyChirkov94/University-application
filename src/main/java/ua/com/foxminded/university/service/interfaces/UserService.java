@@ -19,8 +19,6 @@ public interface UserService<REQUEST extends UserRequest, RESPONSE extends UserR
 
     boolean deleteById(long id);
 
-    boolean login(String email, String password);
-
     Optional<RESPONSE> findByEmail(String email);
 
 }

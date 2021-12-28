@@ -21,14 +21,18 @@
         </div>
         <ul class="list-group list-group-flush">
             <li class="list-group-item" th:text="#{duration} + ': ' + ${formOfLesson.getDuration() + ' ' +'min'}">email</li>
+            <div sec:authorize="hasAuthority('WRITE_PRIVILEGE')">
+                <li class="list-group-item"><a class="btn btn-info" th:href="@{/lesson/type/{id}/edit(id=${formOfLesson.getId()})}" role="button" th:text="#{edit}">Edit</a></li>
 
-            <li class="list-group-item"><a class="btn btn-info" th:href="@{/lesson/type/{id}/edit(id=${formOfLesson.getId()})}" role="button" th:text="#{edit}">Edit</a></li>
-            <li class="list-group-item">
-                <form th:method="DELETE" th:action="@{/lesson/type/{id}(id=${formOfLesson.getId()})}">
-                    <input class="btn btn-danger" type="submit" th:value="#{delete}"/>
-                    <text th:text="#{form.of.lesson.delete.warning}">Be careful, all lessons with current form of lesson will lose form of lesson</text>
-                </form>
-            </li>
+            </div>
+            <div sec:authorize="hasAuthority('DELETE_PRIVILEGE')">
+                <li class="list-group-item">
+                    <form th:method="DELETE" th:action="@{/lesson/type/{id}(id=${formOfLesson.getId()})}">
+                        <input class="btn btn-danger" type="submit" th:value="#{delete}"/>
+                        <text th:text="#{form.of.lesson.delete.warning}">Be careful, all lessons with current form of lesson will lose form of lesson</text>
+                    </form>
+                </li>
+            </div>
         </ul>
     </div>
 

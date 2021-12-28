@@ -27,9 +27,9 @@
                             ' (ID: ' + ${professor.getScienceDegreeResponse().getId()} + ')'">Science Degree</li>
             <li class="list-group-item">
                 <div class="row justify-content-left">
-                    <div class="col-2" th:text="#{courses.of.professor} + ':'"> Students of group: </div>
+                    <div class="col-2" th:text="#{courses.of.professor} + ':'"> Courses of professor: </div>
                     <div class="col-10">
-
+                        <div th:if="${professorsCourses.size > 0}">
                         <table class="table table-striped">
                             <thead>
                             <tr>
@@ -50,18 +50,27 @@
                             </div>
                             </tbody>
                         </table>
+                        </div>
+                        <div th:unless="${professorsCourses.size > 0}">
+                            <text th:text="#{professor.have.no.courses}"> This professor have no course for teaching yet </text>
+                        </div>
 
                     </div>
                 </div>
             </li>
             <li class="list-group-item"><a class="btn btn-success" th:href="@{/professor/{id}/timetable(id=${professor.getId()})}" role="button" th:text="#{show.timetable}">Show timetable</a></li>
-            <li class="list-group-item"><a class="btn btn-info" th:href="@{/professor/{id}/edit(id=${professor.getId()})}" role="button" th:text="#{edit}">Edit</a></li>
-            <li class="list-group-item">
-                <form th:method="DELETE" th:action="@{/professor/{id}(id=${professor.getId()})}">
-                    <input class="btn btn-danger" type="submit" th:value="#{delete}"/>
-                    <text th:text="#{professor.delete.warning}">Be careful, all lessons taught by this professor will be left without a teacher</text>
-                </form>
-            </li>
+            <div sec:authorize="hasAuthority('WRITE_PRIVILEGE')">
+                <li class="list-group-item"><a class="btn btn-info" th:href="@{/professor/{id}/edit(id=${professor.getId()})}" role="button" th:text="#{edit}">Edit</a></li>
+            </div>
+            <div sec:authorize="hasAuthority('DELETE_PRIVILEGE')">
+                <li class="list-group-item">
+                    <form th:method="DELETE" th:action="@{/professor/{id}(id=${professor.getId()})}">
+                        <input class="btn btn-danger" type="submit" th:value="#{delete}"/>
+                        <text th:text="#{professor.delete.warning}">Be careful, all lessons taught by this professor will be left without a teacher</text>
+                    </form>
+                </li>
+            </div>
+
         </ul>
     </div>
 

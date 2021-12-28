@@ -8,16 +8,22 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ua.com.foxminded.university.dao.interfaces.GroupDao;
+import ua.com.foxminded.university.dao.interfaces.RoleDao;
 import ua.com.foxminded.university.dao.interfaces.StudentDao;
 import ua.com.foxminded.university.dto.StudentRequest;
+import ua.com.foxminded.university.dto.StudentResponse;
 import ua.com.foxminded.university.entity.Group;
+import ua.com.foxminded.university.entity.Role;
 import ua.com.foxminded.university.entity.Student;
 import ua.com.foxminded.university.mapper.StudentMapper;
 import ua.com.foxminded.university.service.validator.UserValidator;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -29,6 +35,9 @@ class StudentServiceImplTest {
 
     @Mock
     GroupDao groupDao;
+
+    @Mock
+    RoleDao roleDao;
 
     @Mock
     UserValidator userValidator;
@@ -43,24 +52,26 @@ class StudentServiceImplTest {
     StudentServiceImpl studentService;
 
     @Test
-    void loginShouldReturnTrueIfArgumentEmailAndPasswordIsEqualEmailAndPasswordFromDB() {
+    void findByEmailShouldReturnOptionalOfStudentResponseIfArgumentIsEmail() {
         String email= "Alexey94@gamil.com";
-        String password= "12345";
+        Student student = Student.builder().withId(1L).build();
+        StudentResponse studentResponse = new StudentResponse();
+        studentResponse.setId(1L);
 
-        when(studentDao.findByEmail(email)).thenReturn(Optional.of(Student.builder().withEmail(email).withPassword(password)
-                .withId(1L).build()));
-        when(passwordEncoder.matches(password, password)).thenReturn(true);
+        when(studentDao.findByEmail(email)).thenReturn(Optional.of(Student.builder().withId(1L).build()));
+        when(studentMapper.mapEntityToDto(student)).thenReturn(studentResponse);
 
-        studentService.login(email, password);
+        studentService.findByEmail(email);
 
         verify(studentDao).findByEmail(email);
+        verify(studentMapper).mapEntityToDto(student);
     }
 
     @Test
-    void findByEmailShouldReturnOptionalOfStudentResponseIfArgumentIsEmail() {
+    void findByEmailShouldReturnOptionalOfEmptyStudentResponseIfEmailNotRegistered() {
         String email= "Alexey94@gamil.com";
 
-        when(studentDao.findByEmail(email)).thenReturn(Optional.of(Student.builder().withId(1L).build()));
+        when(studentDao.findByEmail(email)).thenReturn(Optional.empty());
 
         studentService.findByEmail(email);
 
@@ -137,6 +148,7 @@ class StudentServiceImplTest {
     void registerShouldAddStudentToDBIfArgumentsIsStudentRequestWithGroup() {
         String email= "Alexey94@gamil.com";
         String password = "12345";
+        List<Role> studentRole = Collections.singletonList(Role.builder().withName("ROLE_STUDENT").build());
         Student student = Student.builder().withId(1L).withFirstName("Alex").withEmail(email).build();
         Group group = Group.builder().withId(1L).withName("Group").build();
         StudentRequest studentRequest = new StudentRequest();
@@ -151,6 +163,7 @@ class StudentServiceImplTest {
         when(studentDao.save(student)).thenReturn(student);
         when(studentDao.findById(1L)).thenReturn(Optional.of(student));
         when(groupDao.findById(1L)).thenReturn(Optional.of(group));
+        when(roleDao.findByUserId(1L)).thenReturn(studentRole);
         doNothing().when(studentDao).enterGroup(1L, 1L);
 
         studentService.register(studentRequest);
@@ -162,6 +175,7 @@ class StudentServiceImplTest {
         verify(studentDao).save(student);
         verify(studentDao).findById(1L);
         verify(groupDao).findById(1L);
+        verify(roleDao).findByUserId(1L);
         verify(studentDao).enterGroup(1L, 1L);
     }
 
@@ -169,6 +183,7 @@ class StudentServiceImplTest {
     void registerShouldAddStudentToDBIfArgumentsIsStudentRequestWithoutGroup() {
         String email= "Alexey94@gamil.com";
         String password = "12345";
+        List<Role> studentRole = Collections.singletonList(Role.builder().withName("ROLE_STUDENT").build());
         Student student = Student.builder().withId(1L).withFirstName("Alex").withEmail(email).build();
         StudentRequest studentRequest = new StudentRequest();
         studentRequest.setEmail(email);
@@ -180,6 +195,7 @@ class StudentServiceImplTest {
         when(passwordEncoder.encode(password)).thenReturn(password);
         when(studentMapper.mapDtoToEntity(studentRequest)).thenReturn(student);
         when(studentDao.save(student)).thenReturn(student);
+        when(roleDao.findByUserId(1L)).thenReturn(studentRole);
 
         studentService.register(studentRequest);
 
@@ -188,6 +204,72 @@ class StudentServiceImplTest {
         verify(passwordEncoder).encode(password);
         verify(studentMapper).mapDtoToEntity(studentRequest);
         verify(studentDao).save(student);
+        verify(roleDao).findByUserId(1L);
+    }
+
+    @Test
+    void registerWithAddingDefaultRoleShouldAddStudentToDBAndAddRoleToStudentIfArgumentsIsStudentRequestWithoutGroup() {
+        String email= "Alexey94@gamil.com";
+        String password = "12345";
+        List<Role> studentRole = Collections.emptyList();
+        Role defaultRole = Role.builder().withId(3L).withName("ROLE_STUDENT").build();
+        Student student = Student.builder().withId(1L).withFirstName("Alex").withEmail(email).build();
+        StudentRequest studentRequest = new StudentRequest();
+        studentRequest.setEmail(email);
+        studentRequest.setPassword(password);
+        studentRequest.setGroupId(0L);
+
+        doNothing().when(userValidator).validate(studentRequest);
+        when(studentDao.findByEmail(email)).thenReturn(Optional.empty());
+        when(passwordEncoder.encode(password)).thenReturn(password);
+        when(studentMapper.mapDtoToEntity(studentRequest)).thenReturn(student);
+        when(studentDao.save(student)).thenReturn(student);
+        when(roleDao.findByUserId(1L)).thenReturn(studentRole);
+        when(roleDao.findByName("ROLE_STUDENT")).thenReturn(Optional.of(defaultRole));
+        when(studentDao.findById(1L)).thenReturn(Optional.of(student));
+        when(roleDao.findById(3L)).thenReturn(Optional.of(defaultRole));
+
+        studentService.register(studentRequest);
+
+        verify(userValidator).validate(studentRequest);
+        verify(studentDao).findByEmail(email);
+        verify(passwordEncoder).encode(password);
+        verify(studentMapper).mapDtoToEntity(studentRequest);
+        verify(studentDao).save(student);
+        verify(roleDao).findByUserId(1L);
+        verify(roleDao).findByName("ROLE_STUDENT");
+        verify(studentDao).findById(1L);
+        verify(roleDao).findById(3L);
+    }
+
+    @Test
+    void registerWithAddingDefaultRoleShouldThrowExceptionIfDefaultRoleNotExist() {
+        String email= "Alexey94@gamil.com";
+        String password = "12345";
+        List<Role> studentRole = Collections.emptyList();
+        Student student = Student.builder().withId(1L).withFirstName("Alex").withEmail(email).build();
+        StudentRequest studentRequest = new StudentRequest();
+        studentRequest.setEmail(email);
+        studentRequest.setPassword(password);
+        studentRequest.setGroupId(0L);
+
+        doNothing().when(userValidator).validate(studentRequest);
+        when(studentDao.findByEmail(email)).thenReturn(Optional.empty());
+        when(passwordEncoder.encode(password)).thenReturn(password);
+        when(studentMapper.mapDtoToEntity(studentRequest)).thenReturn(student);
+        when(studentDao.save(student)).thenReturn(student);
+        when(roleDao.findByUserId(1L)).thenReturn(studentRole);
+        when(roleDao.findByName("ROLE_STUDENT")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> studentService.register(studentRequest)).hasMessage("ROLE_STUDENT not initialized");
+
+        verify(userValidator).validate(studentRequest);
+        verify(studentDao).findByEmail(email);
+        verify(passwordEncoder).encode(password);
+        verify(studentMapper).mapDtoToEntity(studentRequest);
+        verify(studentDao).save(student);
+        verify(roleDao).findByUserId(1L);
+        verify(roleDao).findByName("ROLE_STUDENT");
     }
 
     @Test
@@ -308,13 +390,18 @@ class StudentServiceImplTest {
     @Test
     void deleteShouldDeleteDataOfStudentIfArgumentIsStudentId() {
         long studentId = 1;
+        List<Role> professorRoles = Collections.singletonList(Role.builder().withId(2L).withName("ROLE_STUDENT").build());
 
         when(studentDao.findById(studentId)).thenReturn(Optional.of(Student.builder().withId(studentId).build()));
         when(studentDao.deleteById(studentId)).thenReturn(true);
+        when(roleDao.findByUserId(studentId)).thenReturn(professorRoles);
+        doNothing().when(studentDao).removeRoleFromUser(1L, 2L);
 
         studentService.deleteById(studentId);
 
-        verify(studentDao).findById(studentId);
+        verify(studentDao, times(2)).findById(studentId);
+        verify(roleDao).findByUserId(studentId);
+        verify(studentDao).removeRoleFromUser(1L, 2L);
         verify(studentDao).deleteById(studentId);
     }
 
