@@ -7,11 +7,21 @@
   <groupId>com.chirkov</groupId>
   <artifactId>UniversityApplication</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <packaging>war</packaging>
+  <modules>
+    <module>university-data</module>
+    <module>university-client</module>
+    <module>university-service</module>
+    <module>university-ui</module>
+  </modules>
+  <packaging>pom</packaging>
   <name>University Application program</name>
   <description>Application for creating and shows TimeTable</description>
 
   <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
     <junit.jupiter.version>5.4.0</junit.jupiter.version>
     <org.springframework.version>5.3.9</org.springframework.version>
     <org.springframework.security.version>5.6.0</org.springframework.security.version>
@@ -35,7 +45,29 @@
     <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
   </properties>
 
-  <dependencies>
+  <dependencyManagement>
+    <dependencies>
+    <dependency>
+      <groupId>com.chirkov</groupId>
+      <artifactId>university-data</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.chirkov</groupId>
+      <artifactId>university-client</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.chirkov</groupId>
+      <artifactId>university-service</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.chirkov</groupId>
+      <artifactId>university-ui</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
@@ -185,23 +217,26 @@
       <version>${org.hamcrest.version}</version>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
+  </dependencyManagement>
 
   <build>
     <finalName>webUniversityApplication</finalName>
+
     <plugins>
+
       <plugin>
         <artifactId>maven-war-plugin</artifactId>
         <version>3.2.2</version>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.0</version>
         <configuration>
-          <source>8</source>
-          <target>8</target>
+          <source>${maven.compiler.source}</source>
+          <target>${maven.compiler.target}</target>
           <annotationProcessorPaths>
             <path>
               <groupId>org.mapstruct</groupId>
@@ -226,6 +261,7 @@
           </compilerArgs>
         </configuration>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -236,78 +272,7 @@
           </includes>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <archive>
-                <manifest>
-                  <mainClass>
-                    ua.com.foxminded.university.Application
-                  </mainClass>
-                </manifest>
-              </archive>
-              <descriptorRefs>
-                <descriptorRef>jar-with-dependencies</descriptorRef>
-              </descriptorRefs>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
-        <version>${org.jacoco.version}</version>
-        <configuration>
-          <excludes>
-            <exclude>ua/com/foxminded/university/Application.class</exclude>
-            <exclude>ua/com/foxminded/university/dao/domain/Page.class</exclude>
-            <exclude>ua/com/foxminded/university/configuration/**</exclude>
-            <exclude>ua/com/foxminded/university/dto/**</exclude>
-            <exclude>ua/com/foxminded/university/entity/**</exclude>
-          </excludes>
-        </configuration>
-        <executions>
-          <execution>
-            <id>default-prepare-agent</id>
-            <goals>
-              <goal>prepare-agent</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>default-report</id>
-            <goals>
-              <goal>report</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>default-check</id>
-            <goals>
-              <goal>check</goal>
-            </goals>
-            <configuration>
-              <rules>
-                <rule>
-                  <element>BUNDLE</element>
-                  <limits>
-                    <limit>
-                      <counter>COMPLEXITY</counter>
-                      <value>COVEREDRATIO</value>
-                      <minimum>0.9</minimum>
-                    </limit>
-                  </limits>
-                </rule>
-              </rules>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
+
     </plugins>
   </build>
 </project>
