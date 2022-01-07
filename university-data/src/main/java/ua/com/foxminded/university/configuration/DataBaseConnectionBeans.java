@@ -6,26 +6,20 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.sql.DataSource;
 
 @Configuration
 @EnableTransactionManagement(proxyTargetClass = true)
-@PropertySource("classpath:db.properties")
+@PropertySource("classpath:dataSourceNameSwitcher.properties")
 public class DataBaseConnectionBeans {
 
     @Bean
-    public DataSource dataSource(@Value("${db.driver}") String dbDriver, @Value("${db.url}") String dbUrl,
-                                 @Value("${db.user}") String dbUsername, @Value("${db.password}") String dbPassword) {
-
-        DriverManagerDataSource driver = new DriverManagerDataSource();
-        driver.setDriverClassName(dbDriver);
-        driver.setUrl(dbUrl);
-        driver.setUsername(dbUsername);
-        driver.setPassword(dbPassword);
-
-        return driver;
+    public DataSource dataSource(@Value("${data.source.name}") String dataSourceName) {
+        JndiDataSourceLookup dataSource = new JndiDataSourceLookup();
+        dataSource.setResourceRef(true);
+        return dataSource.getDataSource(dataSourceName);
     }
 
     @Bean

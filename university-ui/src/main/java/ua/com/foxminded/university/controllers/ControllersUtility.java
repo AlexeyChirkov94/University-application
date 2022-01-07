@@ -11,6 +11,10 @@ import java.util.Map;
 @UtilityClass
 public class ControllersUtility {
 
+    private static final String ATTRIBUTE_NAME_OF_CURRENT_PAGE = "currentPage";
+    private static final String ATTRIBUTE_NAME_OF_NEXT_PAGE = "nextPage";
+    private static final String ATTRIBUTE_NAME_OF_PREVIOUS_PAGE = "previousPage";
+
     public static void setPagesValueAndStatus(String page, Model model){
 
         Map<String, Integer> pages = new HashMap<>();
@@ -22,11 +26,11 @@ public class ControllersUtility {
             currentIntegerPage = 1;
         }
 
-        pages.put("currentPage", currentIntegerPage);
-        pages.put("nextPage", currentIntegerPage + 1);
-        pages.put("previousPage", currentIntegerPage - 1);
+        pages.put(ATTRIBUTE_NAME_OF_CURRENT_PAGE, currentIntegerPage);
+        pages.put(ATTRIBUTE_NAME_OF_NEXT_PAGE, currentIntegerPage + 1);
+        pages.put(ATTRIBUTE_NAME_OF_PREVIOUS_PAGE, currentIntegerPage - 1);
 
-        if(pages.get("previousPage") < 1 ){
+        if(pages.get(ATTRIBUTE_NAME_OF_PREVIOUS_PAGE) < 1 ){
             model.addAttribute("liPreviousPageLabelStatus", "page-item disabled");
             model.addAttribute("aPreviousPageLabelStatus", "page-link");
             model.addAttribute("liPreviousPageNumberStatus", "invisible");
@@ -38,9 +42,9 @@ public class ControllersUtility {
             model.addAttribute("aPreviousPageNumberStatus", "page-link");
         }
 
-        model.addAttribute("currentPage", pages.get("currentPage"));
-        model.addAttribute("nextPage", pages.get("nextPage"));
-        model.addAttribute("previousPage", pages.get("previousPage"));
+        model.addAttribute(ATTRIBUTE_NAME_OF_CURRENT_PAGE, pages.get(ATTRIBUTE_NAME_OF_CURRENT_PAGE));
+        model.addAttribute(ATTRIBUTE_NAME_OF_NEXT_PAGE, pages.get(ATTRIBUTE_NAME_OF_NEXT_PAGE));
+        model.addAttribute(ATTRIBUTE_NAME_OF_PREVIOUS_PAGE, pages.get(ATTRIBUTE_NAME_OF_PREVIOUS_PAGE));
     }
 
 

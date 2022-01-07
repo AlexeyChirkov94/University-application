@@ -3,6 +3,7 @@ package ua.com.foxminded.university.service.impl;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
+import ua.com.foxminded.university.dao.CrudPageableDao;
 import ua.com.foxminded.university.dao.RoleDao;
 import ua.com.foxminded.university.dao.UserDao;
 import ua.com.foxminded.university.dto.UserRequest;
@@ -22,6 +23,7 @@ public abstract class AbstractUserServiceImpl<REQUEST extends UserRequest, RESPO
     protected final UserValidator userValidator;
 
     @Override
+    @Transactional(transactionManager = "txManager")
     public RESPONSE register(REQUEST userDto) {
         userValidator.validate(userDto);
         if (userDao.findByEmail(userDto.getEmail()).isPresent()) {
@@ -46,7 +48,6 @@ public abstract class AbstractUserServiceImpl<REQUEST extends UserRequest, RESPO
         userDao.removeRoleFromUser(userId, removingRoleId);
     }
 
-    @Transactional(transactionManager = "txManager")
     protected void removeAllRolesFromUser(long userId){
         checkThatUserExist(userId);
         roleDao.findByUserId(userId).forEach(role -> userDao.removeRoleFromUser(userId, role.getId()));

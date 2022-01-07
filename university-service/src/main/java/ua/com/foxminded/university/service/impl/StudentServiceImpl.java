@@ -23,7 +23,6 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
 
     private final StudentDao studentDao;
     private final GroupDao groupDao;
-    private final UserValidator userValidator;
     private final StudentMapper studentMapper;
 
     public StudentServiceImpl(StudentDao studentDao,GroupDao groupDao, PasswordEncoder passwordEncoder, UserValidator userValidator,
@@ -31,7 +30,6 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
         super(passwordEncoder, studentDao, roleDao, userValidator);
         this.studentDao = studentDao;
         this.groupDao = groupDao;
-        this.userValidator = userValidator;
         this.studentMapper = studentMapper;
     }
 
@@ -84,6 +82,7 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
     }
 
     @Override
+    @Transactional(transactionManager = "txManager")
     public boolean deleteById(long id) {
         if(studentDao.findById(id).isPresent()){
             removeAllRolesFromUser(id);
@@ -128,7 +127,6 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
     }
 
     @Override
-    @Transactional(transactionManager = "txManager")
     protected StudentResponse registerCertainUser(StudentRequest studentRequest) {
         Student studentBeforeSave = studentMapper.mapDtoToEntity(studentRequest);
         Student studentAfterSave = studentDao.save(studentBeforeSave);
@@ -138,7 +136,7 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
             changeGroup(studentId, studentRequest.getGroupId());
         }
 
-        if(roleDao.findByUserId(studentId).size() == 0) {
+        if(roleDao.findByUserId(studentId).isEmpty()) {
             Role studentRole = roleDao.findByName("ROLE_STUDENT")
                     .orElseThrow(() -> new EntityDontExistException("ROLE_STUDENT not initialized"));
 

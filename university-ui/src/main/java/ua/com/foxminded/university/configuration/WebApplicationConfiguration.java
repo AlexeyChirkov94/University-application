@@ -31,6 +31,8 @@ import java.util.Locale;
 @AllArgsConstructor
 public class WebApplicationConfiguration implements WebMvcConfigurer {
 
+    private static final String ENCODING = "UTF-8";
+
     private ApplicationContext applicationContext;
 
     @Bean
@@ -39,7 +41,7 @@ public class WebApplicationConfiguration implements WebMvcConfigurer {
         templateResolver.setApplicationContext(applicationContext);
         templateResolver.setPrefix("/WEB-INF/views/");
         templateResolver.setSuffix(".html");
-        templateResolver.setCharacterEncoding("UTF-8");
+        templateResolver.setCharacterEncoding(ENCODING);
         return templateResolver;
     }
 
@@ -62,7 +64,7 @@ public class WebApplicationConfiguration implements WebMvcConfigurer {
     public MessageSource messageSource() {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
         messageSource.setBasenames("messages");
-        messageSource.setDefaultEncoding("UTF-8");
+        messageSource.setDefaultEncoding(ENCODING);
 
         return messageSource;
     }
@@ -93,7 +95,7 @@ public class WebApplicationConfiguration implements WebMvcConfigurer {
     public void configureViewResolvers(ViewResolverRegistry registry) {
         ThymeleafViewResolver resolver = new ThymeleafViewResolver();
         resolver.setTemplateEngine(templateEngine());
-        resolver.setCharacterEncoding("UTF-8");
+        resolver.setCharacterEncoding(ENCODING);
         registry.viewResolver(resolver);
     }
 

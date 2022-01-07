@@ -5,13 +5,14 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.chirkov</groupId>
-  <artifactId>UniversityApplication</artifactId>
+  <artifactId>university</artifactId>
   <version>1.0-SNAPSHOT</version>
   <modules>
     <module>university-data</module>
     <module>university-client</module>
     <module>university-service</module>
     <module>university-ui</module>
+    <module>university-coverage</module>
   </modules>
   <packaging>pom</packaging>
   <name>University Application program</name>
@@ -271,6 +272,54 @@
             <include>**/*Test*.java</include>
           </includes>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${org.jacoco.version}</version>
+        <configuration>
+          <excludes>
+            <exclude>ua/com/foxminded/university/dao/domain/Page.class</exclude>
+            <exclude>ua/com/foxminded/university/configuration/**</exclude>
+            <exclude>ua/com/foxminded/university/dto/**</exclude>
+            <exclude>ua/com/foxminded/university/entity/**</exclude>
+          </excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <id>default-prepare-agent</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>default-report</id>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>default-check</id>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <rule>
+                  <element>BUNDLE</element>
+                  <limits>
+                    <limit>
+                      <counter>COMPLEXITY</counter>
+                      <value>COVEREDRATIO</value>
+                      <minimum>0.9</minimum>
+                    </limit>
+                  </limits>
+                </rule>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
 
     </plugins>

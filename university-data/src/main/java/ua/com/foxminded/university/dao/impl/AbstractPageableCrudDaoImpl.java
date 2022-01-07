@@ -22,7 +22,7 @@ public abstract class AbstractPageableCrudDaoImpl<E> extends AbstractCrudDaoImpl
 
     public List<E> findAll(int page, int itemsPerPage){
         int offset = itemsPerPage * (page - 1);
-        PreparedStatementSetter preparedStatementSetter = (ps) -> {
+        PreparedStatementSetter preparedStatementSetter = ps -> {
             ps.setInt(1, offset);
             ps.setInt(2, itemsPerPage);
         };
@@ -32,7 +32,7 @@ public abstract class AbstractPageableCrudDaoImpl<E> extends AbstractCrudDaoImpl
 
     @Override
     public long count(){
-        return jdbcTemplate.queryForObject(countQuery, Long.class, new Object[] {});
+        return jdbcTemplate.queryForObject(countQuery, Long.class);
     }
 
 }

@@ -67,7 +67,7 @@ public class ApplicationUserDetails implements UserDetailsService {
 
     private List<String> getPrivileges(List<Role> roles) {
         List<String> allUserPrivileges = roles.stream().map(Role::getName).collect(Collectors.toList());
-        List<Privilege> privileges = roles.stream().flatMap((role) -> privilegeDao.findByRoleId(role.getId()).stream())
+        List<Privilege> privileges = roles.stream().flatMap(role -> privilegeDao.findByRoleId(role.getId()).stream())
                 .collect(Collectors.toList());
         allUserPrivileges.addAll(privileges.stream().map(Privilege::getName).collect(Collectors.toList()));
 
