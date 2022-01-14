@@ -29,6 +29,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private final PasswordEncoder passwordEncoder;
 
     @Override
+    @Transactional(transactionManager = "txManager")
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
 
         if (alreadySetup){
@@ -59,8 +60,8 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         alreadySetup = true;
     }
 
-    @Transactional(transactionManager = "txManager")
-    Privilege createPrivilegeIfNotFound(String name) {
+
+    private Privilege createPrivilegeIfNotFound(String name) {
 
         Privilege privilege = Privilege.builder().withName(name).build();
         Optional<Privilege> searchingPrivilege = privilegeDao.findByName(name);
@@ -69,8 +70,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
     }
 
-    @Transactional(transactionManager = "txManager")
-    Role createRoleIfNotFound(String name, List<Privilege> necessaryPrivileges) {
+    private Role createRoleIfNotFound(String name, List<Privilege> necessaryPrivileges) {
 
         Role role = Role.builder().withName(name).build();
         Optional<Role> searchingRole = roleDao.findByName(name);

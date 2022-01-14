@@ -161,7 +161,7 @@ class LessonServiceImplTest {
 
         verify(lessonMapper).mapDtoToEntity(lessonRequest);
         verify(lessonDao).save(lesson);
-        verify(lessonDao, times(6)).findById(1L);
+        verify(lessonDao, times(4)).findById(1L);
         verify(courseDao).findById(1L);
         verify(groupDao).findById(1L);
         verify(professorDao).findById(1L);
@@ -257,7 +257,7 @@ class LessonServiceImplTest {
 
         verify(lessonMapper).mapDtoToEntity(lessonRequest);
         verify(lessonDao).update(lesson);
-        verify(lessonDao, times(6)).findById(1L);
+        verify(lessonDao, times(4)).findById(1L);
         verify(courseDao).findById(1L);
         verify(groupDao).findById(1L);
         verify(professorDao).findById(1L);
@@ -329,7 +329,7 @@ class LessonServiceImplTest {
 
         verify(lessonMapper).mapDtoToEntity(lessonRequest);
         verify(lessonDao).update(lesson);
-        verify(lessonDao, times(3)).findById(1L);
+        verify(lessonDao, times(2)).findById(1L);
         verify(courseDao).findById(1L);
         verify(groupDao).findById(1L);
     }
@@ -359,7 +359,7 @@ class LessonServiceImplTest {
 
         verify(lessonMapper).mapDtoToEntity(lessonRequest);
         verify(lessonDao).update(lesson);
-        verify(lessonDao, times(6)).findById(1L);
+        verify(lessonDao, times(4)).findById(1L);
         verify(courseDao).findById(1L);
         verify(groupDao).findById(1L);
         verify(professorDao).findById(1L);
@@ -389,7 +389,7 @@ class LessonServiceImplTest {
 
         verify(lessonMapper).mapDtoToEntity(lessonRequest);
         verify(lessonDao).update(lesson);
-        verify(lessonDao, times(4)).findById(1L);
+        verify(lessonDao, times(3)).findById(1L);
         verify(courseDao).findById(1L);
         verify(groupDao).findById(1L);
         verify(professorDao).findById(1L);
@@ -416,7 +416,7 @@ class LessonServiceImplTest {
 
         verify(lessonMapper).mapDtoToEntity(lessonRequest);
         verify(lessonDao).update(lesson);
-        verify(lessonDao, times(2)).findById(1L);
+        verify(lessonDao).findById(1L);
         verify(professorDao).findById(1L);
     }
 
@@ -442,7 +442,7 @@ class LessonServiceImplTest {
 
         verify(lessonMapper).mapDtoToEntity(lessonRequest);
         verify(lessonDao).update(lesson);
-        verify(lessonDao, times(4)).findById(1L);
+        verify(lessonDao, times(2)).findById(1L);
         verify(courseDao).findById(1L);
         verify(professorDao).findById(1L);
     }

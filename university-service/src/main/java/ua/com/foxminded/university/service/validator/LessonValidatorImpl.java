@@ -6,6 +6,7 @@ import ua.com.foxminded.university.dao.CourseDao;
 import ua.com.foxminded.university.dao.LessonDao;
 import ua.com.foxminded.university.entity.Course;
 import ua.com.foxminded.university.entity.Lesson;
+import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.exception.IncompatibilityCourseAndProfessorException;
 import ua.com.foxminded.university.service.exception.ValidateException;
 
@@ -38,7 +39,8 @@ public class LessonValidatorImpl implements LessonValidator{
     @Override
     public void checkGroupTimeTableCrossing(long lessonId, long groupId) {
         List<Lesson> existingLessonsOfGroup = lessonDao.findByGroupId(groupId);
-        Lesson lesson = lessonDao.findById(lessonId).get();
+        Lesson lesson = lessonDao.findById(lessonId)
+                .orElseThrow(()-> new EntityDontExistException("There are no lesson with id: " + lessonId));
         existingLessonsOfGroup.remove(lesson);
         if(lesson.getTimeOfStartLesson() != null) {
             boolean isNewLessonMatchesWithAnotherLessonsInGroup = existingLessonsOfGroup.stream()
@@ -53,7 +55,8 @@ public class LessonValidatorImpl implements LessonValidator{
     @Override
     public void checkProfessorTimeTableCrossing(long lessonId, long professorId) {
         List<Lesson> existingLessonOfTeacher = lessonDao.findByProfessorId(professorId);
-        Lesson lesson = lessonDao.findById(lessonId).get();
+        Lesson lesson = lessonDao.findById(lessonId)
+                .orElseThrow(()-> new EntityDontExistException("There are no lesson with id: " + lessonId));
         existingLessonOfTeacher.remove(lesson);
         if(lesson.getTimeOfStartLesson() != null) {
             boolean isNewLessonMatchesWithAnotherLessonsOfProfessor = existingLessonOfTeacher.stream()

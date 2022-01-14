@@ -153,6 +153,27 @@ class LessonValidatorImplTest {
     }
 
     @Test
+    void checkGroupTimeTableCrossingShouldThrowExceptionIfLessonNotExist(){
+        long groupId = 1;
+        long lessonId = 2;
+
+        Lesson lesson1 = Lesson.builder().withId(1L).withTimeOfStartLesson(LocalDateTime.of(2020, 01, 10, 10, 00)).build();
+        Lesson lesson2 = Lesson.builder().withId(2L).withTimeOfStartLesson(LocalDateTime.of(2020, 01, 12, 10, 00)).build();
+        List<Lesson> groupLessons = new ArrayList<>();
+        groupLessons.add(lesson1);
+        groupLessons.add(lesson2);
+
+        when(lessonDao.findByGroupId(groupId)).thenReturn(groupLessons);
+        when(lessonDao.findById(lessonId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> lessonValidator.checkGroupTimeTableCrossing(lessonId, groupId))
+                .hasMessage("There are no lesson with id: 2");
+
+        verify(lessonDao).findByGroupId(groupId);
+        verify(lessonDao).findById(lessonId);
+    }
+
+    @Test
     void checkProfessorTimeTableCrossingShouldDoNothingIfLessonHaveToTimeOfStart(){
         long professorId = 1;
         long lessonId = 2;
@@ -222,4 +243,26 @@ class LessonValidatorImplTest {
         verify(lessonDao).findByProfessorId(professorId);
         verify(lessonDao).findById(lessonId);
     }
+
+    @Test
+    void checkProfessorTimeTableCrossingShouldThrowExceptionIfLessonNotExist(){
+        long professorId = 1;
+        long lessonId = 2;
+
+        Lesson lesson1 = Lesson.builder().withId(1L).withTimeOfStartLesson(LocalDateTime.of(2020, 01, 10, 10, 00)).build();
+        Lesson lesson2 = Lesson.builder().withId(2L).withTimeOfStartLesson(LocalDateTime.of(2020, 01, 12, 10, 00)).build();
+        List<Lesson> professorLessons = new ArrayList<>();
+        professorLessons.add(lesson1);
+        professorLessons.add(lesson2);
+
+        when(lessonDao.findByProfessorId(professorId)).thenReturn(professorLessons);
+        when(lessonDao.findById(lessonId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> lessonValidator.checkProfessorTimeTableCrossing(lessonId, professorId))
+                .hasMessage("There are no lesson with id: 2");
+
+        verify(lessonDao).findByProfessorId(professorId);
+        verify(lessonDao).findById(lessonId);
+    }
+
 }

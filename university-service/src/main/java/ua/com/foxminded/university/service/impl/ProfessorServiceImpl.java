@@ -34,7 +34,6 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
     private final CourseDao courseDao;
     private final DepartmentDao departmentDao;
     private final ProfessorMapper professorMapper;
-    private final UserValidator userValidator;
 
     public ProfessorServiceImpl(ProfessorDao professorDao, LessonDao lessonDao, CourseDao courseDao, DepartmentDao departmentDao,
                                 PasswordEncoder passwordEncoder, UserValidator userValidator, ScienceDegreeValidator scienceDegreeValidator,
@@ -46,7 +45,6 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
         this.departmentDao = departmentDao;
         this.scienceDegreeValidator = scienceDegreeValidator;
         this.professorMapper = professorMapper;
-        this.userValidator = userValidator;
     }
 
     @Override
@@ -170,7 +168,6 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
     }
 
     @Override
-    @Transactional(transactionManager = "txManager")
     protected ProfessorResponse registerCertainUser(ProfessorRequest professorRequest) {
         Professor professorBeforeSave = professorMapper.mapDtoToEntity(professorRequest);
         Professor professorAfterSave = professorDao.save(professorBeforeSave);
@@ -184,7 +181,7 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
             changeScienceDegree(professorId, professorRequest.getScienceDegreeId());
         }
 
-        if(roleDao.findByUserId(professorId).size() == 0) {
+        if(roleDao.findByUserId(professorId).isEmpty()) {
             Role professorRole = roleDao.findByName("ROLE_PROFESSOR")
                     .orElseThrow(() -> new EntityDontExistException("ROLE_PROFESSOR not initialized"));
 

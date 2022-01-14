@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+
+  app:
+    build: .
+    environment:
+      - DATA_SOURCE_NAME=jdbc/docker/postgres
+    ports:
+      - 8080:8080
+    networks:
+      - postgres
+
+  db:
+    image: postgres
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      - ../university-data/src/main/resources/database/schema.sql:/docker-entrypoint-initdb.d/create_tables.sql
+      - ../university-data/src/main/resources/database/data.sql:/docker-entrypoint-initdb.d/fill_tables.sql
+    environment:
+      POSTGRES_DB: university_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      PGDATA: /var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres
+    restart: unless-stopped
+
+networks:
+  postgres:
+    driver: bridge
+
+volumes:
+  postgres:

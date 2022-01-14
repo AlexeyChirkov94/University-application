@@ -162,12 +162,11 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
     }
 
     private void changeTeacher(long lessonId, long newProfessorId) {
-        checkThatLessonExist(lessonId);
+        Lesson lesson = checkThatLessonExist(lessonId);
         checkThatProfessorExist(newProfessorId);
 
         lessonDao.changeTeacher(lessonId, newProfessorId);
 
-        Lesson lesson = lessonDao.findById(lessonId).get();
         if(lesson.getCourse() != null){
             lessonValidator.validateCompatibilityCourseAndProfessor(lesson.getCourse().getId(), newProfessorId);
         }
@@ -175,21 +174,20 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
     }
 
     private void changeCourse(long lessonId, long newCourseId) {
-        checkThatLessonExist(lessonId);
+        Lesson lesson = checkThatLessonExist(lessonId);
         checkThatCourseExist(newCourseId);
 
         lessonDao.changeCourse(lessonId, newCourseId);
 
-        Lesson lesson = lessonDao.findById(lessonId).get();
         if(lesson.getTeacher() != null){
             lessonValidator.validateCompatibilityCourseAndProfessor(newCourseId, lesson.getTeacher().getId());
         }
     }
 
-    private void checkThatLessonExist(long lessonId){
-        if (!lessonDao.findById(lessonId).isPresent()) {
-            throw new EntityDontExistException("There no lesson with id: " + lessonId);
-        }
+    private Lesson checkThatLessonExist(long lessonId){
+        return lessonDao.findById(lessonId)
+                .orElseThrow(() -> new EntityDontExistException("There no lesson with id: " + lessonId));
+
     }
 
     private void checkThatFormOfLessonExist(long formOfLessonId){

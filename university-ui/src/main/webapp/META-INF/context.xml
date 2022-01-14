@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='utf-8'?>
+
+<Context>
+    <Resource name="jdbc/localhost/postgres" auth="Container" type="javax.sql.DataSource"
+              maxTotal="50" maxIdle="30" maxWaitMillis="10000"
+              username="postgres" password="1234"
+              driverClassName="org.postgresql.Driver"
+              url="jdbc:postgresql://localhost:5432/university_db"/>
+
+    <Resource name="jdbc/docker/postgres" auth="Container" type="javax.sql.DataSource"
+              maxTotal="50" maxIdle="30" maxWaitMillis="10000"
+              username="postgres" password="1234"
+              driverClassName="org.postgresql.Driver"
+              url="jdbc:postgresql://db:5432/university_db"/>
+</Context>
