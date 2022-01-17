@@ -8,8 +8,8 @@ import ua.com.foxminded.university.dao.CourseDao;
 import ua.com.foxminded.university.dao.DepartmentDao;
 import ua.com.foxminded.university.entity.Course;
 import ua.com.foxminded.university.entity.Department;
-
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +26,7 @@ class CourseDaoImplTest {
         context = new AnnotationConfigApplicationContext(PersistenceTestsContextConfiguration.class);
         courseDao = context.getBean(CourseDaoImpl.class);
         departmentDao = context.getBean(DepartmentDaoImpl.class);
-        departmentForTest = Department.builder().withId(0L).build();
+        departmentForTest = Department.builder().withId(1L).withName("Department of History").build();
     }
 
     @Test
@@ -46,7 +46,7 @@ class CourseDaoImplTest {
     void createAndReadShouldAddListOfNewCoursesToDatabaseIfArgumentIsListOfCourses(){
         List<Course> addingCourseEntities = Arrays.asList(Course.builder()
                 .withName("Rome History")
-                .withDepartment(departmentForTest)
+                .withDepartment(Department.builder().withId(1L).withName("Department of History").build())
                 .build());
         courseDao.saveAll(addingCourseEntities);
         List<Course> readingCourseEntities = Arrays.asList(courseDao.findById(5L).get());
@@ -147,7 +147,8 @@ class CourseDaoImplTest {
                 .withDepartment(Department.builder().withId(0L).build()).build();
         Course actualAfterRemoving = courseDao.findById(1L).get();
 
-        assertCourses(actualAfterRemoving, expectedAfterRemoving);
+        assertThat(actualAfterRemoving.getName()).isEqualTo(expectedAfterRemoving.getName());
+        assertThat(actualAfterRemoving.getDepartment()).isNull();
     }
 
     @Test
@@ -156,15 +157,15 @@ class CourseDaoImplTest {
                 .withName("Russia History")
                 .withDepartment(departmentDao.findById(1L).get())
                 .build();
-        Course actual = courseDao.findByName("Russia History").get();
+        Course actual = courseDao.findByName("Russia History").get(0);
 
         assertCourses(actual, expected);
     }
 
     @Test
     void findByNameShouldReturnOptionalEmptyIfArgumentIsNameAndItDontExist(){
-        Optional<Course> expected = Optional.empty();
-        Optional<Course> actual = courseDao.findByName("unknown name");
+        List<Course> expected = Collections.emptyList();
+        List<Course> actual = courseDao.findByName("unknown name");
 
         assertThat(expected).isEqualTo(actual);
     }

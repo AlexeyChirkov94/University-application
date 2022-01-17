@@ -4,10 +4,10 @@ import java.util.Arrays;
 
 public enum ScienceDegreeRequest {
 
-    GRADUATE(1),
-    MASTER(2),
-    PH_D_CANDIDATE(3),
-    PH_D(4);
+    GRADUATE(0),
+    MASTER(1),
+    PH_D_CANDIDATE(2),
+    PH_D(3);
 
     private int id;
 

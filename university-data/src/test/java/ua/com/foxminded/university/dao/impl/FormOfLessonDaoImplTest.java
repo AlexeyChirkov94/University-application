@@ -8,6 +8,7 @@ import ua.com.foxminded.university.dao.FormOfLessonDao;
 import ua.com.foxminded.university.entity.FormOfLesson;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -85,15 +86,15 @@ class FormOfLessonDaoImplTest {
                 .withName("lecture")
                 .withDuration(60)
                 .build();
-        FormOfLesson actual = formOfLessonDao.findByName("lecture").get();
+        FormOfLesson actual = formOfLessonDao.findByName("lecture").get(0);
 
         assertFormsOfLesson(actual, expected);
     }
 
     @Test
     void findByNameShouldReturnOptionalEmptyIfArgumentIsNameAndItDontExist(){
-        Optional<FormOfLesson> expected = Optional.empty();
-        Optional<FormOfLesson> actual = formOfLessonDao.findByName("unknown name");
+        List<FormOfLesson> expected = Collections.emptyList();
+        List<FormOfLesson> actual = formOfLessonDao.findByName("unknown name");
 
         assertThat(expected).isEqualTo(actual);
     }

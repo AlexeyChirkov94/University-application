@@ -14,6 +14,7 @@ import ua.com.foxminded.university.entity.Lesson;
 import ua.com.foxminded.university.mapper.FormOfLessonMapper;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,7 +45,7 @@ class FormOfLessonServiceImplTest {
         FormOfLessonRequest formOfLessonRequest = new FormOfLessonRequest();
         formOfLessonRequest.setName(formOfLessonName);
 
-        when(formOfLessonDao.findByName(formOfLessonName)).thenReturn(Optional.empty());
+        when(formOfLessonDao.findByName(formOfLessonName)).thenReturn(Collections.emptyList());
 
         formOfLessonService.create(formOfLessonRequest);
 
@@ -57,7 +58,7 @@ class FormOfLessonServiceImplTest {
         FormOfLessonRequest formOfLessonRequest = new FormOfLessonRequest();
         formOfLessonRequest.setName(formOfLessonName);
 
-        when(formOfLessonDao.findByName(formOfLessonName)).thenReturn(Optional.of(FormOfLesson.builder().withName(formOfLessonName).build()));
+        when(formOfLessonDao.findByName(formOfLessonName)).thenReturn(Arrays.asList(FormOfLesson.builder().withName(formOfLessonName).build()));
 
         assertThatThrownBy(() -> formOfLessonService.create(formOfLessonRequest)).hasMessage("Form of lesson with same name already exist");
 
@@ -134,7 +135,7 @@ class FormOfLessonServiceImplTest {
         when(lessonDao.findByFormOfLessonId(1L)).thenReturn(formOfLessonLessons);
         doNothing().when(lessonDao).removeFormOfLessonFromLesson(1L);
         doNothing().when(lessonDao).removeFormOfLessonFromLesson(2L);
-        when(formOfLessonDao.deleteById(formOfLessonId)).thenReturn(true);
+        doNothing().when(formOfLessonDao).deleteById(formOfLessonId);
 
         formOfLessonService.deleteById(formOfLessonId);
 

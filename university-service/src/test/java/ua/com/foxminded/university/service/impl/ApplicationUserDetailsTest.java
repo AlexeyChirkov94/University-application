@@ -60,8 +60,8 @@ public class ApplicationUserDetailsTest {
 
     @Test
     void loadUserByUsernameShouldLoadDataOfStudentToSpringSecurityIfArgumentsIsEmailAndPassword() {
-        when(studentService.findByEmail(EMAIL_OF_STUDENT)).thenReturn(Optional.of(STUDENT_RESPONSE));
-        when(professorService.findByEmail(EMAIL_OF_STUDENT)).thenReturn(Optional.empty());
+        when(studentService.findByEmail(EMAIL_OF_STUDENT)).thenReturn(Collections.singletonList(STUDENT_RESPONSE));
+        when(professorService.findByEmail(EMAIL_OF_STUDENT)).thenReturn(Collections.emptyList());
         when(privilegeDao.findByRoleId(1L)).thenReturn(Collections.singletonList(READ_PRIVILEGE));
 
         applicationUserDetails.loadUserByUsername(EMAIL_OF_STUDENT);
@@ -73,8 +73,8 @@ public class ApplicationUserDetailsTest {
 
     @Test
     void loadUserByUsernameShouldLoadDataOfProfessorToSpringSecurityIfArgumentsIsEmailAndPassword() {
-        when(studentService.findByEmail(EMAIL_OF_PROFESSOR)).thenReturn(Optional.empty());
-        when(professorService.findByEmail(EMAIL_OF_PROFESSOR)).thenReturn(Optional.of(PROFESSOR_RESPONSE));
+        when(studentService.findByEmail(EMAIL_OF_PROFESSOR)).thenReturn(Collections.emptyList());
+        when(professorService.findByEmail(EMAIL_OF_PROFESSOR)).thenReturn(Collections.singletonList(PROFESSOR_RESPONSE));
         when(privilegeDao.findByRoleId(2L)).thenReturn(Arrays.asList(READ_PRIVILEGE, WRITE_PRIVILEGE));
 
         applicationUserDetails.loadUserByUsername(EMAIL_OF_PROFESSOR);
@@ -86,8 +86,8 @@ public class ApplicationUserDetailsTest {
 
     @Test
     void loadUserByUsernameShouldThrowExceptionIfEmailNotExist() {
-        when(studentService.findByEmail(EMAIL_OF_PROFESSOR)).thenReturn(Optional.empty());
-        when(professorService.findByEmail(EMAIL_OF_PROFESSOR)).thenReturn(Optional.empty());
+        when(studentService.findByEmail(EMAIL_OF_PROFESSOR)).thenReturn(Collections.emptyList());
+        when(professorService.findByEmail(EMAIL_OF_PROFESSOR)).thenReturn(Collections.emptyList());
 
         assertThatThrownBy(() -> applicationUserDetails.loadUserByUsername(EMAIL_OF_PROFESSOR))
                 .hasMessage("no user with email: professor@gmail.com");

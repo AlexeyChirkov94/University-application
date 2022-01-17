@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Transactional(transactionManager = "hibernateTransactionManager")
 public class FormOfEducationServiceImpl extends AbstractPageableCrudService implements FormOfEducationService {
 
     private final FormOfEducationDao formOfEducationDao;
@@ -26,7 +27,7 @@ public class FormOfEducationServiceImpl extends AbstractPageableCrudService impl
 
     @Override
     public FormOfEducationResponse create(FormOfEducationRequest formOfEducationRequest) {
-        if (formOfEducationDao.findByName(formOfEducationRequest.getName()).isPresent()){
+        if (!formOfEducationDao.findByName(formOfEducationRequest.getName()).isEmpty()){
             throw new EntityAlreadyExistException("Form of education with same name already exist");
         } else{
             FormOfEducation formOfEducationBeforeSave = formOfEducationMapper.mapDtoToEntity(formOfEducationRequest);
@@ -68,8 +69,7 @@ public class FormOfEducationServiceImpl extends AbstractPageableCrudService impl
     }
 
     @Override
-    @Transactional(transactionManager = "txManager")
-    public boolean deleteById(long id) {
+    public void deleteById(long id) {
         if(formOfEducationDao.findById(id).isPresent()){
 
             List<Group> formOfEducationGroups = groupDao.findByFormOfEducation(id);
@@ -77,9 +77,8 @@ public class FormOfEducationServiceImpl extends AbstractPageableCrudService impl
                 groupDao.removeFormOfEducationFromGroup(group.getId());
             }
 
-            return formOfEducationDao.deleteById(id);
+            formOfEducationDao.deleteById(id);
         }
-        return false;
     }
 
 }

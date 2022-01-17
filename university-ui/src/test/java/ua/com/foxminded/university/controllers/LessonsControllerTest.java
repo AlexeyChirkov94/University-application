@@ -305,7 +305,7 @@ class LessonsControllerTest {
     @Test
     void deleteShouldGetLessonIdFromUrlAndRenderIndexView() throws Exception {
 
-        when(lessonService.deleteById(1L)).thenReturn(true);
+        doNothing().when(lessonService).deleteById(1L);
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/lesson/1")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -484,7 +484,7 @@ class LessonsControllerTest {
     @Test
     void deleteShouldGetFormOfLessonIdFromUrlAndRenderIndexView() throws Exception {
 
-        when(formOfLessonService.deleteById(1L)).thenReturn(true);
+        doNothing().when(formOfLessonService).deleteById(1L);
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/lesson/type/1")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)

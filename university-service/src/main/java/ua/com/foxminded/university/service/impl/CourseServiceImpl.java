@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Transactional(transactionManager = "hibernateTransactionManager")
 public class CourseServiceImpl extends AbstractPageableCrudService implements CourseService {
 
     private final CourseDao courseDao;
@@ -30,7 +31,6 @@ public class CourseServiceImpl extends AbstractPageableCrudService implements Co
 
 
     @Override
-    @Transactional(transactionManager = "txManager")
     public void addCourseToProfessorCourseList(long courseId, long professorId) {
         checkThatCourseExist(courseId);
         checkThatProfessorExist(professorId);
@@ -41,7 +41,6 @@ public class CourseServiceImpl extends AbstractPageableCrudService implements Co
     }
 
     @Override
-    @Transactional(transactionManager = "txManager")
     public void removeCourseFromProfessorCourseList(long courseId, long professorId) {
         checkThatCourseExist(courseId);
         checkThatProfessorExist(professorId);
@@ -52,7 +51,6 @@ public class CourseServiceImpl extends AbstractPageableCrudService implements Co
     }
 
     @Override
-    @Transactional(transactionManager = "txManager")
     public void changeDepartment(long courseId, long departmentId) {
         checkThatCourseExist(courseId);
         checkThatDepartmentExist(departmentId);
@@ -61,7 +59,6 @@ public class CourseServiceImpl extends AbstractPageableCrudService implements Co
     }
 
     @Override
-    @Transactional(transactionManager = "txManager")
     public List<CourseResponse> findByProfessorId(long professorId) {
         if (professorDao.findById(professorId).isPresent()){
             return courseDao.findByProfessorId(professorId).stream().map(courseMapper::mapEntityToDto)
@@ -79,9 +76,8 @@ public class CourseServiceImpl extends AbstractPageableCrudService implements Co
     }
 
     @Override
-    @Transactional(transactionManager = "txManager")
     public CourseResponse create(CourseRequest courseRequest) {
-        if (courseDao.findByName(courseRequest.getName()).isPresent()){
+        if (!courseDao.findByName(courseRequest.getName()).isEmpty()){
             throw new EntityAlreadyExistException("Course with same name already exist");
         } else {
             Course courseBeforeSave = courseMapper.mapDtoToEntity(courseRequest);
@@ -121,7 +117,6 @@ public class CourseServiceImpl extends AbstractPageableCrudService implements Co
     }
 
     @Override
-    @Transactional(transactionManager = "txManager")
     public void edit(CourseRequest courseRequest) {
 
         courseDao.update(courseMapper.mapDtoToEntity(courseRequest));
@@ -133,8 +128,7 @@ public class CourseServiceImpl extends AbstractPageableCrudService implements Co
     }
 
     @Override
-    @Transactional(transactionManager = "txManager")
-    public boolean deleteById(long id) {
+    public void deleteById(long id) {
         if(courseDao.findById(id).isPresent()){
 
             List<Lesson> courseLessons = lessonDao.findByCourseId(id);
@@ -142,9 +136,8 @@ public class CourseServiceImpl extends AbstractPageableCrudService implements Co
                 lessonDao.removeCourseFromLesson(lesson.getId());
             }
 
-            return courseDao.deleteById(id);
+            courseDao.deleteById(id);
         }
-        return false;
     }
 
     @Override

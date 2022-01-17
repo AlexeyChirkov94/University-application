@@ -29,7 +29,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    @Transactional(transactionManager = "txManager")
+    @Transactional(transactionManager = "hibernateTransactionManager")
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
 
         if (alreadySetup){
@@ -48,7 +48,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         createRoleIfNotFound("ROLE_PROFESSOR", professorPrivileges);
         createRoleIfNotFound("ROLE_STUDENT", studentPrivileges);
 
-        if (!professorDao.findByEmail("admin@gmail.com").isPresent()) {
+        if (professorDao.findByEmail("admin@gmail.com").isEmpty()) {
             Professor admin = Professor.builder()
                     .withEmail("admin@gmail.com")
                     .withPassword(passwordEncoder.encode("admin"))
@@ -64,25 +64,29 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private Privilege createPrivilegeIfNotFound(String name) {
 
         Privilege privilege = Privilege.builder().withName(name).build();
-        Optional<Privilege> searchingPrivilege = privilegeDao.findByName(name);
+        List<Privilege> searchingPrivilege = privilegeDao.findByName(name);
 
-        return searchingPrivilege.orElseGet(() -> privilegeDao.save(privilege));
+        if (!searchingPrivilege.isEmpty()){
+            return searchingPrivilege.get(0);
+        } else {
+            return privilegeDao.save(privilege);
+        }
 
     }
 
     private Role createRoleIfNotFound(String name, List<Privilege> necessaryPrivileges) {
 
         Role role = Role.builder().withName(name).build();
-        Optional<Role> searchingRole = roleDao.findByName(name);
+        List<Role> searchingRole = roleDao.findByName(name);
 
-        if(!searchingRole.isPresent()){
+        if(searchingRole.isEmpty()){
             Role roleAfterSave = roleDao.save(role);
             for (Privilege privilege : necessaryPrivileges){
              roleDao.addPrivilegeToRole(roleAfterSave.getId(), privilege.getId());
             }
             return roleAfterSave;
         } else {
-            long roleId = searchingRole.get().getId();
+            long roleId = searchingRole.get(0).getId();
             List<Privilege> realRolePrivilege = privilegeDao.findByRoleId(roleId);
             for (Privilege privilege : necessaryPrivileges){
                 if(!realRolePrivilege.contains(privilege)){
@@ -90,7 +94,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
                 }
             }
 
-            return searchingRole.get();
+            return searchingRole.get(0);
         }
     }
 

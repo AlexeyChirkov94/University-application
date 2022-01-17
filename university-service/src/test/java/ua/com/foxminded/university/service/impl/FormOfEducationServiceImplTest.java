@@ -14,6 +14,7 @@ import ua.com.foxminded.university.entity.Group;
 import ua.com.foxminded.university.mapper.FormOfEducationMapper;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,7 +45,7 @@ class FormOfEducationServiceImplTest {
         FormOfEducationRequest formOfEducationRequest = new FormOfEducationRequest();
         formOfEducationRequest.setName(formOfEducationName);
 
-        when(formOfEducationDao.findByName(formOfEducationName)).thenReturn(Optional.empty());
+        when(formOfEducationDao.findByName(formOfEducationName)).thenReturn(Collections.emptyList());
 
         formOfEducationService.create(formOfEducationRequest);
 
@@ -57,7 +58,7 @@ class FormOfEducationServiceImplTest {
         FormOfEducationRequest formOfEducationRequest = new FormOfEducationRequest();
         formOfEducationRequest.setName(formOfEducationName);
 
-        when(formOfEducationDao.findByName(formOfEducationName)).thenReturn(Optional.of(FormOfEducation.builder()
+        when(formOfEducationDao.findByName(formOfEducationName)).thenReturn(Arrays.asList(FormOfEducation.builder()
                 .withName(formOfEducationName).build()));
 
         assertThatThrownBy(() -> formOfEducationService.create(formOfEducationRequest)).hasMessage("Form of education with same name already exist");
@@ -135,7 +136,8 @@ class FormOfEducationServiceImplTest {
         when(groupDao.findByFormOfEducation(formOfEducationId)).thenReturn(formOfEducationGroups);
         doNothing().when(groupDao).removeFormOfEducationFromGroup(1L);
         doNothing().when(groupDao).removeFormOfEducationFromGroup(2L);
-        when(formOfEducationDao.deleteById(formOfEducationId)).thenReturn(true);
+        doNothing().when(formOfEducationDao).deleteById(formOfEducationId);
+
 
         formOfEducationService.deleteById(formOfEducationId);
 

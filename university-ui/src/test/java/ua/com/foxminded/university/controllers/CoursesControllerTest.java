@@ -224,7 +224,7 @@ class CoursesControllerTest {
     @Test
     void deleteShouldGetCourseIdFromUrlAndRenderIndexView() throws Exception {
 
-        when(courseService.deleteById(1L)).thenReturn(true);
+        doNothing().when(courseService).deleteById(1L);
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/course/1")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)

@@ -16,7 +16,7 @@ public interface LessonService {
 
     void edit(LessonRequest requestDto);
 
-    boolean deleteById(long id);
+    void deleteById(long id);
 
     List<LessonResponse> formTimeTableForGroup(long groupId);
 

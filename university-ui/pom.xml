@@ -85,10 +85,6 @@
             <artifactId>bootstrap</artifactId>
             <version>${org.webjars.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.hibernate.validator</groupId>
-            <artifactId>hibernate-validator</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>

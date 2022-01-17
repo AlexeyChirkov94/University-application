@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Transactional(transactionManager = "hibernateTransactionManager")
 public class LessonServiceImpl extends AbstractPageableCrudService implements LessonService {
 
     private final LessonDao lessonDao;
@@ -35,7 +36,6 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
     private final LessonMapper lessonMapper;
 
     @Override
-    @Transactional(transactionManager = "txManager")
     public List<LessonResponse> formTimeTableForGroup(long groupId) {
         checkThatGroupExist(groupId);
 
@@ -44,7 +44,6 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
     }
 
     @Override
-    @Transactional(transactionManager = "txManager")
     public List<LessonResponse> formTimeTableForStudent(long studentId) {
         Student student = studentDao.findById(studentId)
                 .orElseThrow(() -> new EntityDontExistException("There no student with id: " + studentId));
@@ -58,7 +57,6 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
     }
 
     @Override
-    @Transactional(transactionManager = "txManager")
     public List<LessonResponse> formTimeTableForProfessor(long professorId) {
         checkThatProfessorExist(professorId);
 
@@ -67,7 +65,6 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
     }
 
     @Override
-    @Transactional(transactionManager = "txManager")
     public LessonResponse create(LessonRequest lessonRequest) {
 
         Lesson lessonBeforeSave = lessonMapper.mapDtoToEntity(lessonRequest);
@@ -116,7 +113,6 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
     }
 
     @Override
-    @Transactional(transactionManager = "txManager")
     public void edit(LessonRequest lessonRequest) {
 
         lessonDao.update(lessonMapper.mapDtoToEntity(lessonRequest));
@@ -137,11 +133,10 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
     }
 
     @Override
-    public boolean deleteById(long id) {
+    public void deleteById(long id) {
         if(lessonDao.findById(id).isPresent()){
-            return lessonDao.deleteById(id);
+            lessonDao.deleteById(id);
         }
-        return false;
     }
 
     private void changeGroup(long lessonId, long newGroupId) {

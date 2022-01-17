@@ -20,7 +20,7 @@ public interface GroupService {
 
     void edit(GroupRequest requestDto);
 
-    boolean deleteById(long id);
+    void deleteById(long id);
 
     void changeFormOfEducation(long groupId, long newFormOfEducationId);
 

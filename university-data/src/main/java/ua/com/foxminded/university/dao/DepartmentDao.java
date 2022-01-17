@@ -1,11 +1,10 @@
 package ua.com.foxminded.university.dao;
 
 import ua.com.foxminded.university.entity.Department;
-
-import java.util.Optional;
+import java.util.List;
 
 public interface DepartmentDao extends CrudPageableDao<Department> {
 
-    Optional<Department> findByName(String name);
+    List<Department> findByName(String name);
 
 }

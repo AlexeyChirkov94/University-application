@@ -20,6 +20,7 @@ import ua.com.foxminded.university.entity.Student;
 import ua.com.foxminded.university.mapper.GroupMapper;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -175,7 +176,7 @@ class GroupServiceImplTest {
         groupRequest.setDepartmentId(1L);
         groupRequest.setFormOfEducationId(1L);
 
-        when(groupDao.findByName(groupName)).thenReturn(Optional.empty());
+        when(groupDao.findByName(groupName)).thenReturn(Collections.emptyList());
         when(groupMapper.mapDtoToEntity(groupRequest)).thenReturn(group);
         when(groupDao.save(group)).thenReturn(group);
         when(groupDao.findById(1L)).thenReturn(Optional.of(group));
@@ -205,7 +206,7 @@ class GroupServiceImplTest {
         groupRequest.setDepartmentId(0L);
         groupRequest.setFormOfEducationId(0L);
 
-        when(groupDao.findByName(groupName)).thenReturn(Optional.empty());
+        when(groupDao.findByName(groupName)).thenReturn(Collections.emptyList());
         when(groupMapper.mapDtoToEntity(groupRequest)).thenReturn(group);
         when(groupDao.save(group)).thenReturn(group);
 
@@ -222,7 +223,7 @@ class GroupServiceImplTest {
         GroupRequest groupRequest = new GroupRequest();
         groupRequest.setName(groupName);
 
-        when(groupDao.findByName(groupName)).thenReturn(Optional.of(Group.builder().withName(groupName).build()));
+        when(groupDao.findByName(groupName)).thenReturn(Arrays.asList(Group.builder().withName(groupName).build()));
 
         assertThatThrownBy(() -> groupService.create(groupRequest)).hasMessage("Group with same name already exist");
 
@@ -364,7 +365,7 @@ class GroupServiceImplTest {
         List<Lesson> groupLessons = Arrays.asList(lesson1, lesson2);
 
         when(groupDao.findById(groupId)).thenReturn(Optional.of(Group.builder().withId(groupId).build()));
-        when(groupDao.deleteById(groupId)).thenReturn(true);
+        doNothing().when(groupDao).deleteById(groupId);
         when(studentDao.findByGroupId(1L)).thenReturn(groupsStudents);
         doNothing().when(studentDao).leaveGroup(1L);
         doNothing().when(studentDao).leaveGroup(2L);

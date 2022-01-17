@@ -1,5 +1,6 @@
 package ua.com.foxminded.university.dao.impl;
 
+import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -14,6 +15,7 @@ import ua.com.foxminded.university.dao.GroupDao;
 import ua.com.foxminded.university.entity.FormOfEducation;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +37,9 @@ class FormOfEducationDaoImplTest {
 
     @Mock
     JdbcTemplate mockJdbcTemplate;
+
+    @Mock
+    SessionFactory sessionFactory;
 
     {
         context = new AnnotationConfigApplicationContext(PersistenceTestsContextConfiguration.class);
@@ -134,32 +139,19 @@ class FormOfEducationDaoImplTest {
     }
 
     @Test
-    void deleteAllShouldWriteLogMessageIfCanNotDelete() {
-
-        Set<Long> idsDeletingStudents = new HashSet<>();
-        idsDeletingStudents.add(1L);
-        FormOfEducationDao formOfEducationDaoFromMock = new FormOfEducationDaoImpl(mockJdbcTemplate);
-        when(mockJdbcTemplate.batchUpdate(eq("DELETE FROM formsofeducation WHERE id = ?"),
-                any(BatchPreparedStatementSetter.class)))
-                .thenReturn(new int[]{0});
-
-        assertThat(formOfEducationDaoFromMock.deleteByIds(idsDeletingStudents)).isFalse();
-    }
-
-    @Test
     void findByNameShouldReturnOptionalOfFormOfEducationIfArgumentIsName(){
         FormOfEducation expected = FormOfEducation.builder()
                 .withName("full-time")
                 .build();
-        FormOfEducation actual = formOfEducationDao.findByName("full-time").get();
+        FormOfEducation actual = formOfEducationDao.findByName("full-time").get(0);
 
         assertFormsOfEducation(actual, expected);
     }
 
     @Test
     void findByNameShouldReturnOptionalEmptyIfArgumentIsNameAndItDontExist(){
-        Optional<FormOfEducation> expected = Optional.empty();
-        Optional<FormOfEducation> actual = formOfEducationDao.findByName("unknown name");
+        List<FormOfEducation> expected = Collections.emptyList();
+        List<FormOfEducation> actual = formOfEducationDao.findByName("unknown name");
 
         assertThat(expected).isEqualTo(actual);
     }

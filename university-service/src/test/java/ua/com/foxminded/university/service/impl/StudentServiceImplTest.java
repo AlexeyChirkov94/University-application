@@ -60,7 +60,7 @@ class StudentServiceImplTest {
         StudentResponse studentResponse = new StudentResponse();
         studentResponse.setId(1L);
 
-        when(studentDao.findByEmail(email)).thenReturn(Optional.of(Student.builder().withId(1L).build()));
+        when(studentDao.findByEmail(email)).thenReturn(Collections.singletonList(Student.builder().withId(1L).build()));
         when(studentMapper.mapEntityToDto(student)).thenReturn(studentResponse);
 
         studentService.findByEmail(email);
@@ -73,7 +73,7 @@ class StudentServiceImplTest {
     void findByEmailShouldReturnOptionalOfEmptyStudentResponseIfEmailNotRegistered() {
         String email= "Alexey94@gamil.com";
 
-        when(studentDao.findByEmail(email)).thenReturn(Optional.empty());
+        when(studentDao.findByEmail(email)).thenReturn(Collections.emptyList());
 
         studentService.findByEmail(email);
 
@@ -159,7 +159,7 @@ class StudentServiceImplTest {
         studentRequest.setGroupId(1L);
 
         doNothing().when(userValidator).validate(studentRequest);
-        when(studentDao.findByEmail(email)).thenReturn(Optional.empty());
+        when(studentDao.findByEmail(email)).thenReturn(Collections.emptyList());
         when(passwordEncoder.encode(password)).thenReturn(password);
         when(studentMapper.mapDtoToEntity(studentRequest)).thenReturn(student);
         when(studentDao.save(student)).thenReturn(student);
@@ -193,7 +193,7 @@ class StudentServiceImplTest {
         studentRequest.setGroupId(0L);
 
         doNothing().when(userValidator).validate(studentRequest);
-        when(studentDao.findByEmail(email)).thenReturn(Optional.empty());
+        when(studentDao.findByEmail(email)).thenReturn(Collections.emptyList());
         when(passwordEncoder.encode(password)).thenReturn(password);
         when(studentMapper.mapDtoToEntity(studentRequest)).thenReturn(student);
         when(studentDao.save(student)).thenReturn(student);
@@ -222,12 +222,12 @@ class StudentServiceImplTest {
         studentRequest.setGroupId(0L);
 
         doNothing().when(userValidator).validate(studentRequest);
-        when(studentDao.findByEmail(email)).thenReturn(Optional.empty());
+        when(studentDao.findByEmail(email)).thenReturn(Collections.emptyList());
         when(passwordEncoder.encode(password)).thenReturn(password);
         when(studentMapper.mapDtoToEntity(studentRequest)).thenReturn(student);
         when(studentDao.save(student)).thenReturn(student);
         when(roleDao.findByUserId(1L)).thenReturn(studentRole);
-        when(roleDao.findByName("ROLE_STUDENT")).thenReturn(Optional.of(defaultRole));
+        when(roleDao.findByName("ROLE_STUDENT")).thenReturn(Arrays.asList(defaultRole));
         when(studentDao.findById(1L)).thenReturn(Optional.of(student));
         when(roleDao.findById(3L)).thenReturn(Optional.of(defaultRole));
 
@@ -256,12 +256,12 @@ class StudentServiceImplTest {
         studentRequest.setGroupId(0L);
 
         doNothing().when(userValidator).validate(studentRequest);
-        when(studentDao.findByEmail(email)).thenReturn(Optional.empty());
+        when(studentDao.findByEmail(email)).thenReturn(Collections.emptyList());
         when(passwordEncoder.encode(password)).thenReturn(password);
         when(studentMapper.mapDtoToEntity(studentRequest)).thenReturn(student);
         when(studentDao.save(student)).thenReturn(student);
         when(roleDao.findByUserId(1L)).thenReturn(studentRole);
-        when(roleDao.findByName("ROLE_STUDENT")).thenReturn(Optional.empty());
+        when(roleDao.findByName("ROLE_STUDENT")).thenReturn(Collections.emptyList());
 
         assertThatThrownBy(() -> studentService.register(studentRequest)).hasMessage("ROLE_STUDENT not initialized");
 
@@ -283,7 +283,7 @@ class StudentServiceImplTest {
         studentRequest.setPassword(password);
 
         doNothing().when(userValidator).validate(studentRequest);
-        when(studentDao.findByEmail(email)).thenReturn(Optional.of(Student.builder().withEmail(email).build()));
+        when(studentDao.findByEmail(email)).thenReturn(Collections.singletonList(Student.builder().withEmail(email).build()));
 
         assertThatThrownBy(() -> studentService.register(studentRequest)).hasMessage("This email already registered");
 
@@ -395,7 +395,7 @@ class StudentServiceImplTest {
         List<Role> professorRoles = Collections.singletonList(Role.builder().withId(2L).withName("ROLE_STUDENT").build());
 
         when(studentDao.findById(studentId)).thenReturn(Optional.of(Student.builder().withId(studentId).build()));
-        when(studentDao.deleteById(studentId)).thenReturn(true);
+        doNothing().when(studentDao).deleteById(studentId);
         when(roleDao.findByUserId(studentId)).thenReturn(professorRoles);
         doNothing().when(studentDao).removeRoleFromUser(1L, 2L);
 

@@ -15,6 +15,7 @@ import ua.com.foxminded.university.entity.Group;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,9 +35,9 @@ class GroupDaoImplTest {
         context = new AnnotationConfigApplicationContext(PersistenceTestsContextConfiguration.class);
         groupDao = context.getBean(GroupDaoImpl.class);
         departmentDao = context.getBean(DepartmentDaoImpl.class);
-        departmentForTest = Department.builder().withId(0L).build();
+        departmentForTest = Department.builder().withId(1L).withName("Department of History").build();
         formOfEducationDao = context.getBean(FormOfEducationDaoImpl.class);
-        formOfEducationForTest = FormOfEducation.builder().withId(0L).build();
+        formOfEducationForTest = FormOfEducation.builder().withId(1L).withName("full-time").build();
     }
 
     @Test
@@ -56,8 +57,8 @@ class GroupDaoImplTest {
     void createAndReadShouldAddListOfNewGroupsToDatabaseIfArgumentIsListOfGroups(){
         List<Group> addingGroupEntities = Arrays.asList(Group.builder()
                 .withName("New Test Group")
-                .withDepartment(departmentForTest)
-                .withFormOfEducation(formOfEducationForTest)
+                .withDepartment(Department.builder().withId(1L).withName("Department of History").build())
+                .withFormOfEducation(FormOfEducation.builder().withId(1L).withName("full-time").build())
                 .build());
         groupDao.saveAll(addingGroupEntities);
         List<Group> readingGroupEntities = Arrays.asList(groupDao.findById(4L).get());
@@ -142,10 +143,13 @@ class GroupDaoImplTest {
                 .withId(1L)
                 .withName("History Group #1")
                 .withDepartment(departmentDao.findById(1L).get())
-                .withFormOfEducation(FormOfEducation.builder().withId(0L).build())
                 .build();
         Group actualAfterChange = groupDao.findById(1L).get();
-        assertGroups(actualAfterChange, expectedAfterChange);
+
+        assertThat(actualAfterChange.getName()).isEqualTo(expectedAfterChange.getName());
+        assertThat(actualAfterChange.getDepartment().getId()).isEqualTo(expectedAfterChange.getDepartment().getId());
+        assertThat(actualAfterChange.getDepartment().getName()).isEqualTo(expectedAfterChange.getDepartment().getName());
+        assertThat(actualAfterChange.getFormOfEducation()).isNull();
     }
 
     @Test
@@ -191,7 +195,11 @@ class GroupDaoImplTest {
                 .withFormOfEducation(formOfEducationDao.findById(1L).get())
                 .build();
         Group actualAfterChange = groupDao.findById(1L).get();
-        assertGroups(actualAfterChange, expectedAfterChange);
+
+        assertThat(actualAfterChange.getName()).isEqualTo(expectedAfterChange.getName());
+        assertThat(actualAfterChange.getDepartment()).isNull();
+        assertThat(actualAfterChange.getFormOfEducation().getId()).isEqualTo(expectedAfterChange.getFormOfEducation().getId());
+        assertThat(actualAfterChange.getFormOfEducation().getName()).isEqualTo(expectedAfterChange.getFormOfEducation().getName());
     }
 
     @Test
@@ -226,7 +234,7 @@ class GroupDaoImplTest {
                 .withDepartment(departmentDao.findById(1L).get())
                 .withFormOfEducation(formOfEducationDao.findById(1L).get())
                 .build();
-        Group actual = groupDao.findByName("History Group #1").get();
+        Group actual = groupDao.findByName("History Group #1").get(0);
 
         assertGroups(actual, expected);
     }
@@ -250,8 +258,8 @@ class GroupDaoImplTest {
 
     @Test
     void findByNameShouldReturnOptionalEmptyIfArgumentIsNameAndItDontExist(){
-        Optional<Group> expected = Optional.empty();
-        Optional<Group> actual = groupDao.findByName("unknown name");
+        List<Group> expected = Collections.emptyList();
+        List<Group> actual = groupDao.findByName("unknown name");
 
         assertThat(expected).isEqualTo(actual);
     }

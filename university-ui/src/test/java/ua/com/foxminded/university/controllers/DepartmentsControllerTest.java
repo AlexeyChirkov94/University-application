@@ -279,7 +279,7 @@ class DepartmentsControllerTest {
     @Test
     void deleteShouldGetDepartmentIdFromUrlAndRenderIndexView() throws Exception {
 
-        when(departmentService.deleteById(1L)).thenReturn(true);
+        doNothing().when(departmentService).deleteById(1L);
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/department/1")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)

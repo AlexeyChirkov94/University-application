@@ -8,11 +8,10 @@ import ua.com.foxminded.university.dao.PrivilegeDao;
 import ua.com.foxminded.university.dao.RoleDao;
 import ua.com.foxminded.university.entity.Privilege;
 import ua.com.foxminded.university.entity.Role;
-
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static ua.com.foxminded.university.testUtils.TestUtility.assertPrivileges;
 import static ua.com.foxminded.university.testUtils.TestUtility.assertRoles;
@@ -86,15 +85,15 @@ public class RoleDaoImplTest {
         Role expected = Role.builder()
                 .withName("ROLE_STUDENT")
                 .build();
-        Role actual = roleDao.findByName("ROLE_STUDENT").get();
+        Role actual = roleDao.findByName("ROLE_STUDENT").get(0);
 
         assertRoles(actual, expected);
     }
 
     @Test
     void findByNameShouldReturnOptionalEmptyIfArgumentIsNameAndItDontExist(){
-        Optional<Role> expected = Optional.empty();
-        Optional<Role> actual = roleDao.findByName("unknown name");
+        List<Role> expected = Collections.emptyList();
+        List<Role> actual = roleDao.findByName("unknown name");
 
         assertThat(expected).isEqualTo(actual);
     }

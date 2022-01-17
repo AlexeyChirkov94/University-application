@@ -3,11 +3,13 @@ package ua.com.foxminded.university.dao.impl;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.PersistenceTestsContextConfiguration;
 import ua.com.foxminded.university.dao.DepartmentDao;
 import ua.com.foxminded.university.entity.Department;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -81,15 +83,15 @@ class DepartmentDaoImplTest {
         Department expected = Department.builder()
                 .withName("Department of History")
                 .build();
-        Department actual = departmentDao.findByName("Department of History").get();
+        Department actual = departmentDao.findByName("Department of History").get(0);
 
         assertDepartments(actual, expected);
     }
 
     @Test
     void findByNameShouldReturnOptionalEmptyIfArgumentIsNameAndItDontExist(){
-        Optional<Department> expected = Optional.empty();
-        Optional<Department> actual = departmentDao.findByName("unknown name");
+        List<Department> expected = Collections.emptyList();
+        List<Department> actual = departmentDao.findByName("unknown name");
 
         assertThat(expected).isEqualTo(actual);
     }

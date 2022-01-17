@@ -24,8 +24,6 @@ VALUES('professor', 'Ivan', 'Petrov', 'petrov@gmail.com', 'RI', 1, 1),
 ('professor', 'Ivan', 'Seregin', 'seregin@gmail.com', 'RIGF', 1, 3),
 ('professor', 'Ivan', 'Mazurin', 'Mazurin@gmail.com', '1234', 1, 1);
 
-
-
 insert into professor_course (professor_id, course_id)
 values (7,1), (7,2),
 (8,2), (8,3), (8,4),

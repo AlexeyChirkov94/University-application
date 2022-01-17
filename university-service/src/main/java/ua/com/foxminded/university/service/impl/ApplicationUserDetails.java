@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.PrivilegeDao;
 import ua.com.foxminded.university.dto.ProfessorResponse;
 import ua.com.foxminded.university.dto.StudentResponse;
@@ -18,12 +19,12 @@ import ua.com.foxminded.university.service.ProfessorService;
 import ua.com.foxminded.university.service.StudentService;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Log4j
 @Service
 @AllArgsConstructor
+@Transactional(transactionManager = "hibernateTransactionManager")
 public class ApplicationUserDetails implements UserDetailsService {
 
     private final ProfessorService professorService;
@@ -36,14 +37,14 @@ public class ApplicationUserDetails implements UserDetailsService {
 
         log.info("Load user by email: " + email);
 
-        Optional<StudentResponse> studentOptional = studentService.findByEmail(email);
-        Optional<ProfessorResponse> professorOptional = professorService.findByEmail(email);
+        List<StudentResponse> studentOptional = studentService.findByEmail(email);
+        List<ProfessorResponse> professorOptional = professorService.findByEmail(email);
 
-        if(studentOptional.isPresent()){
-            return getStudentDetails(studentOptional.get());
+        if(!studentOptional.isEmpty()){
+            return getStudentDetails(studentOptional.get(0));
         }
-        if(professorOptional.isPresent()){
-            return getProfessorDetails(professorOptional.get());
+        if(!professorOptional.isEmpty()){
+            return getProfessorDetails(professorOptional.get(0));
         } else {
             throw new UsernameNotFoundException("no user with email: " + email);
         }

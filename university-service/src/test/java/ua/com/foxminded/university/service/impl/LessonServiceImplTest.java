@@ -452,7 +452,7 @@ class LessonServiceImplTest {
         long lessonId = 1;
 
         when(lessonDao.findById(lessonId)).thenReturn(Optional.of(Lesson.builder().withId(lessonId).build()));
-        when(lessonDao.deleteById(lessonId)).thenReturn(true);
+        doNothing().when(lessonDao).deleteById(lessonId);
 
         lessonService.deleteById(lessonId);
 

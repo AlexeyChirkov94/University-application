@@ -18,6 +18,7 @@ import ua.com.foxminded.university.entity.Professor;
 import ua.com.foxminded.university.mapper.DepartmentMapper;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,7 +54,7 @@ class DepartmentServiceImplTest {
         DepartmentRequest departmentRequest = new DepartmentRequest();
         departmentRequest.setName(departmentName);
 
-        when(departmentDao.findByName(departmentName)).thenReturn(Optional.empty());
+        when(departmentDao.findByName(departmentName)).thenReturn(Collections.emptyList());
 
         departmentService.create(departmentRequest);
 
@@ -66,7 +67,7 @@ class DepartmentServiceImplTest {
         DepartmentRequest departmentRequest = new DepartmentRequest();
         departmentRequest.setName(departmentName);
 
-        when(departmentDao.findByName(departmentName)).thenReturn(Optional.of(Department.builder().withName(departmentName).build()));
+        when(departmentDao.findByName(departmentName)).thenReturn(Arrays.asList(Department.builder().withName(departmentName).build()));
 
         assertThatThrownBy(() -> departmentService.create(departmentRequest)).hasMessage("Department with same name already exist");
 
@@ -150,7 +151,7 @@ class DepartmentServiceImplTest {
         doNothing().when(courseDao).removeDepartmentFromCourse(4L);
         doNothing().when(groupDao).removeDepartmentFromGroup(5L);
         doNothing().when(groupDao).removeDepartmentFromGroup(6L);
-        when(departmentDao.deleteById(departmentId)).thenReturn(true);
+        doNothing().when(departmentDao).deleteById(departmentId);
 
         departmentService.deleteById(departmentId);
 
