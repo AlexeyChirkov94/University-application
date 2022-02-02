@@ -12,10 +12,12 @@ import ua.com.foxminded.university.entity.Role;
 import ua.com.foxminded.university.entity.Student;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static ua.com.foxminded.university.testUtils.TestUtility.assertRoles;
 import static ua.com.foxminded.university.testUtils.TestUtility.assertUsers;
 import static ua.com.foxminded.university.testUtils.TestUtility.assertUsersStudents;
 
@@ -42,7 +44,7 @@ class StudentDaoImplTest {
                 .withLastName("Chirkov")
                 .withEmail("chirkov@gmail.com")
                 .withPassword("1234")
-                .withGroup(groupForTests)
+                .withGroup(Group.builder().withId(1L).withName("History Group #1").build())
                 .build();
         studentDao.save(addingStudent);
         Student readingStudent = studentDao.findById(11L).get();
@@ -57,7 +59,7 @@ class StudentDaoImplTest {
                 .withLastName("Chirkov")
                 .withEmail("chirkov@gmail.com")
                 .withPassword("1234")
-                .withGroup(groupForTests)
+                .withGroup(Group.builder().withId(1L).withName("History Group #1").build())
                 .build());
         studentDao.saveAll(addingStudent);
         List<Student> readingStudent = Arrays.asList (studentDao.findById(11L).get());
@@ -116,15 +118,15 @@ class StudentDaoImplTest {
                 .withPassword("1234")
                 .withGroup(groupDao.findById(1L).get())
                 .build();
-        Student actual = studentDao.findByEmail("chrikov@gmail.com").get();
+        Student actual = studentDao.findByEmail("chrikov@gmail.com").get(0);
 
         assertUsers(actual, expected);
     }
 
     @Test
     void findByEmailShouldReturnOptionalEmptyIfArgumentIsEmailAndItDontExist(){
-        Optional<Student> expected = Optional.empty();
-        Optional<Student> actual = studentDao.findByEmail("unknownemail@gmail.com");
+        List<Student> expected = Collections.emptyList();
+        List<Student> actual = studentDao.findByEmail("unknownemail@gmail.com");
 
         assertThat(expected).isEqualTo(actual);
     }
@@ -153,7 +155,6 @@ class StudentDaoImplTest {
         assertUsersStudents(actual, expected);
     }
 
-
     @Test
     void leaveGroupShouldDeleteStudentsFormGroupIfArgumentIsIdOfStudent(){
         Student expected = Student.builder()
@@ -161,13 +162,17 @@ class StudentDaoImplTest {
                 .withLastName("Chrikov")
                 .withEmail("chrikov@gmail.com")
                 .withPassword("1234")
-                .withGroup(groupForTests)
+                .withGroup(Group.builder().withId(1L).withName("History Group #1").build())
                 .build();
 
         studentDao.leaveGroup(1);
         Student actual = studentDao.findById(1L).get();
 
-        assertUsers(actual, expected);
+        assertThat(actual.getFirstName()).isEqualTo(expected.getFirstName());
+        assertThat(actual.getLastName()).isEqualTo(expected.getLastName());
+        assertThat(actual.getEmail()).isEqualTo(expected.getEmail());
+        assertThat(actual.getPassword()).isEqualTo(expected.getPassword());
+        assertThat(actual.getGroup()).isNull();
     }
 
     @Test
@@ -190,27 +195,27 @@ class StudentDaoImplTest {
     void addRoleToUserShouldAddRoleToProfessorsIfArgumentIsIdOfProfessorAndIdOfRole(){
         List<Role> expectedListOfRoleBeforeAdding  = Arrays.asList(Role.builder().withId(1L).withName("ROLE_STUDENT").build());
         List<Role> actualListOfRoleBeforeAdding = roleDao.findByUserId(1L);
-        assertThat(actualListOfRoleBeforeAdding).isEqualTo(expectedListOfRoleBeforeAdding);
+        assertRoles(actualListOfRoleBeforeAdding, expectedListOfRoleBeforeAdding);
 
         studentDao.addRoleToUser(1L, 3L);
 
         List<Role> expectedListOfRoleAfterAdding  = Arrays.asList(Role.builder().withId(1L).withName("ROLE_STUDENT").build(),
                 Role.builder().withId(3L).withName("ROLE_ADMIN").build());
         List<Role> actualListOfRoleAfterAdding = roleDao.findByUserId(1L);
-        assertThat(actualListOfRoleAfterAdding).isEqualTo(expectedListOfRoleAfterAdding);
+        assertRoles(actualListOfRoleAfterAdding, expectedListOfRoleAfterAdding);
     }
 
     @Test
     void removeRoleFromUserShouldRemoveRoleFromProfessorsIfArgumentIsIdOfProfessorAndIdOfRole(){
         List<Role> expectedListOfRoleBeforeAdding  = Arrays.asList(Role.builder().withId(1L).withName("ROLE_STUDENT").build());
         List<Role> actualListOfRoleBeforeAdding = roleDao.findByUserId(1L);
-        assertThat(actualListOfRoleBeforeAdding).isEqualTo(expectedListOfRoleBeforeAdding);
+        assertRoles(actualListOfRoleBeforeAdding, expectedListOfRoleBeforeAdding);
 
         studentDao.removeRoleFromUser(1L, 1L);
 
         List<Role> expectedListOfRoleAfterAdding  = Arrays.asList();
         List<Role> actualListOfRoleAfterAdding = roleDao.findByUserId(1L);
-        assertThat(actualListOfRoleAfterAdding).isEqualTo(expectedListOfRoleAfterAdding);
+        assertRoles(actualListOfRoleAfterAdding, expectedListOfRoleAfterAdding);
     }
 
 }

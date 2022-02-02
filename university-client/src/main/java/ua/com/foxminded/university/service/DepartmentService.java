@@ -16,6 +16,6 @@ public interface DepartmentService {
 
     void edit(DepartmentRequest requestDto);
 
-    boolean deleteById(long id);
+    void deleteById(long id);
 
 }

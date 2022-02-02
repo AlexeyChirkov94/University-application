@@ -21,11 +21,13 @@ import ua.com.foxminded.university.service.ProfessorService;
 import ua.com.foxminded.university.service.validator.ScienceDegreeValidator;
 import ua.com.foxminded.university.service.validator.UserValidator;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(transactionManager = "hibernateTransactionManager")
 public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorRequest, ProfessorResponse>  implements ProfessorService {
 
     private final ScienceDegreeValidator scienceDegreeValidator;
@@ -74,7 +76,6 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
     }
 
     @Override
-    @Transactional(transactionManager = "txManager")
     public void edit(ProfessorRequest professorRequest) {
 
         userValidator.validate(professorRequest);
@@ -93,8 +94,7 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
     }
 
     @Override
-    @Transactional(transactionManager = "txManager")
-    public boolean deleteById(long id) {
+    public void deleteById(long id) {
         if(professorDao.findById(id).isPresent()){
             removeAllRolesFromUser(id);
 
@@ -108,22 +108,21 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
                 lessonDao.removeTeacherFromLesson(lesson.getId());
             }
 
-            return professorDao.deleteById(id);
+            professorDao.deleteById(id);
         }
-        return false;
     }
 
     @Override
-    public Optional<ProfessorResponse> findByEmail(String email) {
-        Optional<Professor> professorOptional = professorDao.findByEmail(email);
+    public List<ProfessorResponse> findByEmail(String email) {
+        List<Professor> professors = professorDao.findByEmail(email);
 
-        if(professorOptional.isPresent()){
-            ProfessorResponse professorResponse = professorMapper.mapEntityToDto(professorOptional.get());
+        if(!professors.isEmpty()){
+            ProfessorResponse professorResponse = professorMapper.mapEntityToDto(professors.get(0));
             professorResponse.setRoles(roleDao.findByUserId(professorResponse.getId()));
-            return Optional.of(professorResponse);
+            return Arrays.asList(professorResponse);
         }
 
-        return professorOptional.map(professorMapper::mapEntityToDto);
+        return Collections.emptyList();
     }
 
     @Override
@@ -182,10 +181,14 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
         }
 
         if(roleDao.findByUserId(professorId).isEmpty()) {
-            Role professorRole = roleDao.findByName("ROLE_PROFESSOR")
-                    .orElseThrow(() -> new EntityDontExistException("ROLE_PROFESSOR not initialized"));
 
-            addRoleToUser(professorId, professorRole.getId());
+            List<Role> professorRoles = roleDao.findByName("ROLE_PROFESSOR");
+
+            if (professorRoles.isEmpty()){
+                throw new EntityDontExistException("ROLE_PROFESSOR not initialized");
+            }
+
+            addRoleToUser(professorId, professorRoles.get(0).getId());
         }
 
         return professorMapper.mapEntityToDto(professorAfterSave);

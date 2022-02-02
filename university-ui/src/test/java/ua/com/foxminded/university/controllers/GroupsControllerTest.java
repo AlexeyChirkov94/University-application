@@ -330,7 +330,7 @@ public class GroupsControllerTest {
     @Test
     void deleteShouldGetGroupIdFromUrlAndRenderIndexView() throws Exception {
 
-        when(groupService.deleteById(1L)).thenReturn(true);
+        doNothing().when(groupService).deleteById(1L);
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/group/1")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)

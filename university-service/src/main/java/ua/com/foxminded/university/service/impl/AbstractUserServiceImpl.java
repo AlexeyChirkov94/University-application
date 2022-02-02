@@ -3,7 +3,6 @@ package ua.com.foxminded.university.service.impl;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
-import ua.com.foxminded.university.dao.CrudPageableDao;
 import ua.com.foxminded.university.dao.RoleDao;
 import ua.com.foxminded.university.dao.UserDao;
 import ua.com.foxminded.university.dto.UserRequest;
@@ -14,6 +13,7 @@ import ua.com.foxminded.university.service.UserService;
 import ua.com.foxminded.university.service.validator.UserValidator;
 
 @AllArgsConstructor
+@Transactional(transactionManager = "hibernateTransactionManager")
 public abstract class AbstractUserServiceImpl<REQUEST extends UserRequest, RESPONSE extends UserResponse>
         extends AbstractPageableCrudService implements UserService<REQUEST, RESPONSE> {
 
@@ -23,10 +23,9 @@ public abstract class AbstractUserServiceImpl<REQUEST extends UserRequest, RESPO
     protected final UserValidator userValidator;
 
     @Override
-    @Transactional(transactionManager = "txManager")
     public RESPONSE register(REQUEST userDto) {
         userValidator.validate(userDto);
-        if (userDao.findByEmail(userDto.getEmail()).isPresent()) {
+        if (!userDao.findByEmail(userDto.getEmail()).isEmpty()) {
             throw new EntityAlreadyExistException("This email already registered");
         } else {
             userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
@@ -34,14 +33,12 @@ public abstract class AbstractUserServiceImpl<REQUEST extends UserRequest, RESPO
         }
     }
 
-    @Transactional(transactionManager = "txManager")
     public void addRoleToUser (long userId, long addingRoleId) {
         checkThatUserExist(userId);
         checkThatRoleExist(addingRoleId);
         userDao.addRoleToUser(userId, addingRoleId);
     }
 
-    @Transactional(transactionManager = "txManager")
     public void removeRoleFromUser(long userId, long removingRoleId) {
         checkThatUserExist(userId);
         checkThatRoleExist(removingRoleId);

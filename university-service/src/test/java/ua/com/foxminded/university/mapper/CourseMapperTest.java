@@ -5,7 +5,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import ua.com.foxminded.university.dto.CourseRequest;
 import ua.com.foxminded.university.dto.CourseResponse;
+import ua.com.foxminded.university.dto.DepartmentResponse;
 import ua.com.foxminded.university.entity.Course;
+import ua.com.foxminded.university.entity.Department;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CourseMapperTest {
@@ -13,10 +16,13 @@ class CourseMapperTest {
     ApplicationContext context;
     CourseMapper courseMapper;
     Course course;
+    Course courseWithEntities;
     Course emptyCourse;
     CourseResponse courseResponse;
     CourseRequest courseRequest;
     CourseResponse emptyCourseResponse;
+    DepartmentResponse departmentResponse;
+    DepartmentResponse emptyDepartmentResponse;
 
 
     {
@@ -25,24 +31,36 @@ class CourseMapperTest {
 
         course = Course.builder().withId(1L).withName("Course 1").build();
         emptyCourse = Course.builder().build();
+        courseWithEntities = Course.builder().withId(1L).withName("Course 1")
+                .withDepartment(Department.builder().withId(1L).withName("Dep 1").build()).build();
 
         courseRequest = new CourseRequest();
         courseRequest.setId(1L);
         courseRequest.setName("Course 1");
 
+        departmentResponse = new DepartmentResponse();
+        departmentResponse.setId(1L);
+        departmentResponse.setName("Dep 1");
+
+        emptyDepartmentResponse = new DepartmentResponse();
+        emptyDepartmentResponse.setId(0L);
+        emptyDepartmentResponse.setName("");
+
         courseResponse = new CourseResponse();
         courseResponse.setId(1L);
         courseResponse.setName("Course 1");
+        courseResponse.setDepartmentResponse(departmentResponse);
 
         emptyCourseResponse = new CourseResponse();
         emptyCourseResponse.setId(0L);
         emptyCourseResponse.setName("");
+        emptyCourseResponse.setDepartmentResponse(emptyDepartmentResponse);
     }
 
     @Test
     void mapEntityToDtoShouldMapEntityToDtoIfArgumentIsCourseEntity() {
         CourseResponse expected = courseResponse;
-        CourseResponse actual = courseMapper.mapEntityToDto(course);
+        CourseResponse actual = courseMapper.mapEntityToDto(courseWithEntities);
 
         assertThat(actual).isEqualTo(expected);
     }

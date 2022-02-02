@@ -14,11 +14,13 @@ import ua.com.foxminded.university.mapper.StudentMapper;
 import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.StudentService;
 import ua.com.foxminded.university.service.validator.UserValidator;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(transactionManager = "hibernateTransactionManager")
 public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, StudentResponse> implements StudentService {
 
     private final StudentDao studentDao;
@@ -68,7 +70,6 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
     }
 
     @Override
-    @Transactional(transactionManager = "txManager")
     public void edit(StudentRequest studentRequest) {
         userValidator.validate(studentRequest);
         studentRequest.setPassword(passwordEncoder.encode(studentRequest.getPassword()));
@@ -82,30 +83,27 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
     }
 
     @Override
-    @Transactional(transactionManager = "txManager")
-    public boolean deleteById(long id) {
+    public void deleteById(long id) {
         if(studentDao.findById(id).isPresent()){
             removeAllRolesFromUser(id);
-            return studentDao.deleteById(id);
+            studentDao.deleteById(id);
         }
-        return false;
     }
 
     @Override
-    public Optional<StudentResponse> findByEmail(String email) {
-        Optional<Student> studentOptional = studentDao.findByEmail(email);
+    public List<StudentResponse> findByEmail(String email) {
+        List<Student> students = studentDao.findByEmail(email);
 
-        if(studentOptional.isPresent()){
-            StudentResponse studentResponse = studentMapper.mapEntityToDto(studentOptional.get());
+        if(!students.isEmpty()){
+            StudentResponse studentResponse = studentMapper.mapEntityToDto(students.get(0));
             studentResponse.setRoles(roleDao.findByUserId(studentResponse.getId()));
-            return Optional.of(studentResponse);
+            return Arrays.asList(studentResponse);
         }
 
-        return studentOptional.map(studentMapper::mapEntityToDto);
+        return Collections.emptyList();
     }
 
     @Override
-    @Transactional(transactionManager = "txManager")
     public boolean leaveGroup(long studentId) {
         if (studentDao.findById(studentId).isPresent()){
             studentDao.leaveGroup(studentId);
@@ -116,7 +114,6 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
     }
 
     @Override
-    @Transactional(transactionManager = "txManager")
     public boolean changeGroup(long studentId, long groupId) {
         if (studentDao.findById(studentId).isPresent() && groupDao.findById(groupId).isPresent()){
             studentDao.enterGroup(studentId, groupId);
@@ -127,7 +124,7 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
     }
 
     @Override
-    protected StudentResponse registerCertainUser(StudentRequest studentRequest) {
+    protected StudentResponse registerCertainUser(StudentRequest studentRequest){
         Student studentBeforeSave = studentMapper.mapDtoToEntity(studentRequest);
         Student studentAfterSave = studentDao.save(studentBeforeSave);
         long studentId = studentAfterSave.getId();
@@ -137,10 +134,14 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
         }
 
         if(roleDao.findByUserId(studentId).isEmpty()) {
-            Role studentRole = roleDao.findByName("ROLE_STUDENT")
-                    .orElseThrow(() -> new EntityDontExistException("ROLE_STUDENT not initialized"));
 
-            addRoleToUser(studentId, studentRole.getId());
+            List<Role> studentRoles = roleDao.findByName("ROLE_STUDENT");
+
+            if (studentRoles.isEmpty()){
+                throw new EntityDontExistException("ROLE_STUDENT not initialized");
+            }
+
+            addRoleToUser(studentId, studentRoles.get(0).getId());
         }
 
         return studentMapper.mapEntityToDto(studentAfterSave);

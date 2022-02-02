@@ -17,8 +17,8 @@ public interface UserService<REQUEST extends UserRequest, RESPONSE extends UserR
 
     void edit(REQUEST requestDto);
 
-    boolean deleteById(long id);
+    void deleteById(long id);
 
-    Optional<RESPONSE> findByEmail(String email);
+    List<RESPONSE> findByEmail(String email);
 
 }

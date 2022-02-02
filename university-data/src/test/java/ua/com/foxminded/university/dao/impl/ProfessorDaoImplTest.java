@@ -11,12 +11,15 @@ import ua.com.foxminded.university.entity.Department;
 import ua.com.foxminded.university.entity.Professor;
 import ua.com.foxminded.university.entity.Role;
 import ua.com.foxminded.university.entity.ScienceDegree;
+import ua.com.foxminded.university.testUtils.TestUtility;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static ua.com.foxminded.university.testUtils.TestUtility.assertRoles;
 import static ua.com.foxminded.university.testUtils.TestUtility.assertUsers;
 import static ua.com.foxminded.university.testUtils.TestUtility.assertUsersProfessors;
 
@@ -43,7 +46,7 @@ class ProfessorDaoImplTest {
                 .withLastName("Chirkov")
                 .withEmail("chirkov@gmail.com")
                 .withPassword("1234")
-                .withDepartment(departmentForTest)
+                .withDepartment(Department.builder().withId(1L).withName("Department of History").build())
                 .withScienceDegree(ScienceDegree.GRADUATE)
                 .build();
         professorDao.save(addingProfessor);
@@ -59,7 +62,7 @@ class ProfessorDaoImplTest {
                 .withLastName("Chirkov")
                 .withEmail("chirkov@gmail.com")
                 .withPassword("1234")
-                .withDepartment(departmentForTest)
+                .withDepartment(Department.builder().withId(1L).withName("Department of History").build())
                 .withScienceDegree(ScienceDegree.GRADUATE)
                 .build());
         professorDao.saveAll(addingProfessorEntities);
@@ -119,17 +122,17 @@ class ProfessorDaoImplTest {
                 .withEmail("petrov@gmail.com")
                 .withPassword("RI")
                 .withDepartment(departmentDao.findById(1L).get())
-                .withScienceDegree(ScienceDegree.GRADUATE)
+                .withScienceDegree(ScienceDegree.MASTER)
                 .build();
-        Professor actual = professorDao.findByEmail("petrov@gmail.com").get();
+        Professor actual = professorDao.findByEmail("petrov@gmail.com").get(0);
 
         assertUsers(actual, expected);
     }
 
     @Test
     void findByEmailShouldReturnOptionalEmptyIfArgumentIsEmailAndItDontExist(){
-        Optional<Professor> expected = Optional.empty();
-        Optional<Professor> actual = professorDao.findByEmail("unknownemail@gmail.com");
+        List<Professor> expected = Collections.emptyList();
+        List<Professor> actual = professorDao.findByEmail("unknownemail@gmail.com");
 
         assertThat(expected).isEqualTo(actual);
     }
@@ -143,7 +146,7 @@ class ProfessorDaoImplTest {
                 .withEmail("Mazurin@gmail.com")
                 .withPassword("1234")
                 .withDepartment(departmentDao.findById(1L).get())
-                .withScienceDegree(ScienceDegree.MASTER)
+                .withScienceDegree(ScienceDegree.PH_D_CANDIDATE)
                 .build();
         professorDao.changeScienceDegree(10, 2);
         Professor actual = professorDao.findById(10L).get();
@@ -178,7 +181,7 @@ class ProfessorDaoImplTest {
                 .withEmail("Mazurin@gmail.com")
                 .withPassword("1234")
                 .withDepartment(departmentDao.findById(1L).get())
-                .withScienceDegree(ScienceDegree.PH_D_CANDIDATE)
+                .withScienceDegree(ScienceDegree.PH_D)
                 .build();
         Professor actualBeforeChanging = professorDao.findById(10L).get();
         assertUsers(actualBeforeChanging, expectedBeforeChanging);
@@ -192,10 +195,16 @@ class ProfessorDaoImplTest {
                 .withEmail("Mazurin@gmail.com")
                 .withPassword("1234")
                 .withDepartment(Department.builder().withId(0L).build())
-                .withScienceDegree(ScienceDegree.PH_D_CANDIDATE)
+                .withScienceDegree(ScienceDegree.PH_D)
                 .build();
         Professor actualAfterChanging = professorDao.findById(10L).get();
-        assertUsers(actualAfterChanging, expectedAfterChanging);
+
+        assertThat(actualAfterChanging.getFirstName()).isEqualTo(expectedAfterChanging.getFirstName());
+        assertThat(actualAfterChanging.getLastName()).isEqualTo(expectedAfterChanging.getLastName());
+        assertThat(actualAfterChanging.getEmail()).isEqualTo(expectedAfterChanging.getEmail());
+        assertThat(actualAfterChanging.getPassword()).isEqualTo(expectedAfterChanging.getPassword());
+        assertThat(actualAfterChanging.getDepartment()).isNull();
+        assertThat(actualAfterChanging.getScienceDegree()).isEqualTo(expectedAfterChanging.getScienceDegree());
     }
 
     @Test
@@ -207,7 +216,7 @@ class ProfessorDaoImplTest {
                 .withEmail("Mazurin@gmail.com")
                 .withPassword("1234")
                 .withDepartment(departmentDao.findById(1L).get())
-                .withScienceDegree(ScienceDegree.PH_D_CANDIDATE)
+                .withScienceDegree(ScienceDegree.PH_D)
                 .build();
         Professor actualBeforeChanging = professorDao.findById(10L).get();
         assertUsers(actualBeforeChanging, expectedBeforeChanging);
@@ -221,7 +230,7 @@ class ProfessorDaoImplTest {
                 .withEmail("Mazurin@gmail.com")
                 .withPassword("1234")
                 .withDepartment(departmentDao.findById(2L).get())
-                .withScienceDegree(ScienceDegree.PH_D_CANDIDATE)
+                .withScienceDegree(ScienceDegree.PH_D)
                 .build();
         Professor actualAfterChanging = professorDao.findById(10L).get();
         assertUsers(actualAfterChanging, expectedAfterChanging);
@@ -232,14 +241,14 @@ class ProfessorDaoImplTest {
 
         List<Role> expectedListOfRoleBeforeAdding  = Arrays.asList(Role.builder().withId(2L).withName("ROLE_PROFESSOR").build());
         List<Role> actualListOfRoleBeforeAdding = roleDao.findByUserId(7L);
-        assertThat(actualListOfRoleBeforeAdding).isEqualTo(expectedListOfRoleBeforeAdding);
+        assertRoles(actualListOfRoleBeforeAdding, expectedListOfRoleBeforeAdding);
 
         professorDao.addRoleToUser(7L, 3L);
 
         List<Role> expectedListOfRoleAfterAdding  = Arrays.asList(Role.builder().withId(2L).withName("ROLE_PROFESSOR").build(),
                 Role.builder().withId(3L).withName("ROLE_ADMIN").build());
         List<Role> actualListOfRoleAfterAdding = roleDao.findByUserId(7L);
-        assertThat(actualListOfRoleAfterAdding).isEqualTo(expectedListOfRoleAfterAdding);
+        assertRoles(actualListOfRoleAfterAdding, expectedListOfRoleAfterAdding);
     }
 
     @Test
@@ -247,13 +256,13 @@ class ProfessorDaoImplTest {
 
         List<Role> expectedListOfRoleBeforeAdding  = Arrays.asList(Role.builder().withId(2L).withName("ROLE_PROFESSOR").build());
         List<Role> actualListOfRoleBeforeAdding = roleDao.findByUserId(7L);
-        assertThat(actualListOfRoleBeforeAdding).isEqualTo(expectedListOfRoleBeforeAdding);
+        assertRoles(actualListOfRoleBeforeAdding, expectedListOfRoleBeforeAdding);
 
         professorDao.removeRoleFromUser(7L, 2L);
 
         List<Role> expectedListOfRoleAfterAdding  = Arrays.asList();
         List<Role> actualListOfRoleAfterAdding = roleDao.findByUserId(7L);
-        assertThat(actualListOfRoleAfterAdding).isEqualTo(expectedListOfRoleAfterAdding);
+        assertRoles(actualListOfRoleAfterAdding, expectedListOfRoleAfterAdding);
     }
 
 }

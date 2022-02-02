@@ -57,11 +57,11 @@ class LessonDaoImplTest {
     @Test
     void createAndReadShouldAddNewLessonToDatabaseIfArgumentIsLesson(){
         Lesson addingLesson = Lesson.builder()
-                .withCourse(courseForTest)
+                .withCourse(Course.builder().withId(1L).withName("Russia History").build())
                 .withTimeOfStartLesson(LocalDateTime.parse("2020-01-15_12:00:00.000", FORMATTER))
-                .withGroup(groupForTest)
-                .withTeacher(professorForTest)
-                .withFormOfLesson(formOfLessonForTest)
+                .withGroup(Group.builder().withId(1L).withName("History Group #1").build())
+                .withTeacher(Professor.builder().withId(7L).withFirstName("Ivan").withLastName("Petrov").build())
+                .withFormOfLesson(FormOfLesson.builder().withId(1L).withName("lecture").build())
                 .build();
         lessonDao.save(addingLesson);
         Lesson readingLesson = lessonDao.findById(6L).get();
@@ -72,10 +72,10 @@ class LessonDaoImplTest {
     @Test
     void createAndReadShouldAddNewLessonToDatabaseIfArgumentIsLessonWithNotAppointedDateTime(){
         Lesson addingLesson = Lesson.builder()
-                .withCourse(courseForTest)
-                .withGroup(groupForTest)
-                .withTeacher(professorForTest)
-                .withFormOfLesson(formOfLessonForTest)
+                .withCourse(Course.builder().withId(1L).withName("Russia History").build())
+                .withGroup(Group.builder().withId(1L).withName("History Group #1").build())
+                .withTeacher(Professor.builder().withId(7L).withFirstName("Ivan").withLastName("Petrov").build())
+                .withFormOfLesson(FormOfLesson.builder().withId(1L).withName("lecture").build())
                 .build();
         lessonDao.save(addingLesson);
         Lesson readingLesson = lessonDao.findById(6L).get();
@@ -86,11 +86,11 @@ class LessonDaoImplTest {
     @Test
     void createAndReadShouldAddListOfNewLessonsToDatabaseIfArgumentIsListOfLessons(){
         List<Lesson> addingLessonEntities = Arrays.asList (Lesson.builder()
-                .withCourse(courseForTest)
+                .withCourse(Course.builder().withId(1L).withName("Russia History").build())
                 .withTimeOfStartLesson(LocalDateTime.parse("2020-01-15_12:00:00.000", FORMATTER))
-                .withGroup(groupForTest)
-                .withTeacher(professorForTest)
-                .withFormOfLesson(formOfLessonForTest)
+                .withGroup(Group.builder().withId(1L).withName("History Group #1").build())
+                .withTeacher(Professor.builder().withId(7L).withFirstName("Ivan").withLastName("Petrov").build())
+                .withFormOfLesson(FormOfLesson.builder().withId(1L).withName("lecture").build())
                 .build());
         lessonDao.saveAll(addingLessonEntities);
         List<Lesson> readingLessonEntities = Arrays.asList(lessonDao.findById(6L).get());
@@ -146,7 +146,10 @@ class LessonDaoImplTest {
                 lessonDao.findById(3L).get());
         List<Lesson> actual = lessonDao.findByGroupId(1);
 
-        assertThat(expected).isEqualTo(actual);
+        System.out.println("expected = " + expected);
+        System.out.println("actual = " + actual);
+
+        assertLessons(actual, expected);
     }
 
     @Test
@@ -155,7 +158,7 @@ class LessonDaoImplTest {
                 lessonDao.findById(2L).get());
         List<Lesson> actual = lessonDao.findByProfessorId(7);
 
-        assertThat(expected).isEqualTo(actual);
+        assertLessons(actual, expected);
     }
 
     @Test
@@ -164,7 +167,7 @@ class LessonDaoImplTest {
                 lessonDao.findById(2L).get());
         List<Lesson> actual = lessonDao.findByCourseId(1);
 
-        assertThat(expected).isEqualTo(actual);
+        assertLessons(actual, expected);
     }
 
     @Test
@@ -173,7 +176,7 @@ class LessonDaoImplTest {
                 lessonDao.findById(5L).get());
         List<Lesson> actual = lessonDao.findByFormOfLessonId(2);
 
-        assertThat(expected).isEqualTo(actual);
+        assertLessons(actual, expected);
     }
 
     @Test
@@ -202,7 +205,6 @@ class LessonDaoImplTest {
                 .withTimeOfStartLesson(LocalDateTime.parse("2020-01-11_13:00:00.000", FORMATTER))
                 .withGroup(groupDao.findById(1L).get())
                 .withTeacher(professorDao.findById(7L).get())
-                .withFormOfLesson(FormOfLesson.builder().withId(0L).build())
                 .build();
 
         lessonDao.removeFormOfLessonFromLesson(1);
@@ -210,7 +212,15 @@ class LessonDaoImplTest {
         Lesson actual = lessonDao.findById(1L).get();
 
 
-        assertLessons(actual, expected);
+        assertThat(actual.getCourse().getId()).isEqualTo(expected.getCourse().getId());
+        assertThat(actual.getCourse().getName()).isEqualTo(expected.getCourse().getName());
+        assertThat(actual.getTimeOfStartLesson()).isEqualTo(expected.getTimeOfStartLesson());
+        assertThat(actual.getGroup().getId()).isEqualTo(expected.getGroup().getId());
+        assertThat(actual.getGroup().getName()).isEqualTo(expected.getGroup().getName());
+        assertThat(actual.getTeacher().getId()).isEqualTo(expected.getTeacher().getId());
+        assertThat(actual.getTeacher().getFirstName()).isEqualTo(expected.getTeacher().getFirstName());
+        assertThat(actual.getTeacher().getLastName()).isEqualTo(expected.getTeacher().getLastName());
+        assertThat(actual.getFormOfLesson()).isNull();
     }
 
     @Test
@@ -246,7 +256,14 @@ class LessonDaoImplTest {
 
         Lesson actual = lessonDao.findById(1L).get();
 
-        assertLessons(actual, expected);
+        assertThat(actual.getCourse().getId()).isEqualTo(expected.getCourse().getId());
+        assertThat(actual.getCourse().getName()).isEqualTo(expected.getCourse().getName());
+        assertThat(actual.getTimeOfStartLesson()).isEqualTo(expected.getTimeOfStartLesson());
+        assertThat(actual.getGroup().getId()).isEqualTo(expected.getGroup().getId());
+        assertThat(actual.getGroup().getName()).isEqualTo(expected.getGroup().getName());
+        assertThat(actual.getTeacher()).isNull();
+        assertThat(actual.getFormOfLesson().getId()).isEqualTo(expected.getFormOfLesson().getId());
+        assertThat(actual.getFormOfLesson().getName()).isEqualTo(expected.getFormOfLesson().getName());
     }
 
     @Test
@@ -282,7 +299,15 @@ class LessonDaoImplTest {
 
         Lesson actual = lessonDao.findById(1L).get();
 
-        assertLessons(actual, expected);
+        assertThat(actual.getCourse()).isNull();
+        assertThat(actual.getTimeOfStartLesson()).isEqualTo(expected.getTimeOfStartLesson());
+        assertThat(actual.getGroup().getId()).isEqualTo(expected.getGroup().getId());
+        assertThat(actual.getGroup().getName()).isEqualTo(expected.getGroup().getName());
+        assertThat(actual.getTeacher().getId()).isEqualTo(expected.getTeacher().getId());
+        assertThat(actual.getTeacher().getFirstName()).isEqualTo(expected.getTeacher().getFirstName());
+        assertThat(actual.getTeacher().getLastName()).isEqualTo(expected.getTeacher().getLastName());
+        assertThat(actual.getFormOfLesson().getId()).isEqualTo(expected.getFormOfLesson().getId());
+        assertThat(actual.getFormOfLesson().getName()).isEqualTo(expected.getFormOfLesson().getName());
     }
 
     @Test
@@ -318,6 +343,14 @@ class LessonDaoImplTest {
 
         Lesson actual = lessonDao.findById(1L).get();
 
-        assertLessons(actual, expected);
+        assertThat(actual.getCourse().getId()).isEqualTo(expected.getCourse().getId());
+        assertThat(actual.getCourse().getName()).isEqualTo(expected.getCourse().getName());
+        assertThat(actual.getTimeOfStartLesson()).isEqualTo(expected.getTimeOfStartLesson());
+        assertThat(actual.getGroup()).isNull();
+        assertThat(actual.getTeacher().getId()).isEqualTo(expected.getTeacher().getId());
+        assertThat(actual.getTeacher().getFirstName()).isEqualTo(expected.getTeacher().getFirstName());
+        assertThat(actual.getTeacher().getLastName()).isEqualTo(expected.getTeacher().getLastName());
+        assertThat(actual.getFormOfLesson().getId()).isEqualTo(expected.getFormOfLesson().getId());
+        assertThat(actual.getFormOfLesson().getName()).isEqualTo(expected.getFormOfLesson().getName());
     }
 }

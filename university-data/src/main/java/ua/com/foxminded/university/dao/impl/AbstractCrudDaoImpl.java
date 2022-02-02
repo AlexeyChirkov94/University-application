@@ -1,44 +1,30 @@
 package ua.com.foxminded.university.dao.impl;
 
 import lombok.extern.log4j.Log4j;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.CrudDao;
-
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 @Log4j
+@Transactional(transactionManager = "hibernateTransactionManager")
 public abstract class AbstractCrudDaoImpl<E> implements CrudDao<E> {
 
-    private static final String MESSAGE_OF_SUCCESS_DELETING = "Entity deleted, id = ";
-    private static final String MESSAGE_OF_ERROR_IN_DELETING = "Error entity deleting, id = ";
+    protected final SessionFactory sessionFactory;
+    protected final String deleteQuery;
+    protected final String findAllQuery;
+    protected final Class<E> typeParameterClass;
 
-    protected JdbcTemplate jdbcTemplate;
-    private final String saveQuery;
-    private final String findByIdQuery;
-    private final String findAllNoPagesQuery;
-    private final String updateQuery;
-    private final String deleteQuery;
-    protected final RowMapper<E> rowMapper;
-
-    protected AbstractCrudDaoImpl(JdbcTemplate jdbcTemplate, String saveQuery, String findByIdQuery,
-                                  String findAllNoPagesQuery, String updateQuery, String deleteQuery, RowMapper<E> rowMapper) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.saveQuery = saveQuery;
-        this.findByIdQuery = findByIdQuery;
-        this.findAllNoPagesQuery = findAllNoPagesQuery;
-        this.updateQuery = updateQuery;
+    protected AbstractCrudDaoImpl(SessionFactory sessionFactory, Class<E> typeParameterClass,
+                                  String findAllQuery, String deleteQuery) {
+        this.sessionFactory = sessionFactory;
+        this.findAllQuery = findAllQuery;
         this.deleteQuery = deleteQuery;
-        this.rowMapper = rowMapper;
+        this.typeParameterClass = typeParameterClass;
     }
 
     @Override
@@ -48,104 +34,49 @@ public abstract class AbstractCrudDaoImpl<E> implements CrudDao<E> {
 
     @Override
     public void saveAll(List<E> entities){
-        jdbcTemplate.batchUpdate(saveQuery,
-                new BatchPreparedStatementSetter() {
-                    @Override
-                    public void setValues(PreparedStatement preparedStatement, int numberOfElement)
-                            throws SQLException {
-                        E entity = entities.get(numberOfElement);
-                        preparePreparedStatementForInsert(preparedStatement, entity);
-                    }
-                    @Override
-                    public int getBatchSize() {
-                        return entities.size();
-                    }
-                });
+        entities.stream().forEach((e)->save(e));
     }
 
     @Override
     public Optional<E> findById(Long id){
-        try {
-            return Optional.ofNullable(jdbcTemplate.queryForObject(findByIdQuery, rowMapper, id));
-        } catch (DataAccessException e) {
-            log.info("Entity not found: " + id);
-            return Optional.empty();
-        }
+        Session session = sessionFactory.getCurrentSession();
+
+        return Optional.ofNullable(session.get(typeParameterClass, id));
     }
 
     @Override
     public List<E> findAll(){
-        return jdbcTemplate.query(findAllNoPagesQuery, rowMapper);
+        Session session = sessionFactory.getCurrentSession();
+
+        return session.createQuery(findAllQuery, typeParameterClass).getResultList();
     }
 
     @Override
     public void update(E entity) {
-        updateCertainEntity(entity);
+        Session session = sessionFactory.getCurrentSession();
+
+        session.update(entity);
     }
 
     @Override
     public void updateAll(List<E> entities) {
-        jdbcTemplate.batchUpdate(updateQuery,
-                new BatchPreparedStatementSetter() {
-                    @Override
-                    public void setValues(PreparedStatement preparedStatement, int numberOfElement)
-                            throws SQLException {
-                        E entity = entities.get(numberOfElement);
-                        preparePreparedStatementForUpdate(preparedStatement, entity);
-                    }
-                    @Override
-                    public int getBatchSize() {
-                        return entities.size();
-                    }
-                });
+        entities.stream().forEach((e)->update(e));
     }
 
     @Override
-    public boolean deleteById(Long id) {
-        int result = jdbcTemplate.update(deleteQuery, id);
-        if (result == 1){
-            log.info(MESSAGE_OF_SUCCESS_DELETING + id);
-            return true;
-        } else {
-            log.info(MESSAGE_OF_ERROR_IN_DELETING + id);
-            return false;
-        }
+    public void deleteById(Long id) {
+        Session session = sessionFactory.getCurrentSession();
+
+        session.createQuery(deleteQuery)
+        .setParameter("deleteId", id)
+        .executeUpdate();
     }
 
     @Override
-    public boolean deleteByIds(Set<Long> ids) {
-        List<Long> listIds = new ArrayList<>(ids);
-        boolean status = true;
-        int [] result = jdbcTemplate.batchUpdate(deleteQuery,
-                new BatchPreparedStatementSetter() {
-                    @Override
-                    public void setValues(PreparedStatement preparedStatement, int numberOfElement)
-                            throws SQLException {
-                        Long id = listIds.get(numberOfElement);
-                        preparedStatement.setLong(1, id);
-                    }
-                    @Override
-                    public int getBatchSize() {
-                        return ids.size();
-                    }
-                });
-        if(Arrays.stream(result).anyMatch(a -> a == 0)){
-            status = false;
-        }
-
-        return status;
-    }
-
-    protected Long getIdOfSavedEntity(KeyHolder keyHolder){
-        return Long.valueOf(String.valueOf(keyHolder.getKeyList().get(0).get("id")));
+    public void deleteByIds(Set<Long> ids) {
+        ids.stream().forEach((e)->deleteById(e));
     }
 
     protected abstract E insertCertainEntity(E entity);
-
-    protected abstract void preparePreparedStatementForInsert(PreparedStatement ps, E entity) throws SQLException;
-
-    protected abstract int updateCertainEntity(E entity);
-
-    protected abstract void preparePreparedStatementForUpdate(PreparedStatement ps, E entity) throws SQLException;
 
 }

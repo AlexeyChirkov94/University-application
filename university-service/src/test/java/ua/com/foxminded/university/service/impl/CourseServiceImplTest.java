@@ -18,6 +18,7 @@ import ua.com.foxminded.university.entity.Professor;
 import ua.com.foxminded.university.mapper.CourseMapper;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -178,7 +179,7 @@ class CourseServiceImplTest {
         courseRequest.setName(courseName);
         courseRequest.setDepartmentId(0L);
 
-        when(courseDao.findByName(courseName)).thenReturn(Optional.empty());
+        when(courseDao.findByName(courseName)).thenReturn(Collections.emptyList());
 
         courseService.create(courseRequest);
 
@@ -197,7 +198,7 @@ class CourseServiceImplTest {
 
         when(courseMapper.mapDtoToEntity(courseRequest)).thenReturn(courseBeforeSave);
         when(courseDao.save(courseBeforeSave)).thenReturn(courseAfterSave);
-        when(courseDao.findByName("Math")).thenReturn(Optional.empty());
+        when(courseDao.findByName("Math")).thenReturn(Collections.emptyList());
         when(courseDao.findById(1L)).thenReturn(Optional.of(courseAfterSave));
         when(departmentDao.findById(1L)).thenReturn(Optional.of(department));
         doNothing().when(courseDao).changeDepartment(1L, 1L);
@@ -222,7 +223,7 @@ class CourseServiceImplTest {
         CourseRequest courseRequest = new CourseRequest();
         courseRequest.setName(courseName);
 
-        when(courseDao.findByName(courseName)).thenReturn(Optional.of(Course.builder().withName(courseName).build()));
+        when(courseDao.findByName(courseName)).thenReturn(Arrays.asList(Course.builder().withName(courseName).build()));
 
         assertThatThrownBy(() -> courseService.create(courseRequest)).hasMessage("Course with same name already exist");
 
@@ -377,7 +378,7 @@ class CourseServiceImplTest {
         when(lessonDao.findByCourseId(courseId)).thenReturn(courseLessons);
         doNothing().when(lessonDao).removeCourseFromLesson(1L);
         doNothing().when(lessonDao).removeCourseFromLesson(2L);
-        when(courseDao.deleteById(courseId)).thenReturn(true);
+        doNothing().when(courseDao).deleteById(courseId);
 
         courseService.deleteById(courseId);
 

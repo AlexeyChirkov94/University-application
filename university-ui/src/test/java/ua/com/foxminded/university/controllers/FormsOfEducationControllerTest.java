@@ -211,7 +211,7 @@ class FormsOfEducationControllerTest {
     @Test
     void deleteShouldGetFormOfEducationIdFromUrlAndRenderIndexView() throws Exception {
 
-        when(formOfEducationService.deleteById(1L)).thenReturn(true);
+        doNothing().when(formOfEducationService).deleteById(1L);
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/education/form/1")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)

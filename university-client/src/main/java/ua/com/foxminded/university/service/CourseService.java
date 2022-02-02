@@ -20,7 +20,7 @@ public interface CourseService {
 
     void edit(CourseRequest requestDto);
 
-    boolean deleteById(long id);
+    void deleteById(long id);
 
     void addCourseToProfessorCourseList(long courseId, long professorId);
 

@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Transactional(transactionManager = "hibernateTransactionManager")
 public class DepartmentServiceImpl extends AbstractPageableCrudService implements DepartmentService {
 
     private final DepartmentDao departmentDao;
@@ -32,7 +33,7 @@ public class DepartmentServiceImpl extends AbstractPageableCrudService implement
 
     @Override
     public DepartmentResponse create(DepartmentRequest departmentRequest) {
-        if (departmentDao.findByName(departmentRequest.getName()).isPresent()){
+        if (!departmentDao.findByName(departmentRequest.getName()).isEmpty()){
             throw new EntityAlreadyExistException("Department with same name already exist");
         } else {
             Department departmentBeforeSave = departmentMapper.mapDtoToEntity(departmentRequest);
@@ -74,8 +75,7 @@ public class DepartmentServiceImpl extends AbstractPageableCrudService implement
     }
 
     @Override
-    @Transactional(transactionManager = "txManager")
-    public boolean deleteById(long id) {
+    public void deleteById(long id) {
         if(departmentDao.findById(id).isPresent()){
 
             List<Professor> departmentsProfessors = professorDao.findByDepartmentId(id);
@@ -93,9 +93,8 @@ public class DepartmentServiceImpl extends AbstractPageableCrudService implement
                 groupDao.removeDepartmentFromGroup(group.getId());
             }
 
-            return departmentDao.deleteById(id);
+            departmentDao.deleteById(id);
         }
-        return false;
     }
 
 }

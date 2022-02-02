@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Transactional(transactionManager = "hibernateTransactionManager")
 public class GroupServiceImpl extends AbstractPageableCrudService implements GroupService {
 
     private final GroupDao groupDao;
@@ -32,7 +33,6 @@ public class GroupServiceImpl extends AbstractPageableCrudService implements Gro
     private final GroupMapper groupMapper;
 
     @Override
-    @Transactional(transactionManager = "txManager")
     public void changeFormOfEducation(long groupId, long newFormOfEducationId) {
         checkThatGroupExist(groupId);
         checkThatFormOfEducationExist(newFormOfEducationId);
@@ -40,14 +40,12 @@ public class GroupServiceImpl extends AbstractPageableCrudService implements Gro
     }
 
     @Override
-    @Transactional(transactionManager = "txManager")
     public void removeFormOfEducationFromGroup(long groupId) {
         checkThatGroupExist(groupId);
         groupDao.removeFormOfEducationFromGroup(groupId);
     }
 
     @Override
-    @Transactional(transactionManager = "txManager")
     public void changeDepartment(long groupId, long newDepartmentId) {
         checkThatGroupExist(groupId);
         checkThatDepartmentExist(newDepartmentId);
@@ -55,16 +53,14 @@ public class GroupServiceImpl extends AbstractPageableCrudService implements Gro
     }
 
     @Override
-    @Transactional(transactionManager = "txManager")
     public void removeDepartmentFromGroup(long groupId) {
         checkThatGroupExist(groupId);
         groupDao.removeDepartmentFromGroup(groupId);
     }
 
     @Override
-    @Transactional(transactionManager = "txManager")
     public GroupResponse create(GroupRequest groupRequest) {
-        if (groupDao.findByName(groupRequest.getName()).isPresent()){
+        if (!groupDao.findByName(groupRequest.getName()).isEmpty()){
             throw new EntityAlreadyExistException("Group with same name already exist");
         } else {
             Group groupBeforeSave = groupMapper.mapDtoToEntity(groupRequest);
@@ -125,7 +121,6 @@ public class GroupServiceImpl extends AbstractPageableCrudService implements Gro
     }
 
     @Override
-    @Transactional(transactionManager = "txManager")
     public void edit(GroupRequest groupRequest) {
 
         groupDao.update(groupMapper.mapDtoToEntity(groupRequest));
@@ -140,8 +135,7 @@ public class GroupServiceImpl extends AbstractPageableCrudService implements Gro
     }
 
     @Override
-    @Transactional(transactionManager = "txManager")
-    public boolean deleteById(long id) {
+    public void deleteById(long id) {
         if(groupDao.findById(id).isPresent()){
 
             List<Student> groupStudents = studentDao.findByGroupId(id);
@@ -154,9 +148,8 @@ public class GroupServiceImpl extends AbstractPageableCrudService implements Gro
                 lessonDao.removeGroupFromLesson(lesson.getId());
             }
 
-            return groupDao.deleteById(id);
+            groupDao.deleteById(id);
         }
-        return false;
     }
 
     private void checkThatGroupExist(long groupId){

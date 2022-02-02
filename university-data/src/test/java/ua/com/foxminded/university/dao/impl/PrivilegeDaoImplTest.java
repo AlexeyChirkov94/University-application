@@ -8,6 +8,7 @@ import ua.com.foxminded.university.dao.PrivilegeDao;
 import ua.com.foxminded.university.entity.Privilege;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -81,15 +82,15 @@ public class PrivilegeDaoImplTest {
         Privilege expected = Privilege.builder()
                 .withName("READ_PRIVILEGE")
                 .build();
-        Privilege actual = privilegeDao.findByName("READ_PRIVILEGE").get();
+        Privilege actual = privilegeDao.findByName("READ_PRIVILEGE").get(0);
 
         assertPrivileges(actual, expected);
     }
 
     @Test
     void findByNameShouldReturnOptionalEmptyIfArgumentIsNameAndItDontExist(){
-        Optional<Privilege> expected = Optional.empty();
-        Optional<Privilege> actual = privilegeDao.findByName("unknown name");
+        List<Privilege> expected = Collections.emptyList();
+        List<Privilege> actual = privilegeDao.findByName("unknown name");
 
         assertThat(expected).isEqualTo(actual);
     }

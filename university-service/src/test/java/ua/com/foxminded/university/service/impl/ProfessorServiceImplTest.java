@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.service.impl;
 
 import org.assertj.core.api.Assertions;
+import org.hibernate.mapping.Collection;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -179,7 +180,7 @@ class ProfessorServiceImplTest {
         ProfessorResponse professorResponse = new ProfessorResponse();
         professorResponse.setId(1L);
 
-        when(professorDao.findByEmail(email)).thenReturn(Optional.of(Professor.builder().withId(1L).build()));
+        when(professorDao.findByEmail(email)).thenReturn(Collections.singletonList(Professor.builder().withId(1L).build()));
         when(professorMapper.mapEntityToDto(professor)).thenReturn(professorResponse);
 
         professorService.findByEmail(email);
@@ -192,7 +193,7 @@ class ProfessorServiceImplTest {
     void findByEmailShouldReturnOptionalOfEmptyProfessorResponseIfEmailNotRegistered() {
         String email= "Alexey94@gamil.com";
 
-        when(professorDao.findByEmail(email)).thenReturn(Optional.empty());
+        when(professorDao.findByEmail(email)).thenReturn(Collections.emptyList());
 
         professorService.findByEmail(email);
 
@@ -213,7 +214,7 @@ class ProfessorServiceImplTest {
         professorRequest.setScienceDegreeId(0);
 
         doNothing().when(userValidator).validate(professorRequest);
-        when(professorDao.findByEmail(email)).thenReturn(Optional.empty());
+        when(professorDao.findByEmail(email)).thenReturn(Collections.emptyList());
         when(passwordEncoder.encode(password)).thenReturn(password);
         when(professorMapper.mapDtoToEntity(professorRequest)).thenReturn(professor);
         when(professorDao.save(professor)).thenReturn(professor);
@@ -244,12 +245,12 @@ class ProfessorServiceImplTest {
         professorRequest.setScienceDegreeId(0);
 
         doNothing().when(userValidator).validate(professorRequest);
-        when(professorDao.findByEmail(email)).thenReturn(Optional.empty());
+        when(professorDao.findByEmail(email)).thenReturn(Collections.emptyList());
         when(passwordEncoder.encode(password)).thenReturn(password);
         when(professorMapper.mapDtoToEntity(professorRequest)).thenReturn(professor);
         when(professorDao.save(professor)).thenReturn(professor);
         when(roleDao.findByUserId(1L)).thenReturn(professorRole);
-        when(roleDao.findByName("ROLE_PROFESSOR")).thenReturn(Optional.of(defaultRole));
+        when(roleDao.findByName("ROLE_PROFESSOR")).thenReturn(Arrays.asList(defaultRole));
         when(professorDao.findById(1L)).thenReturn(Optional.of(professor));
         when(roleDao.findById(3L)).thenReturn(Optional.of(defaultRole));
 
@@ -281,12 +282,12 @@ class ProfessorServiceImplTest {
         professorRequest.setScienceDegreeId(0);
 
         doNothing().when(userValidator).validate(professorRequest);
-        when(professorDao.findByEmail(email)).thenReturn(Optional.empty());
+        when(professorDao.findByEmail(email)).thenReturn(Collections.emptyList());
         when(passwordEncoder.encode(password)).thenReturn(password);
         when(professorMapper.mapDtoToEntity(professorRequest)).thenReturn(professor);
         when(professorDao.save(professor)).thenReturn(professor);
         when(roleDao.findByUserId(1L)).thenReturn(professorRole);
-        when(roleDao.findByName("ROLE_PROFESSOR")).thenReturn(Optional.empty());
+        when(roleDao.findByName("ROLE_PROFESSOR")).thenReturn(Collections.emptyList());
 
         Assertions.assertThatThrownBy(() -> professorService.register(professorRequest)).hasMessage("ROLE_PROFESSOR not initialized");
 
@@ -316,7 +317,7 @@ class ProfessorServiceImplTest {
         professorRequest.setScienceDegreeId(1);
 
         doNothing().when(userValidator).validate(professorRequest);
-        when(professorDao.findByEmail(email)).thenReturn(Optional.empty());
+        when(professorDao.findByEmail(email)).thenReturn(Collections.emptyList());
         when(passwordEncoder.encode(password)).thenReturn(password);
         when(professorMapper.mapDtoToEntity(professorRequest)).thenReturn(professor);
         when(professorDao.save(professor)).thenReturn(professor);
@@ -351,7 +352,7 @@ class ProfessorServiceImplTest {
         professorRequest.setPassword(password);
 
         doNothing().when(userValidator).validate(professorRequest);
-        when(professorDao.findByEmail(email)).thenReturn(Optional.of(Professor.builder().withEmail(email).build()));
+        when(professorDao.findByEmail(email)).thenReturn(Collections.singletonList(Professor.builder().withEmail(email).build()));
 
         assertThatThrownBy(() -> professorService.register(professorRequest)).hasMessage("This email already registered");
 
@@ -475,7 +476,7 @@ class ProfessorServiceImplTest {
         when(professorDao.findById(professorId)).thenReturn(Optional.of(Professor.builder().withId(professorId).build()));
         when(roleDao.findByUserId(professorId)).thenReturn(professorRoles);
         doNothing().when(professorDao).removeRoleFromUser(1L, 2L);
-        when(professorDao.deleteById(professorId)).thenReturn(true);
+        doNothing().when(professorDao).deleteById(professorId);
         when(courseDao.findByProfessorId(1L)).thenReturn(professorCourses);
         doNothing().when(courseDao).removeCourseFromProfessorCourseList(1L, 1L);
         doNothing().when(courseDao).removeCourseFromProfessorCourseList(2L, 1L);

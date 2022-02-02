@@ -1,38 +1,38 @@
 package ua.com.foxminded.university.dao.impl;
 
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementSetter;
-import org.springframework.jdbc.core.RowMapper;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.CrudPageableDao;
-
 import java.util.List;
 
+@Transactional(transactionManager = "hibernateTransactionManager")
 public abstract class AbstractPageableCrudDaoImpl<E> extends AbstractCrudDaoImpl<E> implements CrudPageableDao<E> {
 
-    private final String findAllWithPagesQuery;
     private final String countQuery;
 
-    protected AbstractPageableCrudDaoImpl(JdbcTemplate jdbcTemplate, String saveQuery, String findByIdQuery,
-                                          String findAllNoPagesQuery, String updateQuery, String deleteQuery,
-                                          RowMapper<E> rowMapper, String findAllWithPagesQuery, String countQuery) {
-        super(jdbcTemplate, saveQuery, findByIdQuery, findAllNoPagesQuery, updateQuery, deleteQuery, rowMapper);
-        this.findAllWithPagesQuery = findAllWithPagesQuery;
+    protected AbstractPageableCrudDaoImpl(SessionFactory sessionFactory, Class<E> typeParameterClass,
+                                          String findAllQuery, String deleteQuery, String countQuery) {
+        super(sessionFactory, typeParameterClass,  findAllQuery, deleteQuery);
         this.countQuery = countQuery;
     }
 
     public List<E> findAll(int page, int itemsPerPage){
-        int offset = itemsPerPage * (page - 1);
-        PreparedStatementSetter preparedStatementSetter = ps -> {
-            ps.setInt(1, offset);
-            ps.setInt(2, itemsPerPage);
-        };
+        Session session = sessionFactory.getCurrentSession();
 
-        return jdbcTemplate.query(findAllWithPagesQuery, preparedStatementSetter, rowMapper);
+        int offset = itemsPerPage * (page - 1);
+
+        return session.createQuery(findAllQuery, typeParameterClass)
+                .setFirstResult(offset)
+                .setMaxResults(itemsPerPage)
+                .getResultList();
     }
 
     @Override
     public long count(){
-        return jdbcTemplate.queryForObject(countQuery, Long.class);
+        Session session = sessionFactory.getCurrentSession();
+
+        return session.createQuery(countQuery, Long.class).uniqueResult();
     }
 
 }

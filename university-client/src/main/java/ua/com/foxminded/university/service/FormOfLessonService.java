@@ -16,6 +16,6 @@ public interface FormOfLessonService {
 
     void edit(FormOfLessonRequest requestDto);
 
-    boolean deleteById(long id);
+    void deleteById(long id);
 
 }

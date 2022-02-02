@@ -18,8 +18,8 @@ public interface CrudDao<E> {
 
     void updateAll(List<E> entities);
 
-    boolean deleteById(Long id);
+    void deleteById(Long id);
 
-    boolean deleteByIds (Set<Long> ids);
+    void deleteByIds (Set<Long> ids);
 
 }
