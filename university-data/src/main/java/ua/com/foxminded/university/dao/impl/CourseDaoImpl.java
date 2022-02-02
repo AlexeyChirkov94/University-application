@@ -1,17 +1,15 @@
 package ua.com.foxminded.university.dao.impl;
 
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.CourseDao;
 import ua.com.foxminded.university.entity.Course;
+import javax.persistence.EntityManager;
 import java.util.List;
 
 @Repository
-@Log4j
-@Transactional(transactionManager = "hibernateTransactionManager")
+@Log4j2
 public class CourseDaoImpl extends AbstractPageableCrudDaoImpl<Course> implements CourseDao {
 
     private static final String FIND_QUERY = "SELECT c.id, c.name, c.department_id, d.name as department_name " +
@@ -29,13 +27,13 @@ public class CourseDaoImpl extends AbstractPageableCrudDaoImpl<Course> implement
             "INSERT INTO professor_course (professor_id, course_id) VALUES(:professorId, :courseId)";
     private static final String CHANGE_DEPARTMENT_QUERY = "UPDATE Course c SET c.department.id=:newDepartmentId WHERE id =:courseId";
 
-    public CourseDaoImpl(SessionFactory sessionFactory) {
-        super(sessionFactory, Course.class, FIND_ALL_QUERY, DELETE_QUERY, COUNT_QUERY);
+    public CourseDaoImpl(EntityManager entityManager) {
+        super(entityManager, Course.class, FIND_ALL_QUERY, DELETE_QUERY, COUNT_QUERY);
     }
 
     @Override
     public List<Course> findByName(String name) {
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         return session.createQuery(FIND_BY_NAME_QUERY, Course.class)
                 .setParameter("courseName", name)
@@ -44,7 +42,7 @@ public class CourseDaoImpl extends AbstractPageableCrudDaoImpl<Course> implement
 
     @Override
     public void addCourseToProfessorCourseList(long courseId, long professorId) {
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         session.createSQLQuery(ADD_COURSE_TO_PROFESSOR_COURSE_LIST_QUERY)
                 .setParameter("courseId", courseId)
@@ -54,7 +52,7 @@ public class CourseDaoImpl extends AbstractPageableCrudDaoImpl<Course> implement
 
     @Override
     public void removeCourseFromProfessorCourseList(long courseId, long professorId) {
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         session.createSQLQuery(REMOVE_COURSE_FROM_PROFESSOR_COURSE_LIST_QUERY)
                 .setParameter("courseId", courseId)
@@ -64,7 +62,7 @@ public class CourseDaoImpl extends AbstractPageableCrudDaoImpl<Course> implement
 
     @Override
     public void changeDepartment(long courseId, long departmentId) {
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         session.createQuery(CHANGE_DEPARTMENT_QUERY)
                 .setParameter("newDepartmentId", departmentId)
@@ -74,7 +72,7 @@ public class CourseDaoImpl extends AbstractPageableCrudDaoImpl<Course> implement
 
     @Override
     public void removeDepartmentFromCourse(long courseId) {
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         session.createQuery(CHANGE_DEPARTMENT_QUERY)
                 .setParameter("newDepartmentId", null)
@@ -84,7 +82,7 @@ public class CourseDaoImpl extends AbstractPageableCrudDaoImpl<Course> implement
 
     @Override
     public List<Course> findByProfessorId(long professorId){
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         return session.createSQLQuery(FIND_BY_PROFESSOR_ID)
                 .addEntity(Course.class)
@@ -94,7 +92,7 @@ public class CourseDaoImpl extends AbstractPageableCrudDaoImpl<Course> implement
 
     @Override
     public List<Course> findByDepartmentId(long departmentId) {
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         return session.createQuery(FIND_BY_DEPARTMENT_ID, Course.class)
                 .setParameter("departmentId", departmentId)
@@ -103,7 +101,7 @@ public class CourseDaoImpl extends AbstractPageableCrudDaoImpl<Course> implement
 
     @Override
     protected Course insertCertainEntity(Course course) {
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         Long idOfSavedEntity = (Long)session.save(course);
         course.setId(idOfSavedEntity);

@@ -44,20 +44,20 @@ public class StudentsController {
         setPagesValueAndStatus(page, model);
         model.addAttribute("students", studentService.findAll(page));
 
-        return "/student/all";
+        return "student/all";
     }
 
     @GetMapping("/{id}")
     public String show(@PathVariable("id") long id, Model model){
         model.addAttribute("student", studentService.findById(id));
-        return "/student/show";
+        return "student/show";
     }
 
     @GetMapping("/new")
     public String newStudent(Model model, @ModelAttribute("student") StudentRequest studentRequest) {
 
         model.addAttribute("groups", groupService.findAll());
-        return "/student/add";
+        return "student/add";
     }
 
     @PostMapping()
@@ -78,7 +78,7 @@ public class StudentsController {
         model.addAttribute("studentResponse", studentResponse);
         model.addAttribute("studentRequest", studentRequest);
         model.addAttribute("groups", groupService.findAll());
-        return "/student/edit";
+        return "student/edit";
     }
 
     @PatchMapping("/{id}")
@@ -96,7 +96,7 @@ public class StudentsController {
         model.addAttribute("student", studentService.findById(id));
         model.addAttribute("lessons", lessons);
         model.addAttribute("stringDateTimes", stringDateTimes);
-        return "/student/timetable";
+        return "student/timetable";
     }
 
     @PatchMapping("/{id}/remove/group")

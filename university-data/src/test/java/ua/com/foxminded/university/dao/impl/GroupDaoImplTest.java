@@ -12,13 +12,11 @@ import ua.com.foxminded.university.dao.GroupDao;
 import ua.com.foxminded.university.entity.Department;
 import ua.com.foxminded.university.entity.FormOfEducation;
 import ua.com.foxminded.university.entity.Group;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static ua.com.foxminded.university.testUtils.TestUtility.assertGroups;
 

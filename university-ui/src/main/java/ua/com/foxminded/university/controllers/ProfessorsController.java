@@ -47,14 +47,14 @@ public class ProfessorsController {
         setPagesValueAndStatus(page, model);
         model.addAttribute("professors", professorService.findAll(page));
 
-        return "/professor/all";
+        return "professor/all";
     }
 
     @GetMapping("/{id}")
     public String show(@PathVariable("id") long id, Model model){
         model.addAttribute("professor", professorService.findById(id));
         model.addAttribute("professorsCourses", courseService.findByProfessorId(id));
-        return "/professor/show";
+        return "professor/show";
     }
 
     @GetMapping("/new")
@@ -62,7 +62,7 @@ public class ProfessorsController {
 
         model.addAttribute("scienceDegrees", ScienceDegreeResponse.values());
         model.addAttribute("departments", departmentService.findAll());
-        return "/professor/add";
+        return "professor/add";
     }
 
     @PostMapping()
@@ -89,7 +89,7 @@ public class ProfessorsController {
         model.addAttribute("departments", departmentService.findAll());
         model.addAttribute("professorsCourses", professorsCourses);
         model.addAttribute("anotherCourses", anotherCourses);
-        return "/professor/edit";
+        return "professor/edit";
     }
 
     @PatchMapping("/{id}")
@@ -106,7 +106,7 @@ public class ProfessorsController {
         model.addAttribute("professor", professorService.findById(id));
         model.addAttribute("lessons", lessons);
         model.addAttribute("stringDateTimes", stringDateTimes);
-        return "/professor/timetable";
+        return "professor/timetable";
     }
 
     @PostMapping("/{id}/assign/course")

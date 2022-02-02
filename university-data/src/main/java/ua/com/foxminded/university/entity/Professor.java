@@ -25,7 +25,7 @@ public class Professor extends User {
     @JoinColumn(name="department_id")
     Department department;
 
-    @Column(name="scienceDegree_id")
+    @Column(name="sciencedegree_id")
     ScienceDegree scienceDegree;
 
     public ScienceDegree getScienceDegree() {

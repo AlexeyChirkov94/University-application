@@ -1,17 +1,15 @@
 package ua.com.foxminded.university.dao.impl;
 
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.PrivilegeDao;
 import ua.com.foxminded.university.entity.Privilege;
+import javax.persistence.EntityManager;
 import java.util.List;
 
 @Repository
-@Log4j
-@Transactional(transactionManager = "hibernateTransactionManager")
+@Log4j2
 public class PrivilegeDaoImpl extends AbstractPageableCrudDaoImpl<Privilege> implements PrivilegeDao {
 
     private static final String FIND_BY_NAME_QUERY = "from Privilege where name=:privilegeName";
@@ -22,13 +20,13 @@ public class PrivilegeDaoImpl extends AbstractPageableCrudDaoImpl<Privilege> imp
     private static final String DELETE_QUERY = "delete Privilege Course where id=:deleteId";
     private static final String COUNT_QUERY = "select count(*) from Privilege";
 
-    public PrivilegeDaoImpl(SessionFactory sessionFactory) {
-        super(sessionFactory, Privilege.class, FIND_ALL_QUERY, DELETE_QUERY, COUNT_QUERY);
+    public PrivilegeDaoImpl(EntityManager entityManager) {
+        super(entityManager, Privilege.class, FIND_ALL_QUERY, DELETE_QUERY, COUNT_QUERY);
     }
 
     @Override
     public List<Privilege> findByName(String name) {
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         return session.createQuery(FIND_BY_NAME_QUERY, Privilege.class)
                 .setParameter("privilegeName", name)
@@ -37,7 +35,7 @@ public class PrivilegeDaoImpl extends AbstractPageableCrudDaoImpl<Privilege> imp
 
     @Override
     public List<Privilege> findByRoleId(long roleId) {
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         return session.createSQLQuery(FIND_BY_ROLE_ID)
                 .addEntity(Privilege.class)
@@ -47,7 +45,7 @@ public class PrivilegeDaoImpl extends AbstractPageableCrudDaoImpl<Privilege> imp
 
     @Override
     protected Privilege insertCertainEntity(Privilege entity) {
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         Long idOfSavedEntity = (Long)session.save(entity);
         entity.setId(idOfSavedEntity);

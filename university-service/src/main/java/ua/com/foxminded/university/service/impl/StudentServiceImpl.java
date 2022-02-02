@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional(transactionManager = "hibernateTransactionManager")
+@Transactional
 public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, StudentResponse> implements StudentService {
 
     private final StudentDao studentDao;

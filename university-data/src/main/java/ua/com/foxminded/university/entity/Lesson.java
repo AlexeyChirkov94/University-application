@@ -33,7 +33,7 @@ public class Lesson {
     @JoinColumn(name="course_id")
     Course course;
 
-    @Column(name="timeOfStart")
+    @Column(name="timeofstart")
     LocalDateTime timeOfStartLesson;
 
     @ManyToOne
@@ -45,7 +45,7 @@ public class Lesson {
     Professor teacher;
 
     @ManyToOne
-    @JoinColumn(name="formOfLesson_id")
+    @JoinColumn(name="formoflesson_id")
     FormOfLesson formOfLesson;
 
 }

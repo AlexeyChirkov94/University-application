@@ -57,7 +57,7 @@ public class LessonsController {
         model.addAttribute("lessons", lessons);
         model.addAttribute("stringDateTimes", stringDateTimes);
 
-        return "/lesson/all";
+        return "lesson/all";
     }
 
     @GetMapping("/{id}")
@@ -66,7 +66,7 @@ public class LessonsController {
 
         model.addAttribute("lesson", lesson);
         model.addAttribute("stringDateTimes", getStringDateTime(lesson));
-        return "/lesson/show";
+        return "lesson/show";
     }
 
     @GetMapping("/new")
@@ -76,7 +76,7 @@ public class LessonsController {
         model.addAttribute("groups", groupService.findAll());
         model.addAttribute("formsOfLesson", formOfLessonService.findAll());
         model.addAttribute("courses", courseService.findAll());
-        return "/lesson/add";
+        return "lesson/add";
     }
 
 
@@ -109,7 +109,7 @@ public class LessonsController {
         model.addAttribute("availableTeachers", availableTeachers);
         model.addAttribute("availableCourses", availableCourses);
 
-        return "/lesson/edit";
+        return "lesson/edit";
     }
 
     @PatchMapping("/{id}")
@@ -147,18 +147,18 @@ public class LessonsController {
         setPagesValueAndStatus(page, model);
         model.addAttribute("formsOfLesson", formOfLessonService.findAll(page));
 
-        return "/formOfLesson/all";
+        return "formOfLesson/all";
     }
 
     @GetMapping("/type/{id}")
     public String showFromOFLesson(@PathVariable("id") long id, Model model){
         model.addAttribute("formOfLesson", formOfLessonService.findById(id));
-        return "/formOfLesson/show";
+        return "formOfLesson/show";
     }
 
     @GetMapping("/type/new")
     public String newFromOFLesson(Model model, @ModelAttribute("formOfLesson") FormOfLessonRequest formOfLessonRequest) {
-        return "/formOfLesson/add";
+        return "formOfLesson/add";
     }
 
     @PostMapping("/type")
@@ -176,7 +176,7 @@ public class LessonsController {
         formOfLessonRequest.setDuration(formOfLessonResponse.getDuration());
 
         model.addAttribute("formOfLessonRequest", formOfLessonRequest);
-        return "/formOfLesson/edit";
+        return "formOfLesson/edit";
     }
 
     @PatchMapping("type/{id}")

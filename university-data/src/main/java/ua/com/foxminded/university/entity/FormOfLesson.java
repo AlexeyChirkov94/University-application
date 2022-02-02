@@ -12,7 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="formsOfLesson")
+@Table(name="formsoflesson")
 @Data
 @Builder(setterPrefix = "with")
 @AllArgsConstructor
@@ -27,7 +27,7 @@ public class FormOfLesson {
     @Column(name = "name")
     String name;
 
-    @Column(name = "durationOfLesson")
+    @Column(name = "durationoflesson")
     Integer duration;
 
 }

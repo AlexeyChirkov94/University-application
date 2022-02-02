@@ -37,7 +37,7 @@ public class Group {
     Department department;
 
     @ManyToOne
-    @JoinColumn(name="formOfEducation_id")
+    @JoinColumn(name="formofeducation_id")
     FormOfEducation formOfEducation;
 
 }

@@ -44,7 +44,7 @@ public class DepartmentsController {
         setPagesValueAndStatus(page, model);
         model.addAttribute("departments", departmentService.findAll(page));
 
-        return "/department/all";
+        return "department/all";
     }
 
     @GetMapping("/{id}")
@@ -53,12 +53,12 @@ public class DepartmentsController {
         model.addAttribute("professors", professorService.findByDepartmentId(id));
         model.addAttribute("courses", courseService.findByDepartmentId(id));
         model.addAttribute("groups", groupService.findByDepartmentId(id));
-        return "/department/show";
+        return "department/show";
     }
 
     @GetMapping("/new")
     public String newCourse(Model model, @ModelAttribute("department") DepartmentRequest departmentRequest) {
-        return "/department/add";
+        return "department/add";
     }
 
     @PostMapping()
@@ -93,7 +93,7 @@ public class DepartmentsController {
         model.addAttribute("anotherCourses", anotherCourses);
         model.addAttribute("departmentGroups", departmentGroups);
         model.addAttribute("anotherGroups", anotherGroups);
-        return "/department/edit";
+        return "department/edit";
     }
 
     @PatchMapping("/{id}")

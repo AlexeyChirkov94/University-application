@@ -1,17 +1,15 @@
 package ua.com.foxminded.university.dao.impl;
 
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.ProfessorDao;
 import ua.com.foxminded.university.entity.Professor;
+import javax.persistence.EntityManager;
 import java.util.List;
 
 @Repository
-@Log4j
-@Transactional(transactionManager = "hibernateTransactionManager")
+@Log4j2
 public class ProfessorDaoImpl extends AbstractPageableCrudDaoImpl<Professor> implements ProfessorDao {
 
     private static final String FIND_QUERY = "SELECT u.type, u.id, u.first_name, u.last_name, u.email, u.password, " +
@@ -29,13 +27,13 @@ public class ProfessorDaoImpl extends AbstractPageableCrudDaoImpl<Professor> imp
     private static final String ADD_ROLE_TO_USER_QUERY = "INSERT INTO user_role (user_id, role_id) VALUES(:userId, :roleId)";
     private static final String REMOVE_ROLE_FROM_USER_QUERY = "DELETE FROM user_role WHERE user_id =:userId AND role_id =:roleId";
 
-    public ProfessorDaoImpl(SessionFactory sessionFactory) {
-        super(sessionFactory, Professor.class, FIND_ALL_QUERY, DELETE_QUERY, COUNT_QUERY);
+    public ProfessorDaoImpl(EntityManager entityManager) {
+        super(entityManager, Professor.class, FIND_ALL_QUERY, DELETE_QUERY, COUNT_QUERY);
     }
 
     @Override
     public List<Professor> findByEmail(String email) {
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         return session.createQuery(FIND_BY_EMAIL_QUERY, Professor.class)
                 .setParameter("email", email)
@@ -44,7 +42,7 @@ public class ProfessorDaoImpl extends AbstractPageableCrudDaoImpl<Professor> imp
 
     @Override
     public void addRoleToUser(long userId, long addingRoleId) {
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         session.createSQLQuery(ADD_ROLE_TO_USER_QUERY)
                 .setParameter("userId", userId)
@@ -54,7 +52,7 @@ public class ProfessorDaoImpl extends AbstractPageableCrudDaoImpl<Professor> imp
 
     @Override
     public void removeRoleFromUser(long userId, long removingRoleId) {
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         session.createSQLQuery(REMOVE_ROLE_FROM_USER_QUERY)
                 .setParameter("userId", userId)
@@ -64,7 +62,7 @@ public class ProfessorDaoImpl extends AbstractPageableCrudDaoImpl<Professor> imp
 
     @Override
     public void changeScienceDegree(long professorId, int idNewScienceDegree) {
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         session.createSQLQuery(CHANGE_SCIENCE_DEGREE_QUERY)
                 .setParameter("professorId", professorId)
@@ -74,7 +72,7 @@ public class ProfessorDaoImpl extends AbstractPageableCrudDaoImpl<Professor> imp
 
     @Override
     public List<Professor> findByCourseId(long courseId) {
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         return session.createSQLQuery(FIND_BY_COURSE_ID)
                 .addEntity(Professor.class)
@@ -84,7 +82,7 @@ public class ProfessorDaoImpl extends AbstractPageableCrudDaoImpl<Professor> imp
 
     @Override
     public List<Professor> findByDepartmentId(long departmentId) {
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         return session.createQuery(FIND_BY_DEPARTMENT_ID, Professor.class)
                 .setParameter("departmentId", departmentId)
@@ -93,7 +91,7 @@ public class ProfessorDaoImpl extends AbstractPageableCrudDaoImpl<Professor> imp
 
     @Override
     public void changeDepartment(long professorId, long departmentId) {
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         session.createQuery(CHANGE_DEPARTMENT_QUERY)
                 .setParameter("professorId", professorId)
@@ -103,7 +101,7 @@ public class ProfessorDaoImpl extends AbstractPageableCrudDaoImpl<Professor> imp
 
     @Override
     public void removeDepartmentFromProfessor(long professorId) {
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         session.createQuery(CHANGE_DEPARTMENT_QUERY)
                 .setParameter("professorId", professorId)
@@ -113,7 +111,7 @@ public class ProfessorDaoImpl extends AbstractPageableCrudDaoImpl<Professor> imp
 
     @Override
     protected Professor insertCertainEntity(Professor professor) {
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         Long idOfSavedEntity = (Long)session.save(professor);
         professor.setId(idOfSavedEntity);

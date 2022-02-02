@@ -38,7 +38,7 @@ public class FormsOfEducationController {
         setPagesValueAndStatus(page, model);
         model.addAttribute("formsOfEducation", formOfEducationService.findAll(page));
 
-        return "/formOfEducation/all";
+        return "formOfEducation/all";
     }
 
     @GetMapping("/{id}")
@@ -46,12 +46,12 @@ public class FormsOfEducationController {
 
         model.addAttribute("formOfEducation", formOfEducationService.findById(id));
         model.addAttribute("formOfEducationGroups", groupService.findByFormOfEducation(id));
-        return "/formOfEducation/show";
+        return "formOfEducation/show";
     }
 
     @GetMapping("/new")
     public String newCourse(Model model, @ModelAttribute("formOfEducation") FormOfEducationRequest formOfEducationRequest) {
-        return "/formOfEducation/add";
+        return "formOfEducation/add";
     }
 
     @PostMapping()
@@ -75,7 +75,7 @@ public class FormsOfEducationController {
         model.addAttribute("notFormOfEducationGroups", notFormOfEducationGroups);
         model.addAttribute("formOfEducationGroups", formOfEducationGroups);
 
-        return "/formOfEducation/edit";
+        return "formOfEducation/edit";
     }
 
     @PatchMapping("/{id}")

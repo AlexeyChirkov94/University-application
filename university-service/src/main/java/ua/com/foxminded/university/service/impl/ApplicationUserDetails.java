@@ -1,7 +1,7 @@
 package ua.com.foxminded.university.service.impl;
 
 import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -21,10 +21,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Log4j
+@Log4j2
 @Service
 @AllArgsConstructor
-@Transactional(transactionManager = "hibernateTransactionManager")
+@Transactional
 public class ApplicationUserDetails implements UserDetailsService {
 
     private final ProfessorService professorService;

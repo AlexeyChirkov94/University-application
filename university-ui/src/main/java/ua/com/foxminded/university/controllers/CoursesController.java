@@ -40,7 +40,7 @@ public class CoursesController {
         setPagesValueAndStatus(page, model);
         model.addAttribute("courses", courseService.findAll(page));
 
-        return "/course/all";
+        return "course/all";
     }
 
     @GetMapping("/{id}")
@@ -48,14 +48,14 @@ public class CoursesController {
         model.addAttribute("course", courseService.findById(id));
         model.addAttribute("teachersOfCourse", professorService.findByCourseId(id));
 
-        return "/course/show";
+        return "course/show";
     }
 
     @GetMapping("/new")
     public String newCourse(Model model, @ModelAttribute("course") CourseRequest courseRequest) {
 
         model.addAttribute("departments", departmentService.findAll());
-        return "/course/add";
+        return "course/add";
     }
 
     @PostMapping()
@@ -81,7 +81,7 @@ public class CoursesController {
         model.addAttribute("departments", departmentService.findAll());
         model.addAttribute("courseResponse", courseResponse);
 
-        return "/course/edit";
+        return "course/edit";
     }
 
     @PatchMapping("/{id}")

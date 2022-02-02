@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-@Transactional(transactionManager = "hibernateTransactionManager")
+@Transactional
 public class DepartmentServiceImpl extends AbstractPageableCrudService implements DepartmentService {
 
     private final DepartmentDao departmentDao;

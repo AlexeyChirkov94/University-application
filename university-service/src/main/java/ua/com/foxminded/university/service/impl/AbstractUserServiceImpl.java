@@ -13,7 +13,7 @@ import ua.com.foxminded.university.service.UserService;
 import ua.com.foxminded.university.service.validator.UserValidator;
 
 @AllArgsConstructor
-@Transactional(transactionManager = "hibernateTransactionManager")
+@Transactional
 public abstract class AbstractUserServiceImpl<REQUEST extends UserRequest, RESPONSE extends UserResponse>
         extends AbstractPageableCrudService implements UserService<REQUEST, RESPONSE> {
 

@@ -49,14 +49,14 @@ public class GroupsController {
         setPagesValueAndStatus(page, model);
         model.addAttribute("groups", groupService.findAll(page));
 
-        return "/group/all";
+        return "group/all";
     }
 
     @GetMapping("/{id}")
     public String show(@PathVariable("id") long id, Model model){
         model.addAttribute("group", groupService.findById(id));
         model.addAttribute("studentsOfGroup", studentService.findByGroupId(id));
-        return "/group/show";
+        return "group/show";
     }
 
     @GetMapping("/new")
@@ -64,7 +64,7 @@ public class GroupsController {
 
         model.addAttribute("formsOfEducation", formOfEducationService.findAll());
         model.addAttribute("departments", departmentService.findAll());
-        return "/group/add";
+        return "group/add";
     }
 
     @PostMapping()
@@ -93,7 +93,7 @@ public class GroupsController {
         model.addAttribute("groupResponse", groupResponse);
         model.addAttribute("groupRequest", groupRequest);
 
-        return "/group/edit";
+        return "group/edit";
     }
 
     @PatchMapping("/{id}")
@@ -110,7 +110,7 @@ public class GroupsController {
         model.addAttribute("group", groupService.findById(id));
         model.addAttribute("lessons", lessons);
         model.addAttribute("stringDateTimes", stringDateTimes);
-        return "/group/timetable";
+        return "group/timetable";
     }
 
     @PostMapping("/{id}/add/student")

@@ -87,8 +87,8 @@ class CoursesControllerTest {
 
         mockMvc.perform(get("/course"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/course/all"))
-                .andExpect(forwardedUrl("/course/all"))
+                .andExpect(view().name("course/all"))
+                .andExpect(forwardedUrl("course/all"))
                 .andExpect(model().attribute("courses", hasSize(2)))
                 .andExpect(model().attribute("courses", is(courses)));
 
@@ -106,8 +106,8 @@ class CoursesControllerTest {
 
         mockMvc.perform(get("/course/1"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/course/show"))
-                .andExpect(forwardedUrl("/course/show"))
+                .andExpect(view().name("course/show"))
+                .andExpect(forwardedUrl("course/show"))
                 .andExpect(model().attribute("course", is(courseResponse)));
 
 
@@ -120,8 +120,8 @@ class CoursesControllerTest {
 
         mockMvc.perform(get("/course/new"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/course/add"))
-                .andExpect(forwardedUrl("/course/add"));
+                .andExpect(view().name("course/add"))
+                .andExpect(forwardedUrl("course/add"));
     }
 
     @Test
@@ -150,8 +150,8 @@ class CoursesControllerTest {
 
         mockMvc.perform(get("/course/1/edit"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/course/edit"))
-                .andExpect(forwardedUrl("/course/edit"))
+                .andExpect(view().name("course/edit"))
+                .andExpect(forwardedUrl("course/edit"))
                 .andExpect(model().attribute("teachersOfCourse", is(mathProfessors)))
                 .andExpect(model().attribute("notTeachersOfCourse", is(allProfessors)))
                 .andExpect(model().attribute("courseRequest", is(courseRequest)))

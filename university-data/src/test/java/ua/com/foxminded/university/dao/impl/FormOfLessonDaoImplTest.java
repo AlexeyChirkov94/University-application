@@ -6,12 +6,10 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import ua.com.foxminded.university.PersistenceTestsContextConfiguration;
 import ua.com.foxminded.university.dao.FormOfLessonDao;
 import ua.com.foxminded.university.entity.FormOfLesson;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static ua.com.foxminded.university.testUtils.TestUtility.assertFormsOfLesson;
 
