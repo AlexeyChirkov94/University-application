@@ -12,9 +12,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static ua.com.foxminded.university.testUtils.TestUtility.assertCourses;
+
 class CourseDaoImplTest {
 
     ApplicationContext context;
@@ -116,8 +116,7 @@ class CourseDaoImplTest {
         Course expectedAfterChanging = Course.builder().withName("Russia History")
                 .withDepartment(Department.builder().withId(2L).withName("Department of Math").build()).build();
         Course actualAfterChanging = courseDao.findById(1L).get();
-        assertCourses (actualBeforeChanging, expectedBeforeChanging);
-        assertCourses(expectedAfterChanging, actualAfterChanging);
+        assertCourses(actualAfterChanging, expectedAfterChanging);
     }
 
     @Test

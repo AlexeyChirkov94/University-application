@@ -101,8 +101,8 @@ public class GroupsControllerTest {
 
         mockMvc.perform(get("/group"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/group/all"))
-                .andExpect(forwardedUrl("/group/all"))
+                .andExpect(view().name("group/all"))
+                .andExpect(forwardedUrl("group/all"))
                 .andExpect(model().attribute("groups", hasSize(2)))
                 .andExpect(model().attribute("groups", hasItem(
                         allOf(
@@ -129,8 +129,8 @@ public class GroupsControllerTest {
 
         mockMvc.perform(get("/group/1"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/group/show"))
-                .andExpect(forwardedUrl("/group/show"))
+                .andExpect(view().name("group/show"))
+                .andExpect(forwardedUrl("group/show"))
                 .andExpect(model().attribute("group", is(group)));
 
 
@@ -143,8 +143,8 @@ public class GroupsControllerTest {
 
         mockMvc.perform(get("/group/new"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/group/add"))
-                .andExpect(forwardedUrl("/group/add"));
+                .andExpect(view().name("group/add"))
+                .andExpect(forwardedUrl("group/add"));
     }
 
     @Test
@@ -193,8 +193,8 @@ public class GroupsControllerTest {
 
         mockMvc.perform(get("/group/1/edit"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/group/edit"))
-                .andExpect(forwardedUrl("/group/edit"))
+                .andExpect(view().name("group/edit"))
+                .andExpect(forwardedUrl("group/edit"))
                 .andExpect(model().attribute("groupResponse", is(groupResponse)))
                 .andExpect(model().attribute("groupRequest", is(groupRequest)))
                 .andExpect(model().attribute("departments", is(departments)))
@@ -279,8 +279,8 @@ public class GroupsControllerTest {
 
         mockMvc.perform(get("/group/1/timetable"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/group/timetable"))
-                .andExpect(forwardedUrl("/group/timetable"))
+                .andExpect(view().name("group/timetable"))
+                .andExpect(forwardedUrl("group/timetable"))
                 .andExpect(model().attribute("group", is(group)))
                 .andExpect(model().attribute("lessons", is(lessons)))
                 .andExpect(model().attribute("stringDateTimes", is(stringDateTimes)));

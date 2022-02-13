@@ -29,7 +29,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    @Transactional(transactionManager = "hibernateTransactionManager")
+    @Transactional
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
 
         if (alreadySetup){

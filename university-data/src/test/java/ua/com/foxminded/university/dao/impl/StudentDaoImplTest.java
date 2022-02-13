@@ -10,12 +10,10 @@ import ua.com.foxminded.university.dao.StudentDao;
 import ua.com.foxminded.university.entity.Group;
 import ua.com.foxminded.university.entity.Role;
 import ua.com.foxminded.university.entity.Student;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static ua.com.foxminded.university.testUtils.TestUtility.assertRoles;
 import static ua.com.foxminded.university.testUtils.TestUtility.assertUsers;

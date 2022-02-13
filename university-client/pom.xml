@@ -17,6 +17,7 @@
             <groupId>com.chirkov</groupId>
             <artifactId>university-data</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

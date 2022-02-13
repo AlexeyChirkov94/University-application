@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-@Transactional(transactionManager = "hibernateTransactionManager")
+@Transactional
 public class GroupServiceImpl extends AbstractPageableCrudService implements GroupService {
 
     private final GroupDao groupDao;

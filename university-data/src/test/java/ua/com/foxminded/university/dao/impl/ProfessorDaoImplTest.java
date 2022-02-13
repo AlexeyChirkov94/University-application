@@ -11,13 +11,10 @@ import ua.com.foxminded.university.entity.Department;
 import ua.com.foxminded.university.entity.Professor;
 import ua.com.foxminded.university.entity.Role;
 import ua.com.foxminded.university.entity.ScienceDegree;
-import ua.com.foxminded.university.testUtils.TestUtility;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static ua.com.foxminded.university.testUtils.TestUtility.assertRoles;
 import static ua.com.foxminded.university.testUtils.TestUtility.assertUsers;

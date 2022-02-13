@@ -146,9 +146,6 @@ class LessonDaoImplTest {
                 lessonDao.findById(3L).get());
         List<Lesson> actual = lessonDao.findByGroupId(1);
 
-        System.out.println("expected = " + expected);
-        System.out.println("actual = " + actual);
-
         assertLessons(actual, expected);
     }
 

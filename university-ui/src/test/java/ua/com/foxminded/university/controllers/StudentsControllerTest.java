@@ -95,8 +95,8 @@ class StudentsControllerTest {
 
         mockMvc.perform(get("/student"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/student/all"))
-                .andExpect(forwardedUrl("/student/all"))
+                .andExpect(view().name("student/all"))
+                .andExpect(forwardedUrl("student/all"))
                 .andExpect(model().attribute("students", hasSize(2)))
                 .andExpect(model().attribute("students", hasItem(
                         allOf(
@@ -132,8 +132,8 @@ class StudentsControllerTest {
 
         mockMvc.perform(get("/student/1"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/student/show"))
-                .andExpect(forwardedUrl("/student/show"))
+                .andExpect(view().name("student/show"))
+                .andExpect(forwardedUrl("student/show"))
                 .andExpect(model().attribute("student", is(student)));
 
 
@@ -146,8 +146,8 @@ class StudentsControllerTest {
 
         mockMvc.perform(get("/student/new"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/student/add"))
-                .andExpect(forwardedUrl("/student/add"));
+                .andExpect(view().name("student/add"))
+                .andExpect(forwardedUrl("student/add"));
     }
 
     @Test
@@ -178,8 +178,8 @@ class StudentsControllerTest {
 
         mockMvc.perform(get("/student/1/edit"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/student/edit"))
-                .andExpect(forwardedUrl("/student/edit"))
+                .andExpect(view().name("student/edit"))
+                .andExpect(forwardedUrl("student/edit"))
                 .andExpect(model().attribute("studentResponse", is(studentResponse)))
                 .andExpect(model().attribute("studentRequest", is(studentRequest)))
                 .andExpect(model().attribute("groups", is(allGroups)));
@@ -264,8 +264,8 @@ class StudentsControllerTest {
 
         mockMvc.perform(get("/student/1/timetable"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/student/timetable"))
-                .andExpect(forwardedUrl("/student/timetable"))
+                .andExpect(view().name("student/timetable"))
+                .andExpect(forwardedUrl("student/timetable"))
                 .andExpect(model().attribute("student", is(student)))
                 .andExpect(model().attribute("lessons", is(lessons)))
                 .andExpect(model().attribute("stringDateTimes", is(stringDateTimes)));

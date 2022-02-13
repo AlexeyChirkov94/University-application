@@ -99,8 +99,8 @@ public class ProfessorsControllerTest {
 
         mockMvc.perform(get("/professor"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/professor/all"))
-                .andExpect(forwardedUrl("/professor/all"))
+                .andExpect(view().name("professor/all"))
+                .andExpect(forwardedUrl("professor/all"))
                 .andExpect(model().attribute("professors", hasSize(2)))
                 .andExpect(model().attribute("professors", hasItem(
                         allOf(
@@ -132,8 +132,8 @@ public class ProfessorsControllerTest {
 
         mockMvc.perform(get("/professor/1"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/professor/show"))
-                .andExpect(forwardedUrl("/professor/show"))
+                .andExpect(view().name("professor/show"))
+                .andExpect(forwardedUrl("professor/show"))
                 .andExpect(model().attribute("professor", is(professor)));
 
 
@@ -146,8 +146,8 @@ public class ProfessorsControllerTest {
 
         mockMvc.perform(get("/professor/new"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/professor/add"))
-                .andExpect(forwardedUrl("/professor/add"));
+                .andExpect(view().name("professor/add"))
+                .andExpect(forwardedUrl("professor/add"));
     }
 
     @Test
@@ -201,8 +201,8 @@ public class ProfessorsControllerTest {
 
         mockMvc.perform(get("/professor/1/edit"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/professor/edit"))
-                .andExpect(forwardedUrl("/professor/edit"))
+                .andExpect(view().name("professor/edit"))
+                .andExpect(forwardedUrl("professor/edit"))
                 .andExpect(model().attribute("professorResponse", is(professorResponse)))
                 .andExpect(model().attribute("professorRequest", is(professorRequest)))
                 .andExpect(model().attribute("ScienceDegrees", is(ScienceDegreeResponse.values())))
@@ -293,8 +293,8 @@ public class ProfessorsControllerTest {
 
         mockMvc.perform(get("/professor/1/timetable"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/professor/timetable"))
-                .andExpect(forwardedUrl("/professor/timetable"))
+                .andExpect(view().name("professor/timetable"))
+                .andExpect(forwardedUrl("professor/timetable"))
                 .andExpect(model().attribute("professor", is(professor)))
                 .andExpect(model().attribute("lessons", is(lessons)))
                 .andExpect(model().attribute("stringDateTimes", is(stringDateTimes)));

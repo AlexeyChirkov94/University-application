@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-@Transactional(transactionManager = "hibernateTransactionManager")
+@Transactional
 public class FormOfEducationServiceImpl extends AbstractPageableCrudService implements FormOfEducationService {
 
     private final FormOfEducationDao formOfEducationDao;

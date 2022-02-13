@@ -1,27 +1,28 @@
 package ua.com.foxminded.university.dao.impl;
 
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.springframework.jdbc.core.RowMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.CrudDao;
+import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-@Log4j
-@Transactional(transactionManager = "hibernateTransactionManager")
+@Log4j2
+@Transactional
 public abstract class AbstractCrudDaoImpl<E> implements CrudDao<E> {
 
-    protected final SessionFactory sessionFactory;
+    @Autowired
+    protected final EntityManager entityManager;
     protected final String deleteQuery;
     protected final String findAllQuery;
     protected final Class<E> typeParameterClass;
 
-    protected AbstractCrudDaoImpl(SessionFactory sessionFactory, Class<E> typeParameterClass,
+    protected AbstractCrudDaoImpl(EntityManager entityManager, Class<E> typeParameterClass,
                                   String findAllQuery, String deleteQuery) {
-        this.sessionFactory = sessionFactory;
+        this.entityManager = entityManager;
         this.findAllQuery = findAllQuery;
         this.deleteQuery = deleteQuery;
         this.typeParameterClass = typeParameterClass;
@@ -39,21 +40,21 @@ public abstract class AbstractCrudDaoImpl<E> implements CrudDao<E> {
 
     @Override
     public Optional<E> findById(Long id){
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         return Optional.ofNullable(session.get(typeParameterClass, id));
     }
 
     @Override
     public List<E> findAll(){
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         return session.createQuery(findAllQuery, typeParameterClass).getResultList();
     }
 
     @Override
     public void update(E entity) {
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         session.update(entity);
     }
@@ -65,7 +66,7 @@ public abstract class AbstractCrudDaoImpl<E> implements CrudDao<E> {
 
     @Override
     public void deleteById(Long id) {
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         session.createQuery(deleteQuery)
         .setParameter("deleteId", id)

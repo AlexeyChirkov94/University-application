@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional(transactionManager = "hibernateTransactionManager")
+@Transactional
 public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorRequest, ProfessorResponse>  implements ProfessorService {
 
     private final ScienceDegreeValidator scienceDegreeValidator;

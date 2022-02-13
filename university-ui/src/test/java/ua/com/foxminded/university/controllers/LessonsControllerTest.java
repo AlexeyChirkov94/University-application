@@ -100,8 +100,8 @@ class LessonsControllerTest {
 
         mockMvc.perform(get("/lesson"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/lesson/all"))
-                .andExpect(forwardedUrl("/lesson/all"))
+                .andExpect(view().name("lesson/all"))
+                .andExpect(forwardedUrl("lesson/all"))
                 .andExpect(model().attribute("lessons", hasSize(2)))
                 .andExpect(model().attribute("lessons", is(lessons)));
 
@@ -119,8 +119,8 @@ class LessonsControllerTest {
 
         mockMvc.perform(get("/lesson/1"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/lesson/show"))
-                .andExpect(forwardedUrl("/lesson/show"))
+                .andExpect(view().name("lesson/show"))
+                .andExpect(forwardedUrl("lesson/show"))
                 .andExpect(model().attribute("lesson", is(lessonResponse)));
 
         verify(lessonService).findById(1L);
@@ -132,8 +132,8 @@ class LessonsControllerTest {
 
         mockMvc.perform(get("/lesson/new"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/lesson/add"))
-                .andExpect(forwardedUrl("/lesson/add"));
+                .andExpect(view().name("lesson/add"))
+                .andExpect(forwardedUrl("lesson/add"));
     }
 
     @Test
@@ -164,8 +164,8 @@ class LessonsControllerTest {
 
         mockMvc.perform(get("/lesson/1/edit"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/lesson/edit"))
-                .andExpect(forwardedUrl("/lesson/edit"))
+                .andExpect(view().name("lesson/edit"))
+                .andExpect(forwardedUrl("lesson/edit"))
                 .andExpect(model().attribute("lessonResponse", is(lessonResponse)))
                 .andExpect(model().attribute("lessonRequest", is(lessonRequest)))
                 .andExpect(model().attribute("allGroups", is(allGroups)))
@@ -215,8 +215,8 @@ class LessonsControllerTest {
 
         mockMvc.perform(get("/lesson/1/edit"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/lesson/edit"))
-                .andExpect(forwardedUrl("/lesson/edit"))
+                .andExpect(view().name("lesson/edit"))
+                .andExpect(forwardedUrl("lesson/edit"))
                 .andExpect(model().attribute("lessonResponse", is(lessonResponse)))
                 .andExpect(model().attribute("lessonRequest", is(lessonRequest)))
                 .andExpect(model().attribute("allGroups", is(allGroups)))
@@ -370,8 +370,8 @@ class LessonsControllerTest {
 
         mockMvc.perform(get("/lesson/type"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/formOfLesson/all"))
-                .andExpect(forwardedUrl("/formOfLesson/all"))
+                .andExpect(view().name("formOfLesson/all"))
+                .andExpect(forwardedUrl("formOfLesson/all"))
                 .andExpect(model().attribute("formsOfLesson", hasSize(2)))
                 .andExpect(model().attribute("formsOfLesson", is(formsOfLessonResponse)));
 
@@ -389,8 +389,8 @@ class LessonsControllerTest {
 
         mockMvc.perform(get("/lesson/type/1"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/formOfLesson/show"))
-                .andExpect(forwardedUrl("/formOfLesson/show"))
+                .andExpect(view().name("formOfLesson/show"))
+                .andExpect(forwardedUrl("formOfLesson/show"))
                 .andExpect(model().attribute("formOfLesson", is(formOfLessonResponse)));
 
         verify(formOfLessonService).findById(1L);
@@ -402,8 +402,8 @@ class LessonsControllerTest {
 
         mockMvc.perform(get("/lesson/type/new"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/formOfLesson/add"))
-                .andExpect(forwardedUrl("/formOfLesson/add"));
+                .andExpect(view().name("formOfLesson/add"))
+                .andExpect(forwardedUrl("formOfLesson/add"));
     }
 
     @Test
@@ -419,8 +419,8 @@ class LessonsControllerTest {
 
         mockMvc.perform(get("/lesson/type/1/edit"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/formOfLesson/edit"))
-                .andExpect(forwardedUrl("/formOfLesson/edit"))
+                .andExpect(view().name("formOfLesson/edit"))
+                .andExpect(forwardedUrl("formOfLesson/edit"))
                 .andExpect(model().attribute("formOfLessonRequest", is(formOfLessonRequest)));
 
         verify(formOfLessonService).findById(1L);

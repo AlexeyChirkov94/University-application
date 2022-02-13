@@ -3,7 +3,6 @@ package ua.com.foxminded.university.dao.impl;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.PersistenceTestsContextConfiguration;
 import ua.com.foxminded.university.dao.DepartmentDao;
 import ua.com.foxminded.university.entity.Department;

@@ -1,6 +1,5 @@
 package ua.com.foxminded.university;
 
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,7 +47,7 @@ public class IntegrationTest {
 
         mockMvc.perform(get("/department"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/department/all"))
+                .andExpect(view().name("department/all"))
                 .andExpect(model().attribute("departments", hasSize(2)))
                 .andExpect(model().attribute("departments", is(departmentsResponse)));
     }

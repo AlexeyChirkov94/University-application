@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-@Transactional(transactionManager = "hibernateTransactionManager")
+@Transactional
 public class CourseServiceImpl extends AbstractPageableCrudService implements CourseService {
 
     private final CourseDao courseDao;

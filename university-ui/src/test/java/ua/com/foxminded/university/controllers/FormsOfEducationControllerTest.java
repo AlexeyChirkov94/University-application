@@ -80,8 +80,8 @@ class FormsOfEducationControllerTest {
 
         mockMvc.perform(get("/education/form"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/formOfEducation/all"))
-                .andExpect(forwardedUrl("/formOfEducation/all"))
+                .andExpect(view().name("formOfEducation/all"))
+                .andExpect(forwardedUrl("formOfEducation/all"))
                 .andExpect(model().attribute("formsOfEducation", hasSize(2)))
                 .andExpect(model().attribute("formsOfEducation", is(formsOfEducationResponse)));
 
@@ -103,8 +103,8 @@ class FormsOfEducationControllerTest {
 
         mockMvc.perform(get("/education/form/1"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/formOfEducation/show"))
-                .andExpect(forwardedUrl("/formOfEducation/show"))
+                .andExpect(view().name("formOfEducation/show"))
+                .andExpect(forwardedUrl("formOfEducation/show"))
                 .andExpect(model().attribute("formOfEducation", is(formOfEducationResponse)))
                 .andExpect(model().attribute("formOfEducationGroups", is(formOfEducationGroups)));
 
@@ -117,8 +117,8 @@ class FormsOfEducationControllerTest {
 
         mockMvc.perform(get("/education/form/new"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/formOfEducation/add"))
-                .andExpect(forwardedUrl("/formOfEducation/add"));
+                .andExpect(view().name("formOfEducation/add"))
+                .andExpect(forwardedUrl("formOfEducation/add"));
     }
 
     @Test
@@ -147,8 +147,8 @@ class FormsOfEducationControllerTest {
 
         mockMvc.perform(get("/education/form/1/edit"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/formOfEducation/edit"))
-                .andExpect(forwardedUrl("/formOfEducation/edit"))
+                .andExpect(view().name("formOfEducation/edit"))
+                .andExpect(forwardedUrl("formOfEducation/edit"))
                 .andExpect(model().attribute("formOfEducationRequest", is(formOfEducationRequest)))
                 .andExpect(model().attribute("formOfEducationGroups", is(formOfEducationGroups)))
                 .andExpect(model().attribute("notFormOfEducationGroups", is(notFormOfEducationGroups)));

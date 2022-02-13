@@ -93,8 +93,8 @@ class DepartmentsControllerTest {
 
         mockMvc.perform(get("/department"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/department/all"))
-                .andExpect(forwardedUrl("/department/all"))
+                .andExpect(view().name("department/all"))
+                .andExpect(forwardedUrl("department/all"))
                 .andExpect(model().attribute("departments", hasSize(2)))
                 .andExpect(model().attribute("departments", is(departmentsResponse)));
 
@@ -124,8 +124,8 @@ class DepartmentsControllerTest {
 
         mockMvc.perform(get("/department/1"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/department/show"))
-                .andExpect(forwardedUrl("/department/show"))
+                .andExpect(view().name("department/show"))
+                .andExpect(forwardedUrl("department/show"))
                 .andExpect(model().attribute("department", is(departmentResponse)))
                 .andExpect(model().attribute("professors", is(departmentProfessors)))
                 .andExpect(model().attribute("courses", is(departmentCourse)))
@@ -146,8 +146,8 @@ class DepartmentsControllerTest {
 
         mockMvc.perform(get("/department/new"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/department/add"))
-                .andExpect(forwardedUrl("/department/add"));
+                .andExpect(view().name("department/add"))
+                .andExpect(forwardedUrl("department/add"));
     }
 
     @Test
@@ -205,8 +205,8 @@ class DepartmentsControllerTest {
 
         mockMvc.perform(get("/department/1/edit"))
                 .andExpect(status().is(200))
-                .andExpect(view().name("/department/edit"))
-                .andExpect(forwardedUrl("/department/edit"))
+                .andExpect(view().name("department/edit"))
+                .andExpect(forwardedUrl("department/edit"))
                 .andExpect(model().attribute("departmentRequest", is(departmentRequest)))
                 .andExpect(model().attribute("departmentProfessors", is(departmentProfessors)))
                 .andExpect(model().attribute("anotherProfessors", is(anotherProfessors)))

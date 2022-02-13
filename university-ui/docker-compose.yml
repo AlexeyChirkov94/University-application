@@ -5,11 +5,13 @@ services:
   app:
     build: .
     environment:
-      - DATA_SOURCE_NAME=jdbc/docker/postgres
+      - DB_URL=jdbc:postgresql://db:5432/university_db
     ports:
-      - 8080:8080
+      - 80:80
     networks:
       - postgres
+    volumes:
+      - ./:/tmp
 
   db:
     image: postgres

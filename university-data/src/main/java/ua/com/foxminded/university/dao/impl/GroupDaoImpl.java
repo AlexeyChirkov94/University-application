@@ -1,17 +1,15 @@
 package ua.com.foxminded.university.dao.impl;
 
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.GroupDao;
 import ua.com.foxminded.university.entity.Group;
+import javax.persistence.EntityManager;
 import java.util.List;
 
 @Repository
-@Log4j
-@Transactional(transactionManager = "hibernateTransactionManager")
+@Log4j2
 public class GroupDaoImpl extends AbstractPageableCrudDaoImpl<Group> implements GroupDao {
 
     private static final String FIND_BY_NAME_QUERY = "from Group where name=:groupName";
@@ -23,13 +21,13 @@ public class GroupDaoImpl extends AbstractPageableCrudDaoImpl<Group> implements 
     private static final String FIND_BY_FROM_OF_EDUCATION_ID = "from Group where formOfEducation.id=:formOfEducationId";
     private static final String FIND_BY_DEPARTMENT_ID = "from Group where department.id=:departmentId";
 
-    public GroupDaoImpl(SessionFactory sessionFactory) {
-        super(sessionFactory, Group.class, FIND_ALL_QUERY, DELETE_QUERY, COUNT_QUERY);
+    public GroupDaoImpl(EntityManager entityManager) {
+        super(entityManager, Group.class, FIND_ALL_QUERY, DELETE_QUERY, COUNT_QUERY);
     }
 
     @Override
     public List<Group> findByName(String name) {
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         return session.createQuery(FIND_BY_NAME_QUERY, Group.class)
                 .setParameter("groupName", name)
@@ -38,7 +36,7 @@ public class GroupDaoImpl extends AbstractPageableCrudDaoImpl<Group> implements 
 
     @Override
     public List<Group> findByFormOfEducation(long formOfEducationId){
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         return session.createQuery(FIND_BY_FROM_OF_EDUCATION_ID, Group.class)
                 .setParameter("formOfEducationId", formOfEducationId)
@@ -47,7 +45,7 @@ public class GroupDaoImpl extends AbstractPageableCrudDaoImpl<Group> implements 
 
     @Override
     public List<Group> findByDepartmentId(long departmentId){
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         return session.createQuery(FIND_BY_DEPARTMENT_ID, Group.class)
                 .setParameter("departmentId", departmentId)
@@ -56,7 +54,7 @@ public class GroupDaoImpl extends AbstractPageableCrudDaoImpl<Group> implements 
 
     @Override
     public void changeFormOfEducation(long groupId, long newFormOfEducationId) {
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         session.createQuery(CHANGE_FORM_OF_EDUCATION_QUERY)
                 .setParameter("newFormOfEducationId", newFormOfEducationId)
@@ -66,7 +64,7 @@ public class GroupDaoImpl extends AbstractPageableCrudDaoImpl<Group> implements 
 
     @Override
     public void removeFormOfEducationFromGroup(long groupId) {
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         session.createQuery(CHANGE_FORM_OF_EDUCATION_QUERY)
                 .setParameter("newFormOfEducationId", null)
@@ -76,7 +74,7 @@ public class GroupDaoImpl extends AbstractPageableCrudDaoImpl<Group> implements 
 
     @Override
     public void changeDepartment(long groupId, long newDepartmentId) {
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         session.createQuery(CHANGE_DEPARTMENT_QUERY)
                 .setParameter("newDepartmentId", newDepartmentId)
@@ -86,7 +84,7 @@ public class GroupDaoImpl extends AbstractPageableCrudDaoImpl<Group> implements 
 
     @Override
     public void removeDepartmentFromGroup(long groupId) {
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         session.createQuery(CHANGE_DEPARTMENT_QUERY)
                 .setParameter("newDepartmentId", null)
@@ -96,7 +94,7 @@ public class GroupDaoImpl extends AbstractPageableCrudDaoImpl<Group> implements 
 
     @Override
     protected Group insertCertainEntity(Group group) {
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
 
         Long idOfSavedEntity = (Long)session.save(group);
         group.setId(idOfSavedEntity);

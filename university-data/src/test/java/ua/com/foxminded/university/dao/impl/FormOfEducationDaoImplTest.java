@@ -1,45 +1,26 @@
 package ua.com.foxminded.university.dao.impl;
 
-import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.jdbc.core.JdbcTemplate;
 import ua.com.foxminded.university.PersistenceTestsContextConfiguration;
 import ua.com.foxminded.university.dao.FormOfEducationDao;
 import ua.com.foxminded.university.dao.GroupDao;
 import ua.com.foxminded.university.entity.FormOfEducation;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
 import static ua.com.foxminded.university.testUtils.TestUtility.assertFormsOfEducation;
 
-
-@ExtendWith( MockitoExtension.class)
 class FormOfEducationDaoImplTest {
 
     ApplicationContext context;
     FormOfEducationDao formOfEducationDao;
     GroupDao groupDao;
-
-    @Mock
-    JdbcTemplate mockJdbcTemplate;
-
-    @Mock
-    SessionFactory sessionFactory;
 
     {
         context = new AnnotationConfigApplicationContext(PersistenceTestsContextConfiguration.class);

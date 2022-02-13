@@ -5,7 +5,7 @@ import ua.com.foxminded.university.dao.domain.Page;
 import ua.com.foxminded.university.dao.domain.Pageable;
 import java.util.List;
 
-@Transactional(transactionManager = "hibernateTransactionManager")
+@Transactional
 public interface CrudPageableDao<E> extends CrudDao<E> {
 
     List<E> findAll(int page, int itemsPerPage);

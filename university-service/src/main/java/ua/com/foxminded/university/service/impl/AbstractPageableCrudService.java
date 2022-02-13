@@ -1,10 +1,10 @@
 package ua.com.foxminded.university.service.impl;
 
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 public abstract class AbstractPageableCrudService {
 
-    private static final Logger LOGGER = Logger.getLogger(AbstractPageableCrudService.class);
 
     protected static final int ITEMS_PER_PAGE = 5;
 
@@ -25,7 +25,7 @@ public abstract class AbstractPageableCrudService {
             }
             return integerPage;
         } catch (NumberFormatException e) {
-            LOGGER.warn("can`t lead sting page to integer");
+            log.warn("can`t lead sting page to integer");
             return defaultValue;
         }
     }
