@@ -1,10 +1,12 @@
 package ua.com.foxminded.university.service.impl;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ua.com.foxminded.university.dao.FormOfEducationDao;
-import ua.com.foxminded.university.dao.GroupDao;
+import ua.com.foxminded.university.repository.FormOfEducationRepository;
+import ua.com.foxminded.university.repository.GroupRepository;
 import ua.com.foxminded.university.dto.FormOfEducationRequest;
 import ua.com.foxminded.university.dto.FormOfEducationResponse;
 import ua.com.foxminded.university.entity.FormOfEducation;
@@ -21,17 +23,17 @@ import java.util.stream.Collectors;
 @Transactional
 public class FormOfEducationServiceImpl extends AbstractPageableCrudService implements FormOfEducationService {
 
-    private final FormOfEducationDao formOfEducationDao;
-    private final GroupDao groupDao;
+    private final FormOfEducationRepository formOfEducationRepository;
+    private final GroupRepository groupRepository;
     private final FormOfEducationMapper formOfEducationMapper;
 
     @Override
     public FormOfEducationResponse create(FormOfEducationRequest formOfEducationRequest) {
-        if (!formOfEducationDao.findByName(formOfEducationRequest.getName()).isEmpty()){
+        if (!formOfEducationRepository.findAllByName(formOfEducationRequest.getName()).isEmpty()){
             throw new EntityAlreadyExistException("Form of education with same name already exist");
         } else{
             FormOfEducation formOfEducationBeforeSave = formOfEducationMapper.mapDtoToEntity(formOfEducationRequest);
-            FormOfEducation formOfEducationAfterSave = formOfEducationDao.save(formOfEducationBeforeSave);
+            FormOfEducation formOfEducationAfterSave = formOfEducationRepository.save(formOfEducationBeforeSave);
 
             return formOfEducationMapper.mapEntityToDto(formOfEducationAfterSave);
         }
@@ -39,7 +41,7 @@ public class FormOfEducationServiceImpl extends AbstractPageableCrudService impl
 
     @Override
     public FormOfEducationResponse findById(long id) {
-        FormOfEducation formOfEducation = formOfEducationDao.findById(id)
+        FormOfEducation formOfEducation = formOfEducationRepository.findById(id)
                 .orElseThrow(() -> new EntityDontExistException("There no form of education with id: " + id));
 
         return formOfEducationMapper.mapEntityToDto(formOfEducation);
@@ -47,10 +49,10 @@ public class FormOfEducationServiceImpl extends AbstractPageableCrudService impl
 
     @Override
     public List<FormOfEducationResponse> findAll(String page) {
-        final long itemsCount = formOfEducationDao.count();
+        final long itemsCount = formOfEducationRepository.count();
         int pageNumber = parsePageNumber(page, itemsCount, 1);
 
-        return formOfEducationDao.findAll(pageNumber, ITEMS_PER_PAGE).stream()
+        return formOfEducationRepository.findAll(PageRequest.of(pageNumber - 1, ITEMS_PER_PAGE, Sort.by("id"))).stream()
                 .map(formOfEducationMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
@@ -58,26 +60,26 @@ public class FormOfEducationServiceImpl extends AbstractPageableCrudService impl
     @Override
     public List<FormOfEducationResponse> findAll() {
 
-        return formOfEducationDao.findAll().stream()
+        return formOfEducationRepository.findAll(Sort.by("id")).stream()
                 .map(formOfEducationMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public void edit(FormOfEducationRequest formOfEducationRequest) {
-        formOfEducationDao.update(formOfEducationMapper.mapDtoToEntity(formOfEducationRequest));
+        formOfEducationRepository.save(formOfEducationMapper.mapDtoToEntity(formOfEducationRequest));
     }
 
     @Override
     public void deleteById(long id) {
-        if(formOfEducationDao.findById(id).isPresent()){
+        if(formOfEducationRepository.findById(id).isPresent()){
 
-            List<Group> formOfEducationGroups = groupDao.findByFormOfEducation(id);
+            List<Group> formOfEducationGroups = groupRepository.findAllByFormOfEducationIdOrderById(id);
             for(Group group : formOfEducationGroups){
-                groupDao.removeFormOfEducationFromGroup(group.getId());
+                groupRepository.removeFormOfEducationFromGroup(group.getId());
             }
 
-            formOfEducationDao.deleteById(id);
+            formOfEducationRepository.deleteById(id);
         }
     }
 

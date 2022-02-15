@@ -1,14 +1,16 @@
 package ua.com.foxminded.university.service.impl;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ua.com.foxminded.university.dao.CourseDao;
-import ua.com.foxminded.university.dao.FormOfLessonDao;
-import ua.com.foxminded.university.dao.GroupDao;
-import ua.com.foxminded.university.dao.LessonDao;
-import ua.com.foxminded.university.dao.ProfessorDao;
-import ua.com.foxminded.university.dao.StudentDao;
+import ua.com.foxminded.university.repository.CourseRepository;
+import ua.com.foxminded.university.repository.FormOfLessonRepository;
+import ua.com.foxminded.university.repository.GroupRepository;
+import ua.com.foxminded.university.repository.LessonRepository;
+import ua.com.foxminded.university.repository.ProfessorRepository;
+import ua.com.foxminded.university.repository.StudentRepository;
 import ua.com.foxminded.university.dto.LessonRequest;
 import ua.com.foxminded.university.dto.LessonResponse;
 import ua.com.foxminded.university.entity.Lesson;
@@ -26,12 +28,12 @@ import java.util.stream.Collectors;
 @Transactional
 public class LessonServiceImpl extends AbstractPageableCrudService implements LessonService {
 
-    private final LessonDao lessonDao;
-    private final FormOfLessonDao formOfLessonDao;
-    private final ProfessorDao professorDao;
-    private final CourseDao courseDao;
-    private final GroupDao groupDao;
-    private final StudentDao studentDao;
+    private final LessonRepository lessonRepository;
+    private final FormOfLessonRepository formOfLessonRepository;
+    private final ProfessorRepository professorRepository;
+    private final CourseRepository courseRepository;
+    private final GroupRepository groupRepository;
+    private final StudentRepository studentRepository;
     private final LessonValidator lessonValidator;
     private final LessonMapper lessonMapper;
 
@@ -39,20 +41,21 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
     public List<LessonResponse> formTimeTableForGroup(long groupId) {
         checkThatGroupExist(groupId);
 
-        return lessonDao.findByGroupId(groupId).stream().map(lessonMapper::mapEntityToDto)
+        return lessonRepository.findAllByGroupIdOrderByTimeOfStartLesson(groupId).stream().map(lessonMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<LessonResponse> formTimeTableForStudent(long studentId) {
-        Student student = studentDao.findById(studentId)
+        Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new EntityDontExistException("There no student with id: " + studentId));
 
-        long groupId = student.getGroup().getId();
-        if(groupId == 0L){
+        if(student.getGroup() == null){
             throw new TimeTableStudentWithoutGroupException("Student with id: " + studentId + " not a member of any group");
         }
-        return lessonDao.findByGroupId(groupId).stream().map(lessonMapper::mapEntityToDto)
+
+        long groupId = student.getGroup().getId();
+        return lessonRepository.findAllByGroupIdOrderByTimeOfStartLesson(groupId).stream().map(lessonMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
@@ -60,7 +63,7 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
     public List<LessonResponse> formTimeTableForProfessor(long professorId) {
         checkThatProfessorExist(professorId);
 
-        return lessonDao.findByProfessorId(professorId).stream().map(lessonMapper::mapEntityToDto)
+        return lessonRepository.findAllByTeacherIdOrderByTimeOfStartLesson(professorId).stream().map(lessonMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
@@ -68,7 +71,7 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
     public LessonResponse create(LessonRequest lessonRequest) {
 
         Lesson lessonBeforeSave = lessonMapper.mapDtoToEntity(lessonRequest);
-        Lesson lessonAfterSave = lessonDao.save(lessonBeforeSave);
+        Lesson lessonAfterSave = lessonRepository.save(lessonBeforeSave);
 
         if(lessonRequest.getCourseId() != 0L){
             changeCourse(lessonAfterSave.getId(), lessonRequest.getCourseId());
@@ -88,7 +91,7 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
 
     @Override
     public LessonResponse findById(long id) {
-        Lesson lesson = lessonDao.findById(id)
+        Lesson lesson = lessonRepository.findById(id)
                 .orElseThrow(() -> new EntityDontExistException("There no lesson with id: " + id));
 
         return lessonMapper.mapEntityToDto(lesson);
@@ -96,18 +99,18 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
 
     @Override
     public List<LessonResponse> findAll(String page) {
-        final long itemsCount = lessonDao.count();
+        final long itemsCount = lessonRepository.count();
         int pageNumber = parsePageNumber(page, itemsCount, 1);
 
-        return lessonDao.findAll(pageNumber, ITEMS_PER_PAGE).stream()
-                .map(lessonMapper::mapEntityToDto)
+        return lessonRepository.findAll(PageRequest.of(pageNumber - 1, ITEMS_PER_PAGE, Sort.by("id")))
+                .stream().map(lessonMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<LessonResponse> findAll() {
 
-        return lessonDao.findAll().stream()
+        return lessonRepository.findAll(Sort.by("id")).stream()
                 .map(lessonMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
@@ -115,7 +118,7 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
     @Override
     public void edit(LessonRequest lessonRequest) {
 
-        lessonDao.update(lessonMapper.mapDtoToEntity(lessonRequest));
+        lessonRepository.save(lessonMapper.mapDtoToEntity(lessonRequest));
 
         if(lessonRequest.getCourseId() != 0L){
             changeCourse(lessonRequest.getId(), lessonRequest.getCourseId());
@@ -134,8 +137,8 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
 
     @Override
     public void deleteById(long id) {
-        if(lessonDao.findById(id).isPresent()){
-            lessonDao.deleteById(id);
+        if(lessonRepository.findById(id).isPresent()){
+            lessonRepository.deleteById(id);
         }
     }
 
@@ -145,7 +148,7 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
 
         lessonValidator.checkGroupTimeTableCrossing(lessonId, newGroupId);
 
-        lessonDao.changeGroup(lessonId, newGroupId);
+        lessonRepository.changeGroup(lessonId, newGroupId);
 
     }
 
@@ -153,14 +156,14 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
         checkThatLessonExist(lessonId);
         checkThatFormOfLessonExist(newFormOfLessonId);
 
-        lessonDao.changeFormOfLesson(lessonId, newFormOfLessonId);
+        lessonRepository.changeFormOfLesson(lessonId, newFormOfLessonId);
     }
 
     private void changeTeacher(long lessonId, long newProfessorId) {
         Lesson lesson = checkThatLessonExist(lessonId);
         checkThatProfessorExist(newProfessorId);
 
-        lessonDao.changeTeacher(lessonId, newProfessorId);
+        lessonRepository.changeTeacher(lessonId, newProfessorId);
 
         if(lesson.getCourse() != null){
             lessonValidator.validateCompatibilityCourseAndProfessor(lesson.getCourse().getId(), newProfessorId);
@@ -172,7 +175,7 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
         Lesson lesson = checkThatLessonExist(lessonId);
         checkThatCourseExist(newCourseId);
 
-        lessonDao.changeCourse(lessonId, newCourseId);
+        lessonRepository.changeCourse(lessonId, newCourseId);
 
         if(lesson.getTeacher() != null){
             lessonValidator.validateCompatibilityCourseAndProfessor(newCourseId, lesson.getTeacher().getId());
@@ -180,31 +183,31 @@ public class LessonServiceImpl extends AbstractPageableCrudService implements Le
     }
 
     private Lesson checkThatLessonExist(long lessonId){
-        return lessonDao.findById(lessonId)
+        return lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new EntityDontExistException("There no lesson with id: " + lessonId));
 
     }
 
     private void checkThatFormOfLessonExist(long formOfLessonId){
-        if (!formOfLessonDao.findById(formOfLessonId).isPresent()) {
+        if (!formOfLessonRepository.findById(formOfLessonId).isPresent()) {
             throw new EntityDontExistException("There no form of lesson with id: " + formOfLessonId);
         }
     }
 
     private void checkThatProfessorExist(long professorId){
-        if (!professorDao.findById(professorId).isPresent()) {
+        if (!professorRepository.findById(professorId).isPresent()) {
             throw new EntityDontExistException("There no professor with id: " + professorId);
         }
     }
 
     private void checkThatCourseExist(long courseId){
-        if (!courseDao.findById(courseId).isPresent()) {
+        if (!courseRepository.findById(courseId).isPresent()) {
             throw new EntityDontExistException("There no course with id: " + courseId);
         }
     }
 
     private void checkThatGroupExist(long groupId){
-        if (!groupDao.findById(groupId).isPresent()) {
+        if (!groupRepository.findById(groupId).isPresent()) {
             throw new EntityDontExistException("There no group with id: " + groupId);
         }
     }

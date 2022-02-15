@@ -1,13 +1,15 @@
 package ua.com.foxminded.university.service.impl;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ua.com.foxminded.university.dao.DepartmentDao;
-import ua.com.foxminded.university.dao.FormOfEducationDao;
-import ua.com.foxminded.university.dao.GroupDao;
-import ua.com.foxminded.university.dao.LessonDao;
-import ua.com.foxminded.university.dao.StudentDao;
+import ua.com.foxminded.university.repository.DepartmentRepository;
+import ua.com.foxminded.university.repository.FormOfEducationRepository;
+import ua.com.foxminded.university.repository.GroupRepository;
+import ua.com.foxminded.university.repository.LessonRepository;
+import ua.com.foxminded.university.repository.StudentRepository;
 import ua.com.foxminded.university.dto.GroupRequest;
 import ua.com.foxminded.university.dto.GroupResponse;
 import ua.com.foxminded.university.entity.Group;
@@ -25,46 +27,46 @@ import java.util.stream.Collectors;
 @Transactional
 public class GroupServiceImpl extends AbstractPageableCrudService implements GroupService {
 
-    private final GroupDao groupDao;
-    private final StudentDao studentDao;
-    private final FormOfEducationDao formOfEducationDao;
-    private final DepartmentDao departmentDao;
-    private final LessonDao lessonDao;
+    private final GroupRepository groupRepository;
+    private final StudentRepository studentRepository;
+    private final FormOfEducationRepository formOfEducationRepository;
+    private final DepartmentRepository departmentRepository;
+    private final LessonRepository lessonRepository;
     private final GroupMapper groupMapper;
 
     @Override
     public void changeFormOfEducation(long groupId, long newFormOfEducationId) {
         checkThatGroupExist(groupId);
         checkThatFormOfEducationExist(newFormOfEducationId);
-        groupDao.changeFormOfEducation(groupId, newFormOfEducationId);
+        groupRepository.changeFormOfEducation(groupId, newFormOfEducationId);
     }
 
     @Override
     public void removeFormOfEducationFromGroup(long groupId) {
         checkThatGroupExist(groupId);
-        groupDao.removeFormOfEducationFromGroup(groupId);
+        groupRepository.removeFormOfEducationFromGroup(groupId);
     }
 
     @Override
     public void changeDepartment(long groupId, long newDepartmentId) {
         checkThatGroupExist(groupId);
         checkThatDepartmentExist(newDepartmentId);
-        groupDao.changeDepartment(groupId, newDepartmentId);
+        groupRepository.changeDepartment(groupId, newDepartmentId);
     }
 
     @Override
     public void removeDepartmentFromGroup(long groupId) {
         checkThatGroupExist(groupId);
-        groupDao.removeDepartmentFromGroup(groupId);
+        groupRepository.removeDepartmentFromGroup(groupId);
     }
 
     @Override
     public GroupResponse create(GroupRequest groupRequest) {
-        if (!groupDao.findByName(groupRequest.getName()).isEmpty()){
+        if (!groupRepository.findAllByName(groupRequest.getName()).isEmpty()){
             throw new EntityAlreadyExistException("Group with same name already exist");
         } else {
             Group groupBeforeSave = groupMapper.mapDtoToEntity(groupRequest);
-            Group groupAfterSave = groupDao.save(groupBeforeSave);
+            Group groupAfterSave = groupRepository.save(groupBeforeSave);
 
             if(groupRequest.getDepartmentId() != 0L){
                 changeDepartment(groupAfterSave.getId(), groupRequest.getDepartmentId());
@@ -80,7 +82,7 @@ public class GroupServiceImpl extends AbstractPageableCrudService implements Gro
 
     @Override
     public GroupResponse findById(long id) {
-        Group group = groupDao.findById(id)
+        Group group = groupRepository.findById(id)
                 .orElseThrow(() -> new EntityDontExistException("There no group with id: " + id));
 
         return groupMapper.mapEntityToDto(group);
@@ -90,7 +92,7 @@ public class GroupServiceImpl extends AbstractPageableCrudService implements Gro
     public List<GroupResponse> findByFormOfEducation(long formOfEducationId) {
         checkThatFormOfEducationExist(formOfEducationId);
 
-        return groupDao.findByFormOfEducation(formOfEducationId).stream().map(groupMapper::mapEntityToDto)
+        return groupRepository.findAllByFormOfEducationIdOrderById(formOfEducationId).stream().map(groupMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
@@ -98,24 +100,24 @@ public class GroupServiceImpl extends AbstractPageableCrudService implements Gro
     public List<GroupResponse> findByDepartmentId(long departmentId) {
         checkThatDepartmentExist(departmentId);
 
-        return groupDao.findByDepartmentId(departmentId).stream().map(groupMapper::mapEntityToDto)
+        return groupRepository.findAllByDepartmentIdOrderById(departmentId).stream().map(groupMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<GroupResponse> findAll(String page) {
-        final long itemsCount = groupDao.count();
+        final long itemsCount = groupRepository.count();
         int pageNumber = parsePageNumber(page, itemsCount, 1);
 
-        return groupDao.findAll(pageNumber, ITEMS_PER_PAGE).stream()
-                .map(groupMapper::mapEntityToDto)
+        return groupRepository.findAll(PageRequest.of(pageNumber - 1, ITEMS_PER_PAGE, Sort.by("id")))
+                .stream().map(groupMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<GroupResponse> findAll() {
 
-        return groupDao.findAll().stream()
+        return groupRepository.findAll(Sort.by("id")).stream()
                 .map(groupMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
@@ -123,7 +125,7 @@ public class GroupServiceImpl extends AbstractPageableCrudService implements Gro
     @Override
     public void edit(GroupRequest groupRequest) {
 
-        groupDao.update(groupMapper.mapDtoToEntity(groupRequest));
+        groupRepository.save(groupMapper.mapDtoToEntity(groupRequest));
 
         if(groupRequest.getDepartmentId() != 0L){
             changeDepartment(groupRequest.getId(), groupRequest.getDepartmentId());
@@ -136,36 +138,36 @@ public class GroupServiceImpl extends AbstractPageableCrudService implements Gro
 
     @Override
     public void deleteById(long id) {
-        if(groupDao.findById(id).isPresent()){
+        if(groupRepository.findById(id).isPresent()){
 
-            List<Student> groupStudents = studentDao.findByGroupId(id);
+            List<Student> groupStudents = studentRepository.findAllByGroupId(id);
             for(Student student : groupStudents){
-                studentDao.leaveGroup(student.getId());
+                studentRepository.leaveGroup(student.getId());
             }
 
-            List<Lesson> groupLesson = lessonDao.findByGroupId(id);
+            List<Lesson> groupLesson = lessonRepository.findAllByGroupIdOrderByTimeOfStartLesson(id);
             for(Lesson lesson : groupLesson){
-                lessonDao.removeGroupFromLesson(lesson.getId());
+                lessonRepository.removeGroupFromLesson(lesson.getId());
             }
 
-            groupDao.deleteById(id);
+            groupRepository.deleteById(id);
         }
     }
 
     private void checkThatGroupExist(long groupId){
-        if (!groupDao.findById(groupId).isPresent()) {
+        if (!groupRepository.findById(groupId).isPresent()) {
             throw new EntityDontExistException("There no group with this id:" + groupId);
         }
     }
 
     private void checkThatFormOfEducationExist(long formOfEducationId){
-        if (!formOfEducationDao.findById(formOfEducationId).isPresent()) {
+        if (!formOfEducationRepository.findById(formOfEducationId).isPresent()) {
             throw new EntityDontExistException("There no formOfEducation with this id:" + formOfEducationId);
         }
     }
 
     private void checkThatDepartmentExist(long departmentId){
-        if (!departmentDao.findById(departmentId).isPresent()) {
+        if (!departmentRepository.findById(departmentId).isPresent()) {
             throw new EntityDontExistException("There no department with this id:" + departmentId);
         }
     }

@@ -6,10 +6,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import ua.com.foxminded.university.dao.GroupDao;
-import ua.com.foxminded.university.dao.RoleDao;
-import ua.com.foxminded.university.dao.StudentDao;
+import ua.com.foxminded.university.repository.GroupRepository;
+import ua.com.foxminded.university.repository.RoleRepository;
+import ua.com.foxminded.university.repository.StudentRepository;
 import ua.com.foxminded.university.dto.StudentRequest;
 import ua.com.foxminded.university.dto.StudentResponse;
 import ua.com.foxminded.university.entity.Group;
@@ -17,7 +19,6 @@ import ua.com.foxminded.university.entity.Role;
 import ua.com.foxminded.university.entity.Student;
 import ua.com.foxminded.university.mapper.StudentMapper;
 import ua.com.foxminded.university.service.validator.UserValidator;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -33,13 +34,13 @@ import static org.mockito.Mockito.when;
 class StudentServiceImplTest {
 
     @Mock
-    StudentDao studentDao;
+    StudentRepository studentRepository;
 
     @Mock
-    GroupDao groupDao;
+    GroupRepository groupRepository;
 
     @Mock
-    RoleDao roleDao;
+    RoleRepository roleRepository;
 
     @Mock
     UserValidator userValidator;
@@ -60,12 +61,12 @@ class StudentServiceImplTest {
         StudentResponse studentResponse = new StudentResponse();
         studentResponse.setId(1L);
 
-        when(studentDao.findByEmail(email)).thenReturn(Collections.singletonList(Student.builder().withId(1L).build()));
+        when(studentRepository.findAllByEmail(email)).thenReturn(Collections.singletonList(Student.builder().withId(1L).build()));
         when(studentMapper.mapEntityToDto(student)).thenReturn(studentResponse);
 
         studentService.findByEmail(email);
 
-        verify(studentDao).findByEmail(email);
+        verify(studentRepository).findAllByEmail(email);
         verify(studentMapper).mapEntityToDto(student);
     }
 
@@ -73,35 +74,35 @@ class StudentServiceImplTest {
     void findByEmailShouldReturnOptionalOfEmptyStudentResponseIfEmailNotRegistered() {
         String email= "Alexey94@gamil.com";
 
-        when(studentDao.findByEmail(email)).thenReturn(Collections.emptyList());
+        when(studentRepository.findAllByEmail(email)).thenReturn(Collections.emptyList());
 
         studentService.findByEmail(email);
 
-        verify(studentDao).findByEmail(email);
+        verify(studentRepository).findAllByEmail(email);
     }
 
     @Test
     void leaveGroupShouldDeleteStudentFromGroupIfArgumentsIsStudentId() {
         long studentId = 1;
 
-        when(studentDao.findById(studentId)).thenReturn(Optional.of(Student.builder().withId(1L).build()));
-        doNothing().when(studentDao).leaveGroup(studentId);
+        when(studentRepository.findById(studentId)).thenReturn(Optional.of(Student.builder().withId(1L).build()));
+        doNothing().when(studentRepository).leaveGroup(studentId);
 
         studentService.leaveGroup(studentId);
 
-        verify(studentDao).findById(studentId);
-        verify(studentDao).leaveGroup(studentId);
+        verify(studentRepository).findById(studentId);
+        verify(studentRepository).leaveGroup(studentId);
     }
 
     @Test
     void leaveGroupShouldDoNothingIfStudentDontExist() {
         long studentId = 1;
 
-        when(studentDao.findById(studentId)).thenReturn(Optional.empty());
+        when(studentRepository.findById(studentId)).thenReturn(Optional.empty());
 
         studentService.leaveGroup(studentId);
 
-        verify(studentDao).findById(studentId);
+        verify(studentRepository).findById(studentId);
     }
 
     @Test
@@ -109,15 +110,15 @@ class StudentServiceImplTest {
         long studentId = 1;
         long groupId = 2;
 
-        when(studentDao.findById(studentId)).thenReturn(Optional.of(Student.builder().withId(1L).build()));
-        when(groupDao.findById(groupId)).thenReturn(Optional.of(Group.builder().withId(2L).build()));
-        doNothing().when(studentDao).enterGroup(studentId, groupId);
+        when(studentRepository.findById(studentId)).thenReturn(Optional.of(Student.builder().withId(1L).build()));
+        when(groupRepository.findById(groupId)).thenReturn(Optional.of(Group.builder().withId(2L).build()));
+        doNothing().when(studentRepository).enterGroup(studentId, groupId);
 
         studentService.changeGroup(studentId, groupId);
 
-        verify(studentDao).findById(studentId);
-        verify(groupDao).findById(groupId);
-        verify(studentDao).enterGroup(studentId, groupId);
+        verify(studentRepository).findById(studentId);
+        verify(groupRepository).findById(groupId);
+        verify(studentRepository).enterGroup(studentId, groupId);
     }
 
     @Test
@@ -125,11 +126,11 @@ class StudentServiceImplTest {
         long studentId = 1;
         long groupId = 2;
 
-        when(studentDao.findById(studentId)).thenReturn(Optional.empty());
+        when(studentRepository.findById(studentId)).thenReturn(Optional.empty());
 
         studentService.changeGroup(studentId, groupId);
 
-        verify(studentDao).findById(studentId);
+        verify(studentRepository).findById(studentId);
     }
 
     @Test
@@ -137,13 +138,13 @@ class StudentServiceImplTest {
         long studentId = 1;
         long groupId = 2;
 
-        when(studentDao.findById(studentId)).thenReturn(Optional.of(Student.builder().withId(1L).build()));
-        when(groupDao.findById(groupId)).thenReturn(Optional.empty());
+        when(studentRepository.findById(studentId)).thenReturn(Optional.of(Student.builder().withId(1L).build()));
+        when(groupRepository.findById(groupId)).thenReturn(Optional.empty());
 
         studentService.changeGroup(studentId, groupId);
 
-        verify(studentDao).findById(studentId);
-        verify(groupDao).findById(groupId);
+        verify(studentRepository).findById(studentId);
+        verify(groupRepository).findById(groupId);
     }
 
     @Test
@@ -159,26 +160,26 @@ class StudentServiceImplTest {
         studentRequest.setGroupId(1L);
 
         doNothing().when(userValidator).validate(studentRequest);
-        when(studentDao.findByEmail(email)).thenReturn(Collections.emptyList());
+        when(studentRepository.findAllByEmail(email)).thenReturn(Collections.emptyList());
         when(passwordEncoder.encode(password)).thenReturn(password);
         when(studentMapper.mapDtoToEntity(studentRequest)).thenReturn(student);
-        when(studentDao.save(student)).thenReturn(student);
-        when(studentDao.findById(1L)).thenReturn(Optional.of(student));
-        when(groupDao.findById(1L)).thenReturn(Optional.of(group));
-        when(roleDao.findByUserId(1L)).thenReturn(studentRole);
-        doNothing().when(studentDao).enterGroup(1L, 1L);
+        when(studentRepository.save(student)).thenReturn(student);
+        when(studentRepository.findById(1L)).thenReturn(Optional.of(student));
+        when(groupRepository.findById(1L)).thenReturn(Optional.of(group));
+        when(roleRepository.findAllByUserId(1L)).thenReturn(studentRole);
+        doNothing().when(studentRepository).enterGroup(1L, 1L);
 
         studentService.register(studentRequest);
 
         verify(userValidator).validate(studentRequest);
-        verify(studentDao).findByEmail(email);
+        verify(studentRepository).findAllByEmail(email);
         verify(passwordEncoder).encode(password);
         verify(studentMapper).mapDtoToEntity(studentRequest);
-        verify(studentDao).save(student);
-        verify(studentDao).findById(1L);
-        verify(groupDao).findById(1L);
-        verify(roleDao).findByUserId(1L);
-        verify(studentDao).enterGroup(1L, 1L);
+        verify(studentRepository).save(student);
+        verify(studentRepository).findById(1L);
+        verify(groupRepository).findById(1L);
+        verify(roleRepository).findAllByUserId(1L);
+        verify(studentRepository).enterGroup(1L, 1L);
     }
 
     @Test
@@ -193,20 +194,20 @@ class StudentServiceImplTest {
         studentRequest.setGroupId(0L);
 
         doNothing().when(userValidator).validate(studentRequest);
-        when(studentDao.findByEmail(email)).thenReturn(Collections.emptyList());
+        when(studentRepository.findAllByEmail(email)).thenReturn(Collections.emptyList());
         when(passwordEncoder.encode(password)).thenReturn(password);
         when(studentMapper.mapDtoToEntity(studentRequest)).thenReturn(student);
-        when(studentDao.save(student)).thenReturn(student);
-        when(roleDao.findByUserId(1L)).thenReturn(studentRole);
+        when(studentRepository.save(student)).thenReturn(student);
+        when(roleRepository.findAllByUserId(1L)).thenReturn(studentRole);
 
         studentService.register(studentRequest);
 
         verify(userValidator).validate(studentRequest);
-        verify(studentDao).findByEmail(email);
+        verify(studentRepository).findAllByEmail(email);
         verify(passwordEncoder).encode(password);
         verify(studentMapper).mapDtoToEntity(studentRequest);
-        verify(studentDao).save(student);
-        verify(roleDao).findByUserId(1L);
+        verify(studentRepository).save(student);
+        verify(roleRepository).findAllByUserId(1L);
     }
 
     @Test
@@ -222,26 +223,26 @@ class StudentServiceImplTest {
         studentRequest.setGroupId(0L);
 
         doNothing().when(userValidator).validate(studentRequest);
-        when(studentDao.findByEmail(email)).thenReturn(Collections.emptyList());
+        when(studentRepository.findAllByEmail(email)).thenReturn(Collections.emptyList());
         when(passwordEncoder.encode(password)).thenReturn(password);
         when(studentMapper.mapDtoToEntity(studentRequest)).thenReturn(student);
-        when(studentDao.save(student)).thenReturn(student);
-        when(roleDao.findByUserId(1L)).thenReturn(studentRole);
-        when(roleDao.findByName("ROLE_STUDENT")).thenReturn(Arrays.asList(defaultRole));
-        when(studentDao.findById(1L)).thenReturn(Optional.of(student));
-        when(roleDao.findById(3L)).thenReturn(Optional.of(defaultRole));
+        when(studentRepository.save(student)).thenReturn(student);
+        when(roleRepository.findAllByUserId(1L)).thenReturn(studentRole);
+        when(roleRepository.findAllByName("ROLE_STUDENT")).thenReturn(Arrays.asList(defaultRole));
+        when(studentRepository.findById(1L)).thenReturn(Optional.of(student));
+        when(roleRepository.findById(3L)).thenReturn(Optional.of(defaultRole));
 
         studentService.register(studentRequest);
 
         verify(userValidator).validate(studentRequest);
-        verify(studentDao).findByEmail(email);
+        verify(studentRepository).findAllByEmail(email);
         verify(passwordEncoder).encode(password);
         verify(studentMapper).mapDtoToEntity(studentRequest);
-        verify(studentDao).save(student);
-        verify(roleDao).findByUserId(1L);
-        verify(roleDao).findByName("ROLE_STUDENT");
-        verify(studentDao).findById(1L);
-        verify(roleDao).findById(3L);
+        verify(studentRepository).save(student);
+        verify(roleRepository).findAllByUserId(1L);
+        verify(roleRepository).findAllByName("ROLE_STUDENT");
+        verify(studentRepository).findById(1L);
+        verify(roleRepository).findById(3L);
     }
 
     @Test
@@ -256,22 +257,22 @@ class StudentServiceImplTest {
         studentRequest.setGroupId(0L);
 
         doNothing().when(userValidator).validate(studentRequest);
-        when(studentDao.findByEmail(email)).thenReturn(Collections.emptyList());
+        when(studentRepository.findAllByEmail(email)).thenReturn(Collections.emptyList());
         when(passwordEncoder.encode(password)).thenReturn(password);
         when(studentMapper.mapDtoToEntity(studentRequest)).thenReturn(student);
-        when(studentDao.save(student)).thenReturn(student);
-        when(roleDao.findByUserId(1L)).thenReturn(studentRole);
-        when(roleDao.findByName("ROLE_STUDENT")).thenReturn(Collections.emptyList());
+        when(studentRepository.save(student)).thenReturn(student);
+        when(roleRepository.findAllByUserId(1L)).thenReturn(studentRole);
+        when(roleRepository.findAllByName("ROLE_STUDENT")).thenReturn(Collections.emptyList());
 
         assertThatThrownBy(() -> studentService.register(studentRequest)).hasMessage("ROLE_STUDENT not initialized");
 
         verify(userValidator).validate(studentRequest);
-        verify(studentDao).findByEmail(email);
+        verify(studentRepository).findAllByEmail(email);
         verify(passwordEncoder).encode(password);
         verify(studentMapper).mapDtoToEntity(studentRequest);
-        verify(studentDao).save(student);
-        verify(roleDao).findByUserId(1L);
-        verify(roleDao).findByName("ROLE_STUDENT");
+        verify(studentRepository).save(student);
+        verify(roleRepository).findAllByUserId(1L);
+        verify(roleRepository).findAllByName("ROLE_STUDENT");
     }
 
     @Test
@@ -283,67 +284,67 @@ class StudentServiceImplTest {
         studentRequest.setPassword(password);
 
         doNothing().when(userValidator).validate(studentRequest);
-        when(studentDao.findByEmail(email)).thenReturn(Collections.singletonList(Student.builder().withEmail(email).build()));
+        when(studentRepository.findAllByEmail(email)).thenReturn(Collections.singletonList(Student.builder().withEmail(email).build()));
 
         assertThatThrownBy(() -> studentService.register(studentRequest)).hasMessage("This email already registered");
 
         verify(userValidator).validate(studentRequest);
-        verify(studentDao).findByEmail(email);
+        verify(studentRepository).findAllByEmail(email);
     }
 
     @Test
     void findByIdShouldReturnStudentResponseIfArgumentIsStudentId() {
         long studentId = 1;
 
-        when(studentDao.findById(studentId)).thenReturn(Optional.of(Student.builder().withId(1L).build()));
+        when(studentRepository.findById(studentId)).thenReturn(Optional.of(Student.builder().withId(1L).build()));
 
         studentService.findById(studentId);
 
-        verify(studentDao).findById(studentId);
+        verify(studentRepository).findById(studentId);
     }
 
     @Test
     void findByIdShouldThrowExceptionIfStudentNotExistIfArgumentIsProfessorId() {
         long studentId = 1;
 
-        when(studentDao.findById(studentId)).thenReturn(Optional.empty());
+        when(studentRepository.findById(studentId)).thenReturn(Optional.empty());
 
         AssertionsForClassTypes.assertThatThrownBy(() -> studentService.findById(studentId)).hasMessage("There no student with id: 1");
 
-        verify(studentDao).findById(studentId);
+        verify(studentRepository).findById(studentId);
     }
 
     @Test
     void findByGroupIdShouldReturnListOfStudentResponseIfArgumentIsGroupId() {
         long groupId = 1;
 
-        when(studentDao.findByGroupId(groupId)).thenReturn(Arrays.asList(Student.builder().withId(1L).build()));
+        when(studentRepository.findAllByGroupId(groupId)).thenReturn(Arrays.asList(Student.builder().withId(1L).build()));
 
         studentService.findByGroupId(groupId);
 
-        verify(studentDao).findByGroupId(groupId);
+        verify(studentRepository).findAllByGroupId(groupId);
     }
 
     @Test
     void findAllIdShouldReturnListOfStudentResponseIfArgumentIsPageNumber() {
         String pageNumber = "2";
 
-        when(studentDao.count()).thenReturn(11L);
-        when(studentDao.findAll(2, 5)).thenReturn(Arrays.asList(Student.builder().withId(1L).build()));
+        when(studentRepository.count()).thenReturn(11L);
+        when(studentRepository.findAll(PageRequest.of(1, 5))).thenReturn(new PageImpl(Collections.singletonList(Student.builder().withId(1L).build())));
 
         studentService.findAll(pageNumber);
 
-        verify(studentDao).count();
-        verify(studentDao).findAll(2, 5);
+        verify(studentRepository).count();
+        verify(studentRepository).findAll(PageRequest.of(1, 5));
     }
 
     @Test
     void findAllIdShouldReturnListOfStudentResponseNoArguments() {
-        when(studentDao.findAll()).thenReturn(Arrays.asList(Student.builder().withId(1L).build()));
+        when(studentRepository.findAll()).thenReturn(Arrays.asList(Student.builder().withId(1L).build()));
 
         studentService.findAll();
 
-        verify(studentDao).findAll();
+        verify(studentRepository).findAll();
     }
 
     @Test
@@ -359,18 +360,18 @@ class StudentServiceImplTest {
         studentRequest.setGroupId(1L);
 
         when(studentMapper.mapDtoToEntity(studentRequest)).thenReturn(student);
-        doNothing().when(studentDao).update(student);
-        when(studentDao.findById(1L)).thenReturn(Optional.of(student));
-        when(groupDao.findById(1L)).thenReturn(Optional.of(group));
-        doNothing().when(studentDao).enterGroup(1L, 1L);
+        when(studentRepository.save(student)).thenReturn(student);
+        when(studentRepository.findById(1L)).thenReturn(Optional.of(student));
+        when(groupRepository.findById(1L)).thenReturn(Optional.of(group));
+        doNothing().when(studentRepository).enterGroup(1L, 1L);
 
         studentService.edit(studentRequest);
 
         verify(studentMapper).mapDtoToEntity(studentRequest);
-        verify(studentDao).update(student);
-        verify(studentDao).findById(1L);
-        verify(groupDao).findById(1L);
-        verify(studentDao).enterGroup(1L, 1L);
+        verify(studentRepository).save(student);
+        verify(studentRepository).findById(1L);
+        verify(groupRepository).findById(1L);
+        verify(studentRepository).enterGroup(1L, 1L);
     }
 
     @Test
@@ -381,12 +382,12 @@ class StudentServiceImplTest {
         studentRequest.setGroupId(0L);
 
         when(studentMapper.mapDtoToEntity(studentRequest)).thenReturn(student);
-        doNothing().when(studentDao).update(student);
+        when(studentRepository.save(student)).thenReturn(student);
 
         studentService.edit(studentRequest);
 
         verify(studentMapper).mapDtoToEntity(studentRequest);
-        verify(studentDao).update(student);
+        verify(studentRepository).save(student);
     }
 
     @Test
@@ -394,28 +395,28 @@ class StudentServiceImplTest {
         long studentId = 1;
         List<Role> professorRoles = Collections.singletonList(Role.builder().withId(2L).withName("ROLE_STUDENT").build());
 
-        when(studentDao.findById(studentId)).thenReturn(Optional.of(Student.builder().withId(studentId).build()));
-        doNothing().when(studentDao).deleteById(studentId);
-        when(roleDao.findByUserId(studentId)).thenReturn(professorRoles);
-        doNothing().when(studentDao).removeRoleFromUser(1L, 2L);
+        when(studentRepository.findById(studentId)).thenReturn(Optional.of(Student.builder().withId(studentId).build()));
+        doNothing().when(studentRepository).deleteById(studentId);
+        when(roleRepository.findAllByUserId(studentId)).thenReturn(professorRoles);
+        doNothing().when(studentRepository).removeRoleFromUser(1L, 2L);
 
         studentService.deleteById(studentId);
 
-        verify(studentDao, times(2)).findById(studentId);
-        verify(roleDao).findByUserId(studentId);
-        verify(studentDao).removeRoleFromUser(1L, 2L);
-        verify(studentDao).deleteById(studentId);
+        verify(studentRepository, times(2)).findById(studentId);
+        verify(roleRepository).findAllByUserId(studentId);
+        verify(studentRepository).removeRoleFromUser(1L, 2L);
+        verify(studentRepository).deleteById(studentId);
     }
 
     @Test
     void deleteShouldDoNothingIfArgumentStudentDontExist() {
         long studentId = 1;
 
-        when(studentDao.findById(studentId)).thenReturn(Optional.empty());
+        when(studentRepository.findById(studentId)).thenReturn(Optional.empty());
 
         studentService.deleteById(studentId);
 
-        verify(studentDao).findById(studentId);
+        verify(studentRepository).findById(studentId);
     }
 
 }

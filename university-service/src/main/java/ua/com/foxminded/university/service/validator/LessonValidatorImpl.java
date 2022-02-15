@@ -2,8 +2,8 @@ package ua.com.foxminded.university.service.validator;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-import ua.com.foxminded.university.dao.CourseDao;
-import ua.com.foxminded.university.dao.LessonDao;
+import ua.com.foxminded.university.repository.CourseRepository;
+import ua.com.foxminded.university.repository.LessonRepository;
 import ua.com.foxminded.university.entity.Course;
 import ua.com.foxminded.university.entity.Lesson;
 import ua.com.foxminded.university.service.exception.EntityDontExistException;
@@ -17,13 +17,13 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class LessonValidatorImpl implements LessonValidator{
 
-    private final LessonDao lessonDao;
-    private final CourseDao courseDao;
+    private final LessonRepository lessonRepository;
+    private final CourseRepository courseRepository;
 
     @Override
     public void validateCompatibilityCourseAndProfessor(long courseId, long professorId){
         if(courseId != 0 && professorId != 0) {
-            List<Course> professorCourses = courseDao.findByProfessorId(professorId);
+            List<Course> professorCourses = courseRepository.findByProfessorId(professorId);
             boolean canProfessorTeachThisCourse =
                     professorCourses.stream()
                             .map(Course::getId)
@@ -38,8 +38,8 @@ public class LessonValidatorImpl implements LessonValidator{
 
     @Override
     public void checkGroupTimeTableCrossing(long lessonId, long groupId) {
-        List<Lesson> existingLessonsOfGroup = lessonDao.findByGroupId(groupId);
-        Lesson lesson = lessonDao.findById(lessonId)
+        List<Lesson> existingLessonsOfGroup = lessonRepository.findAllByGroupIdOrderByTimeOfStartLesson(groupId);
+        Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(()-> new EntityDontExistException("There are no lesson with id: " + lessonId));
         existingLessonsOfGroup.remove(lesson);
         if(lesson.getTimeOfStartLesson() != null) {
@@ -54,8 +54,8 @@ public class LessonValidatorImpl implements LessonValidator{
 
     @Override
     public void checkProfessorTimeTableCrossing(long lessonId, long professorId) {
-        List<Lesson> existingLessonOfTeacher = lessonDao.findByProfessorId(professorId);
-        Lesson lesson = lessonDao.findById(lessonId)
+        List<Lesson> existingLessonOfTeacher = lessonRepository.findAllByTeacherIdOrderByTimeOfStartLesson(professorId);
+        Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(()-> new EntityDontExistException("There are no lesson with id: " + lessonId));
         existingLessonOfTeacher.remove(lesson);
         if(lesson.getTimeOfStartLesson() != null) {

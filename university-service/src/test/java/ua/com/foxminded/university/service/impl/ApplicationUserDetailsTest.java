@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ua.com.foxminded.university.dao.PrivilegeDao;
+import ua.com.foxminded.university.repository.PrivilegeRepository;
 import ua.com.foxminded.university.dto.ProfessorResponse;
 import ua.com.foxminded.university.dto.StudentResponse;
 import ua.com.foxminded.university.entity.Privilege;
@@ -15,7 +15,6 @@ import ua.com.foxminded.university.service.StudentService;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
@@ -53,7 +52,7 @@ public class ApplicationUserDetailsTest {
     StudentService studentService;
 
     @Mock
-    PrivilegeDao privilegeDao;
+    PrivilegeRepository privilegeRepository;
 
     @InjectMocks
     ApplicationUserDetails applicationUserDetails;
@@ -62,26 +61,26 @@ public class ApplicationUserDetailsTest {
     void loadUserByUsernameShouldLoadDataOfStudentToSpringSecurityIfArgumentsIsEmailAndPassword() {
         when(studentService.findByEmail(EMAIL_OF_STUDENT)).thenReturn(Collections.singletonList(STUDENT_RESPONSE));
         when(professorService.findByEmail(EMAIL_OF_STUDENT)).thenReturn(Collections.emptyList());
-        when(privilegeDao.findByRoleId(1L)).thenReturn(Collections.singletonList(READ_PRIVILEGE));
+        when(privilegeRepository.findAllByRoleId(1L)).thenReturn(Collections.singletonList(READ_PRIVILEGE));
 
         applicationUserDetails.loadUserByUsername(EMAIL_OF_STUDENT);
 
         verify(studentService).findByEmail(EMAIL_OF_STUDENT);
         verify(professorService).findByEmail(EMAIL_OF_STUDENT);
-        verify(privilegeDao).findByRoleId(1L);
+        verify(privilegeRepository).findAllByRoleId(1L);
     }
 
     @Test
     void loadUserByUsernameShouldLoadDataOfProfessorToSpringSecurityIfArgumentsIsEmailAndPassword() {
         when(studentService.findByEmail(EMAIL_OF_PROFESSOR)).thenReturn(Collections.emptyList());
         when(professorService.findByEmail(EMAIL_OF_PROFESSOR)).thenReturn(Collections.singletonList(PROFESSOR_RESPONSE));
-        when(privilegeDao.findByRoleId(2L)).thenReturn(Arrays.asList(READ_PRIVILEGE, WRITE_PRIVILEGE));
+        when(privilegeRepository.findAllByRoleId(2L)).thenReturn(Arrays.asList(READ_PRIVILEGE, WRITE_PRIVILEGE));
 
         applicationUserDetails.loadUserByUsername(EMAIL_OF_PROFESSOR);
 
         verify(studentService).findByEmail(EMAIL_OF_PROFESSOR);
         verify(professorService).findByEmail(EMAIL_OF_PROFESSOR);
-        verify(privilegeDao).findByRoleId(2L);
+        verify(privilegeRepository).findAllByRoleId(2L);
     }
 
     @Test

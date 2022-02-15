@@ -10,7 +10,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ua.com.foxminded.university.dao.PrivilegeDao;
+import ua.com.foxminded.university.repository.PrivilegeRepository;
 import ua.com.foxminded.university.dto.ProfessorResponse;
 import ua.com.foxminded.university.dto.StudentResponse;
 import ua.com.foxminded.university.entity.Privilege;
@@ -29,7 +29,7 @@ public class ApplicationUserDetails implements UserDetailsService {
 
     private final ProfessorService professorService;
     private final StudentService studentService;
-    private final PrivilegeDao privilegeDao;
+    private final PrivilegeRepository privilegeRepository;
 
     @Override
     public UserDetails loadUserByUsername(final String email)
@@ -68,7 +68,7 @@ public class ApplicationUserDetails implements UserDetailsService {
 
     private List<String> getPrivileges(List<Role> roles) {
         List<String> allUserPrivileges = roles.stream().map(Role::getName).collect(Collectors.toList());
-        List<Privilege> privileges = roles.stream().flatMap(role -> privilegeDao.findByRoleId(role.getId()).stream())
+        List<Privilege> privileges = roles.stream().flatMap(role -> privilegeRepository.findAllByRoleId(role.getId()).stream())
                 .collect(Collectors.toList());
         allUserPrivileges.addAll(privileges.stream().map(Privilege::getName).collect(Collectors.toList()));
 

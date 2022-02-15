@@ -123,7 +123,6 @@
         <version>${org.jacoco.version}</version>
         <configuration>
           <excludes>
-            <exclude>ua/com/foxminded/university/dao/domain/Page.class</exclude>
             <exclude>ua/com/foxminded/university/configuration/**</exclude>
             <exclude>ua/com/foxminded/university/dto/**</exclude>
             <exclude>ua/com/foxminded/university/entity/**</exclude>

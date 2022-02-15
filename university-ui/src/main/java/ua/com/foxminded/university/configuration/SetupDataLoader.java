@@ -6,16 +6,15 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import ua.com.foxminded.university.dao.PrivilegeDao;
-import ua.com.foxminded.university.dao.ProfessorDao;
-import ua.com.foxminded.university.dao.RoleDao;
+import ua.com.foxminded.university.repository.PrivilegeRepository;
+import ua.com.foxminded.university.repository.ProfessorRepository;
+import ua.com.foxminded.university.repository.RoleRepository;
 import ua.com.foxminded.university.entity.Privilege;
 import ua.com.foxminded.university.entity.Professor;
 import ua.com.foxminded.university.entity.Role;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 @AllArgsConstructor
@@ -23,9 +22,9 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
     private static boolean alreadySetup = false;
 
-    private final ProfessorDao professorDao;
-    private final RoleDao roleDao;
-    private final PrivilegeDao privilegeDao;
+    private final ProfessorRepository professorRepository;
+    private final RoleRepository roleRepository;
+    private final PrivilegeRepository privilegeRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -48,13 +47,13 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         createRoleIfNotFound("ROLE_PROFESSOR", professorPrivileges);
         createRoleIfNotFound("ROLE_STUDENT", studentPrivileges);
 
-        if (professorDao.findByEmail("admin@gmail.com").isEmpty()) {
+        if (professorRepository.findAllByEmail("admin@gmail.com").isEmpty()) {
             Professor admin = Professor.builder()
                     .withEmail("admin@gmail.com")
                     .withPassword(passwordEncoder.encode("admin"))
                     .build();
-            Professor adminAfterSave = professorDao.save(admin);
-            professorDao.addRoleToUser(adminAfterSave.getId(), adminRole.getId());
+            Professor adminAfterSave = professorRepository.save(admin);
+            professorRepository.addRoleToUser(adminAfterSave.getId(), adminRole.getId());
         }
 
         alreadySetup = true;
@@ -64,12 +63,12 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private Privilege createPrivilegeIfNotFound(String name) {
 
         Privilege privilege = Privilege.builder().withName(name).build();
-        List<Privilege> searchingPrivilege = privilegeDao.findByName(name);
+        List<Privilege> searchingPrivilege = privilegeRepository.findAllByName(name);
 
         if (!searchingPrivilege.isEmpty()){
             return searchingPrivilege.get(0);
         } else {
-            return privilegeDao.save(privilege);
+            return privilegeRepository.save(privilege);
         }
 
     }
@@ -77,20 +76,20 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private Role createRoleIfNotFound(String name, List<Privilege> necessaryPrivileges) {
 
         Role role = Role.builder().withName(name).build();
-        List<Role> searchingRole = roleDao.findByName(name);
+        List<Role> searchingRole = roleRepository.findAllByName(name);
 
         if(searchingRole.isEmpty()){
-            Role roleAfterSave = roleDao.save(role);
+            Role roleAfterSave = roleRepository.save(role);
             for (Privilege privilege : necessaryPrivileges){
-             roleDao.addPrivilegeToRole(roleAfterSave.getId(), privilege.getId());
+             roleRepository.addPrivilegeToRole(roleAfterSave.getId(), privilege.getId());
             }
             return roleAfterSave;
         } else {
             long roleId = searchingRole.get(0).getId();
-            List<Privilege> realRolePrivilege = privilegeDao.findByRoleId(roleId);
+            List<Privilege> realRolePrivilege = privilegeRepository.findAllByRoleId(roleId);
             for (Privilege privilege : necessaryPrivileges){
                 if(!realRolePrivilege.contains(privilege)){
-                    roleDao.addPrivilegeToRole(roleId, privilege.getId());
+                    roleRepository.addPrivilegeToRole(roleId, privilege.getId());
                 }
             }
 
