@@ -1,10 +1,12 @@
 package ua.com.foxminded.university.service.impl;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ua.com.foxminded.university.dao.FormOfLessonDao;
-import ua.com.foxminded.university.dao.LessonDao;
+import ua.com.foxminded.university.repository.FormOfLessonRepository;
+import ua.com.foxminded.university.repository.LessonRepository;
 import ua.com.foxminded.university.dto.FormOfLessonRequest;
 import ua.com.foxminded.university.dto.FormOfLessonResponse;
 import ua.com.foxminded.university.entity.FormOfLesson;
@@ -21,17 +23,17 @@ import java.util.stream.Collectors;
 @Transactional
 public class FormOfLessonServiceImpl extends AbstractPageableCrudService implements FormOfLessonService {
 
-    private final FormOfLessonDao formOfLessonDao;
-    private final LessonDao lessonDao;
+    private final FormOfLessonRepository formOfLessonRepository;
+    private final LessonRepository lessonRepository;
     private final FormOfLessonMapper formOfLessonMapper;
 
     @Override
     public FormOfLessonResponse create(FormOfLessonRequest formOfLessonRequest) {
-        if (!formOfLessonDao.findByName(formOfLessonRequest.getName()).isEmpty()){
+        if (!formOfLessonRepository.findAllByName(formOfLessonRequest.getName()).isEmpty()){
             throw new EntityAlreadyExistException("Form of lesson with same name already exist");
         } else{
             FormOfLesson formOfLessonBeforeSave = formOfLessonMapper.mapDtoToEntity(formOfLessonRequest);
-            FormOfLesson formOfLessonAfterSave = formOfLessonDao.save(formOfLessonBeforeSave);
+            FormOfLesson formOfLessonAfterSave = formOfLessonRepository.save(formOfLessonBeforeSave);
 
             return formOfLessonMapper.mapEntityToDto(formOfLessonAfterSave);
         }
@@ -39,7 +41,7 @@ public class FormOfLessonServiceImpl extends AbstractPageableCrudService impleme
 
     @Override
     public FormOfLessonResponse findById(long id) {
-        FormOfLesson formOfLesson = formOfLessonDao.findById(id)
+        FormOfLesson formOfLesson = formOfLessonRepository.findById(id)
                 .orElseThrow(() -> new EntityDontExistException("There no form of lesson with id: " + id));
 
         return formOfLessonMapper.mapEntityToDto(formOfLesson);
@@ -47,10 +49,10 @@ public class FormOfLessonServiceImpl extends AbstractPageableCrudService impleme
 
     @Override
     public List<FormOfLessonResponse> findAll(String page) {
-        final long itemsCount = formOfLessonDao.count();
+        final long itemsCount = formOfLessonRepository.count();
         int pageNumber = parsePageNumber(page, itemsCount, 1);
 
-        return formOfLessonDao.findAll(pageNumber, ITEMS_PER_PAGE).stream()
+        return formOfLessonRepository.findAll(PageRequest.of(pageNumber - 1, ITEMS_PER_PAGE, Sort.by("id"))).stream()
                 .map(formOfLessonMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
@@ -58,26 +60,26 @@ public class FormOfLessonServiceImpl extends AbstractPageableCrudService impleme
     @Override
     public List<FormOfLessonResponse> findAll() {
 
-        return formOfLessonDao.findAll().stream()
+        return formOfLessonRepository.findAll(Sort.by("id")).stream()
                 .map(formOfLessonMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public void edit(FormOfLessonRequest formOfLessonRequest) {
-        formOfLessonDao.update(formOfLessonMapper.mapDtoToEntity(formOfLessonRequest));
+        formOfLessonRepository.save(formOfLessonMapper.mapDtoToEntity(formOfLessonRequest));
     }
 
     @Override
     public void deleteById(long id) {
-        if(formOfLessonDao.findById(id).isPresent()){
+        if(formOfLessonRepository.findById(id).isPresent()){
 
-            List<Lesson> formOfLessonLessons = lessonDao.findByFormOfLessonId(id);
+            List<Lesson> formOfLessonLessons = lessonRepository.findAllByFormOfLessonIdOrderByTimeOfStartLesson(id);
             for(Lesson lesson : formOfLessonLessons){
-                lessonDao.removeFormOfLessonFromLesson(lesson.getId());
+                lessonRepository.removeFormOfLessonFromLesson(lesson.getId());
             }
 
-            formOfLessonDao.deleteById(id);
+            formOfLessonRepository.deleteById(id);
         }
     }
 

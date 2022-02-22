@@ -6,22 +6,23 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ua.com.foxminded.university.dao.CourseDao;
-import ua.com.foxminded.university.dao.DepartmentDao;
-import ua.com.foxminded.university.dao.LessonDao;
-import ua.com.foxminded.university.dao.ProfessorDao;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import ua.com.foxminded.university.repository.CourseRepository;
+import ua.com.foxminded.university.repository.DepartmentRepository;
+import ua.com.foxminded.university.repository.LessonRepository;
+import ua.com.foxminded.university.repository.ProfessorRepository;
 import ua.com.foxminded.university.dto.CourseRequest;
 import ua.com.foxminded.university.entity.Course;
 import ua.com.foxminded.university.entity.Department;
 import ua.com.foxminded.university.entity.Lesson;
 import ua.com.foxminded.university.entity.Professor;
 import ua.com.foxminded.university.mapper.CourseMapper;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
@@ -32,16 +33,16 @@ import static org.mockito.Mockito.when;
 class CourseServiceImplTest {
 
     @Mock
-    CourseDao courseDao;
+    CourseRepository courseRepository;
 
     @Mock
-    ProfessorDao professorDao;
+    ProfessorRepository professorRepository;
 
     @Mock
-    DepartmentDao departmentDao;
+    DepartmentRepository departmentRepository;
 
     @Mock
-    LessonDao lessonDao;
+    LessonRepository lessonRepository;
 
     @Mock
     CourseMapper courseMapper;
@@ -56,17 +57,17 @@ class CourseServiceImplTest {
         long professorId = 2;
         List<Course> coursesOfProfessor = Arrays.asList(Course.builder().withId(3L).build());
 
-        when(courseDao.findById(courseId)).thenReturn(Optional.of(Course.builder().withId(courseId).build()));
-        when(professorDao.findById(professorId)).thenReturn(Optional.of(Professor.builder().withId(professorId).build()));
-        when(courseDao.findByProfessorId(professorId)).thenReturn(coursesOfProfessor);
-        doNothing().when(courseDao).addCourseToProfessorCourseList(courseId, professorId);
+        when(courseRepository.findById(courseId)).thenReturn(Optional.of(Course.builder().withId(courseId).build()));
+        when(professorRepository.findById(professorId)).thenReturn(Optional.of(Professor.builder().withId(professorId).build()));
+        when(courseRepository.findByProfessorId(professorId)).thenReturn(coursesOfProfessor);
+        doNothing().when(courseRepository).addCourseToProfessorCourseList(courseId, professorId);
 
         courseService.addCourseToProfessorCourseList(courseId, professorId);
 
-        verify(courseDao).findById(courseId);
-        verify(professorDao).findById(professorId);
-        verify(courseDao).findByProfessorId(professorId);
-        verify(courseDao).addCourseToProfessorCourseList(courseId, professorId);
+        verify(courseRepository).findById(courseId);
+        verify(professorRepository).findById(professorId);
+        verify(courseRepository).findByProfessorId(professorId);
+        verify(courseRepository).addCourseToProfessorCourseList(courseId, professorId);
     }
 
     @Test
@@ -75,15 +76,15 @@ class CourseServiceImplTest {
         long professorId = 2;
         List<Course> coursesOfProfessor = Arrays.asList(Course.builder().withId(1L).build());
 
-        when(courseDao.findById(courseId)).thenReturn(Optional.of(Course.builder().withId(courseId).build()));
-        when(professorDao.findById(professorId)).thenReturn(Optional.of(Professor.builder().withId(professorId).build()));
-        when(courseDao.findByProfessorId(professorId)).thenReturn(coursesOfProfessor);
+        when(courseRepository.findById(courseId)).thenReturn(Optional.of(Course.builder().withId(courseId).build()));
+        when(professorRepository.findById(professorId)).thenReturn(Optional.of(Professor.builder().withId(professorId).build()));
+        when(courseRepository.findByProfessorId(professorId)).thenReturn(coursesOfProfessor);
 
         courseService.addCourseToProfessorCourseList(courseId, professorId);
 
-        verify(courseDao).findById(courseId);
-        verify(professorDao).findById(professorId);
-        verify(courseDao).findByProfessorId(professorId);
+        verify(courseRepository).findById(courseId);
+        verify(professorRepository).findById(professorId);
+        verify(courseRepository).findByProfessorId(professorId);
     }
 
     @Test
@@ -91,11 +92,11 @@ class CourseServiceImplTest {
         long courseId = 1;
         long professorId = 2;
 
-        when(courseDao.findById(courseId)).thenReturn(Optional.empty());
+        when(courseRepository.findById(courseId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> courseService.addCourseToProfessorCourseList(courseId, professorId)).hasMessage("There no course with id: 1");
 
-        verify(courseDao).findById(courseId);
+        verify(courseRepository).findById(courseId);
     }
 
     @Test
@@ -103,13 +104,13 @@ class CourseServiceImplTest {
         long courseId = 1;
         long professorId = 2;
 
-        when(courseDao.findById(courseId)).thenReturn(Optional.of(Course.builder().withId(courseId).build()));
-        when(professorDao.findById(professorId)).thenReturn(Optional.empty());
+        when(courseRepository.findById(courseId)).thenReturn(Optional.of(Course.builder().withId(courseId).build()));
+        when(professorRepository.findById(professorId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> courseService.addCourseToProfessorCourseList(courseId, professorId)).hasMessage("There no professor with id: 2");
 
-        verify(courseDao).findById(courseId);
-        verify(professorDao).findById(professorId);
+        verify(courseRepository).findById(courseId);
+        verify(professorRepository).findById(professorId);
     }
 
     @Test
@@ -118,17 +119,17 @@ class CourseServiceImplTest {
         long professorId = 2;
         List<Course> coursesOfProfessor = Arrays.asList(Course.builder().withId(1L).build());
 
-        when(courseDao.findById(courseId)).thenReturn(Optional.of(Course.builder().withId(courseId).build()));
-        when(professorDao.findById(professorId)).thenReturn(Optional.of(Professor.builder().withId(professorId).build()));
-        when(courseDao.findByProfessorId(professorId)).thenReturn(coursesOfProfessor);
-        doNothing().when(courseDao).removeCourseFromProfessorCourseList(courseId, professorId);
+        when(courseRepository.findById(courseId)).thenReturn(Optional.of(Course.builder().withId(courseId).build()));
+        when(professorRepository.findById(professorId)).thenReturn(Optional.of(Professor.builder().withId(professorId).build()));
+        when(courseRepository.findByProfessorId(professorId)).thenReturn(coursesOfProfessor);
+        doNothing().when(courseRepository).removeCourseFromProfessorCourseList(courseId, professorId);
 
         courseService.removeCourseFromProfessorCourseList(courseId, professorId);
 
-        verify(courseDao).findById(courseId);
-        verify(professorDao).findById(professorId);
-        verify(courseDao).findByProfessorId(professorId);
-        verify(courseDao).removeCourseFromProfessorCourseList(courseId, professorId);
+        verify(courseRepository).findById(courseId);
+        verify(professorRepository).findById(professorId);
+        verify(courseRepository).findByProfessorId(professorId);
+        verify(courseRepository).removeCourseFromProfessorCourseList(courseId, professorId);
     }
 
     @Test
@@ -137,39 +138,39 @@ class CourseServiceImplTest {
         long professorId = 2;
         List<Course> coursesOfProfessor = Arrays.asList(Course.builder().withId(3L).build());
 
-        when(courseDao.findById(courseId)).thenReturn(Optional.of(Course.builder().withId(courseId).build()));
-        when(professorDao.findById(professorId)).thenReturn(Optional.of(Professor.builder().withId(professorId).build()));
-        when(courseDao.findByProfessorId(professorId)).thenReturn(coursesOfProfessor);
+        when(courseRepository.findById(courseId)).thenReturn(Optional.of(Course.builder().withId(courseId).build()));
+        when(professorRepository.findById(professorId)).thenReturn(Optional.of(Professor.builder().withId(professorId).build()));
+        when(courseRepository.findByProfessorId(professorId)).thenReturn(coursesOfProfessor);
 
         courseService.removeCourseFromProfessorCourseList(courseId, professorId);
 
-        verify(courseDao).findById(courseId);
-        verify(professorDao).findById(professorId);
-        verify(courseDao).findByProfessorId(professorId);
+        verify(courseRepository).findById(courseId);
+        verify(professorRepository).findById(professorId);
+        verify(courseRepository).findByProfessorId(professorId);
     }
 
     @Test
     void findByProfessorIdShouldReturnListOfCourseResponsesIfArgumentIsProfessorId() {
         long professorId = 1;
 
-        when(professorDao.findById(professorId)).thenReturn(Optional.of(Professor.builder().withId(professorId).build()));
-        when(courseDao.findByProfessorId(professorId)).thenReturn(Arrays.asList(Course.builder().withId(1L).build()));
+        when(professorRepository.findById(professorId)).thenReturn(Optional.of(Professor.builder().withId(professorId).build()));
+        when(courseRepository.findByProfessorId(professorId)).thenReturn(Arrays.asList(Course.builder().withId(1L).build()));
 
         courseService.findByProfessorId(professorId);
 
-        verify(professorDao).findById(professorId);
-        verify(courseDao).findByProfessorId(professorId);
+        verify(professorRepository).findById(professorId);
+        verify(courseRepository).findByProfessorId(professorId);
     }
 
     @Test
     void findByProfessorIdShouldThrowExceptionIfProfessorDontExist() {
         long professorId = 100;
 
-        when(professorDao.findById(professorId)).thenReturn(Optional.empty());
+        when(professorRepository.findById(professorId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> courseService.findByProfessorId(professorId)).hasMessage("There no professor with id = 100");
 
-        verify(professorDao).findById(professorId);
+        verify(professorRepository).findById(professorId);
     }
 
     @Test
@@ -179,11 +180,11 @@ class CourseServiceImplTest {
         courseRequest.setName(courseName);
         courseRequest.setDepartmentId(0L);
 
-        when(courseDao.findByName(courseName)).thenReturn(Collections.emptyList());
+        when(courseRepository.findAllByName(courseName)).thenReturn(Collections.emptyList());
 
         courseService.create(courseRequest);
 
-        verify(courseDao).findByName(courseName);
+        verify(courseRepository).findAllByName(courseName);
     }
 
     @Test
@@ -197,24 +198,24 @@ class CourseServiceImplTest {
         Course courseAfterSave = Course.builder().withId(1L).withName("Math").build();
 
         when(courseMapper.mapDtoToEntity(courseRequest)).thenReturn(courseBeforeSave);
-        when(courseDao.save(courseBeforeSave)).thenReturn(courseAfterSave);
-        when(courseDao.findByName("Math")).thenReturn(Collections.emptyList());
-        when(courseDao.findById(1L)).thenReturn(Optional.of(courseAfterSave));
-        when(departmentDao.findById(1L)).thenReturn(Optional.of(department));
-        doNothing().when(courseDao).changeDepartment(1L, 1L);
+        when(courseRepository.save(courseBeforeSave)).thenReturn(courseAfterSave);
+        when(courseRepository.findAllByName("Math")).thenReturn(Collections.emptyList());
+        when(courseRepository.findById(1L)).thenReturn(Optional.of(courseAfterSave));
+        when(departmentRepository.findById(1L)).thenReturn(Optional.of(department));
+        doNothing().when(courseRepository).changeDepartment(1L, 1L);
 
         courseService.create(courseRequest);
 
         verify(courseMapper).mapDtoToEntity(courseRequest);
         verify(courseMapper).mapEntityToDto(courseAfterSave);
-        verify(courseDao).save(courseBeforeSave);
-        verify(courseDao).findByName("Math");
-        verify(courseDao).findById(1L);
-        verify(departmentDao).findById(1L);
-        verify(courseDao).changeDepartment(1L, 1L);
+        verify(courseRepository).save(courseBeforeSave);
+        verify(courseRepository).findAllByName("Math");
+        verify(courseRepository).findById(1L);
+        verify(departmentRepository).findById(1L);
+        verify(courseRepository).changeDepartment(1L, 1L);
         verifyNoMoreInteractions(courseMapper);
-        verifyNoMoreInteractions(courseDao);
-        verifyNoMoreInteractions(departmentDao);
+        verifyNoMoreInteractions(courseRepository);
+        verifyNoMoreInteractions(departmentRepository);
     }
 
     @Test
@@ -223,69 +224,69 @@ class CourseServiceImplTest {
         CourseRequest courseRequest = new CourseRequest();
         courseRequest.setName(courseName);
 
-        when(courseDao.findByName(courseName)).thenReturn(Arrays.asList(Course.builder().withName(courseName).build()));
+        when(courseRepository.findAllByName(courseName)).thenReturn(Arrays.asList(Course.builder().withName(courseName).build()));
 
         assertThatThrownBy(() -> courseService.create(courseRequest)).hasMessage("Course with same name already exist");
 
-        verify(courseDao).findByName(courseName);
+        verify(courseRepository).findAllByName(courseName);
     }
 
     @Test
     void findByIdShouldReturnCourseResponseIfArgumentIsCourseId() {
         long courseId = 1;
 
-        when(courseDao.findById(courseId)).thenReturn(Optional.of(Course.builder().withId(1L).build()));
+        when(courseRepository.findById(courseId)).thenReturn(Optional.of(Course.builder().withId(1L).build()));
 
         courseService.findById(courseId);
 
-        verify(courseDao).findById(courseId);
+        verify(courseRepository).findById(courseId);
     }
 
     @Test
     void findByIdShouldThrowExceptionIfCourseNotExist() {
         long courseId = 1;
 
-        when(courseDao.findById(courseId)).thenReturn(Optional.empty());
+        when(courseRepository.findById(courseId)).thenReturn(Optional.empty());
 
         Assertions.assertThatThrownBy(() -> courseService.findById(courseId)).hasMessage("There no course with id: 1");
 
-        verify(courseDao).findById(courseId);
+        verify(courseRepository).findById(courseId);
     }
 
     @Test
     void findByDepartmentIdShouldReturnCoursesResponseIfArgumentIsDepartmentId() {
         long departmentId = 1;
 
-        when(departmentDao.findById(departmentId)).thenReturn(Optional.of(Department.builder().withId(1L).build()));
-        when(courseDao.findByDepartmentId(departmentId)).thenReturn(Arrays.asList(Course.builder().withId(1L).build(),
+        when(departmentRepository.findById(departmentId)).thenReturn(Optional.of(Department.builder().withId(1L).build()));
+        when(courseRepository.findByDepartmentId(departmentId)).thenReturn(Arrays.asList(Course.builder().withId(1L).build(),
                 Course.builder().withId(2L).build()));
 
         courseService.findByDepartmentId(departmentId);
 
-        verify(departmentDao).findById(departmentId);
-        verify(courseDao).findByDepartmentId(departmentId);
+        verify(departmentRepository).findById(departmentId);
+        verify(courseRepository).findByDepartmentId(departmentId);
     }
 
     @Test
     void findAllIdShouldReturnListOfCourseResponseIfArgumentIsPageNumber() {
         String pageNumber = "2";
 
-        when(courseDao.count()).thenReturn(11L);
-        when(courseDao.findAll(2, 5)).thenReturn(Arrays.asList(Course.builder().withId(1L).build()));
+        when(courseRepository.count()).thenReturn(11L);
+        when(courseRepository.findAll(PageRequest.of(1, 5, Sort.by("id")))).thenReturn(new PageImpl(Collections.singletonList(Course.builder().withId(1L).build())));
 
         courseService.findAll(pageNumber);
 
-        verify(courseDao).count();
-        verify(courseDao).findAll(2, 5);
+        verify(courseRepository).count();
+        verify(courseRepository).findAll(PageRequest.of(1, 5, Sort.by("id")));
     }
 
     @Test
     void findAllIdShouldReturnListOfCourseResponseNoArguments() {
-        when(courseDao.findAll()).thenReturn(Arrays.asList(Course.builder().withId(1L).build()));
+        when(courseRepository.findAll(Sort.by("id"))).thenReturn(Arrays.asList(Course.builder().withId(1L).build()));
 
         courseService.findAll();
 
-        verify(courseDao).findAll();
+        verify(courseRepository).findAll(Sort.by("id"));
     }
 
     @Test
@@ -296,12 +297,12 @@ class CourseServiceImplTest {
         courseRequest.setDepartmentId(0L);
 
         when(courseMapper.mapDtoToEntity(courseRequest)).thenReturn(course);
-        doNothing().when(courseDao).update(course);
+        when(courseRepository.save(course)).thenReturn(course);
 
         courseService.edit(courseRequest);
 
         verify(courseMapper).mapDtoToEntity(courseRequest);
-        verify(courseDao).update(course);
+        verify(courseRepository).save(course);
     }
 
     @Test
@@ -313,21 +314,21 @@ class CourseServiceImplTest {
         courseRequest.setDepartmentId(1L);
 
         when(courseMapper.mapDtoToEntity(courseRequest)).thenReturn(course);
-        doNothing().when(courseDao).update(course);
-        when(courseDao.findById(1L)).thenReturn(Optional.of(course));
-        when(departmentDao.findById(1L)).thenReturn(Optional.of(department));
-        doNothing().when(courseDao).changeDepartment(1L, 1L);
+        when(courseRepository.save(course)).thenReturn(course);
+        when(courseRepository.findById(1L)).thenReturn(Optional.of(course));
+        when(departmentRepository.findById(1L)).thenReturn(Optional.of(department));
+        doNothing().when(courseRepository).changeDepartment(1L, 1L);
 
         courseService.edit(courseRequest);
 
         verify(courseMapper).mapDtoToEntity(courseRequest);
-        verify(courseDao).update(course);
-        verify(courseDao).findById(1L);
-        verify(departmentDao).findById(1L);
-        verify(courseDao).changeDepartment(1L, 1L);
+        verify(courseRepository).save(course);
+        verify(courseRepository).findById(1L);
+        verify(departmentRepository).findById(1L);
+        verify(courseRepository).changeDepartment(1L, 1L);
         verifyNoMoreInteractions(courseMapper);
-        verifyNoMoreInteractions(courseDao);
-        verifyNoMoreInteractions(departmentDao);
+        verifyNoMoreInteractions(courseRepository);
+        verifyNoMoreInteractions(departmentRepository);
     }
 
     @Test
@@ -338,33 +339,33 @@ class CourseServiceImplTest {
         courseRequest.setDepartmentId(1L);
 
         when(courseMapper.mapDtoToEntity(courseRequest)).thenReturn(course);
-        doNothing().when(courseDao).update(course);
-        when(courseDao.findById(1L)).thenReturn(Optional.of(course));
-        when(departmentDao.findById(1L)).thenReturn(Optional.empty());
+        when(courseRepository.save(course)).thenReturn(course);
+        when(courseRepository.findById(1L)).thenReturn(Optional.of(course));
+        when(departmentRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> courseService.edit(courseRequest)).hasMessage("There no department with id: 1");
 
         verify(courseMapper).mapDtoToEntity(courseRequest);
-        verify(courseDao).update(course);
-        verify(courseDao).findById(1L);
-        verify(departmentDao).findById(1L);
+        verify(courseRepository).save(course);
+        verify(courseRepository).findById(1L);
+        verify(departmentRepository).findById(1L);
         verifyNoMoreInteractions(courseMapper);
-        verifyNoMoreInteractions(courseDao);
-        verifyNoMoreInteractions(departmentDao);
+        verifyNoMoreInteractions(courseRepository);
+        verifyNoMoreInteractions(departmentRepository);
     }
 
     @Test
     void removeDepartmentFromCourseShouldRemoveDepartmentFromCourseIfArgumentCourseId() {
         Course course = Course.builder().withId(1L).build();
 
-        when(courseDao.findById(1L)).thenReturn(Optional.of(course));
-        doNothing().when(courseDao).removeDepartmentFromCourse(1L);
+        when(courseRepository.findById(1L)).thenReturn(Optional.of(course));
+        doNothing().when(courseRepository).removeDepartmentFromCourse(1L);
 
         courseService.removeDepartmentFromCourse(1L);
 
-        verify(courseDao).findById(1L);
-        verify(courseDao).removeDepartmentFromCourse(1L);
-        verifyNoMoreInteractions(courseDao);
+        verify(courseRepository).findById(1L);
+        verify(courseRepository).removeDepartmentFromCourse(1L);
+        verifyNoMoreInteractions(courseRepository);
     }
 
     @Test
@@ -374,30 +375,30 @@ class CourseServiceImplTest {
         Lesson lesson2 = Lesson.builder().withId(2L).build();
         List<Lesson> courseLessons = Arrays.asList(lesson1, lesson2);
 
-        when(courseDao.findById(courseId)).thenReturn(Optional.of(Course.builder().withId(courseId).build()));
-        when(lessonDao.findByCourseId(courseId)).thenReturn(courseLessons);
-        doNothing().when(lessonDao).removeCourseFromLesson(1L);
-        doNothing().when(lessonDao).removeCourseFromLesson(2L);
-        doNothing().when(courseDao).deleteById(courseId);
+        when(courseRepository.findById(courseId)).thenReturn(Optional.of(Course.builder().withId(courseId).build()));
+        when(lessonRepository.findAllByCourseIdOrderByTimeOfStartLesson(courseId)).thenReturn(courseLessons);
+        doNothing().when(lessonRepository).removeCourseFromLesson(1L);
+        doNothing().when(lessonRepository).removeCourseFromLesson(2L);
+        doNothing().when(courseRepository).deleteById(courseId);
 
         courseService.deleteById(courseId);
 
-        verify(courseDao).findById(courseId);
-        verify(lessonDao).findByCourseId(courseId);
-        verify(lessonDao).removeCourseFromLesson(1L);
-        verify(lessonDao).removeCourseFromLesson(2L);
-        verify(courseDao).deleteById(courseId);
+        verify(courseRepository).findById(courseId);
+        verify(lessonRepository).findAllByCourseIdOrderByTimeOfStartLesson(courseId);
+        verify(lessonRepository).removeCourseFromLesson(1L);
+        verify(lessonRepository).removeCourseFromLesson(2L);
+        verify(courseRepository).deleteById(courseId);
     }
 
     @Test
     void deleteShouldDoNothingIfArgumentCourseDontExist() {
         long courseId = 1;
 
-        when(courseDao.findById(courseId)).thenReturn(Optional.empty());
+        when(courseRepository.findById(courseId)).thenReturn(Optional.empty());
 
         courseService.deleteById(courseId);
 
-        verify(courseDao).findById(courseId);
+        verify(courseRepository).findById(courseId);
     }
 
 }

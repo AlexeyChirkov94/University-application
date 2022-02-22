@@ -5,8 +5,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ua.com.foxminded.university.dao.CourseDao;
-import ua.com.foxminded.university.dao.LessonDao;
+import ua.com.foxminded.university.repository.CourseRepository;
+import ua.com.foxminded.university.repository.LessonRepository;
 import ua.com.foxminded.university.entity.Course;
 import ua.com.foxminded.university.entity.Lesson;
 
@@ -24,10 +24,10 @@ import static org.mockito.Mockito.when;
 class LessonValidatorImplTest {
 
     @Mock
-    CourseDao courseDao;
+    CourseRepository courseRepository;
 
     @Mock
-    LessonDao lessonDao;
+    LessonRepository lessonRepository;
 
     @InjectMocks
     LessonValidatorImpl lessonValidator;
@@ -56,12 +56,12 @@ class LessonValidatorImplTest {
         long professorId = 1;
         long courseId = 2;
 
-        when(courseDao.findByProfessorId(professorId)).thenReturn(professorCourses);
+        when(courseRepository.findByProfessorId(professorId)).thenReturn(professorCourses);
 
         assertThatCode(() -> lessonValidator.validateCompatibilityCourseAndProfessor(courseId, professorId))
                 .doesNotThrowAnyException();
 
-        verify(courseDao).findByProfessorId(professorId);
+        verify(courseRepository).findByProfessorId(professorId);
     }
 
     @Test
@@ -75,12 +75,12 @@ class LessonValidatorImplTest {
         long professorId = 1;
         long courseId = 3;
 
-        when(courseDao.findByProfessorId(professorId)).thenReturn(professorCourses);
+        when(courseRepository.findByProfessorId(professorId)).thenReturn(professorCourses);
 
         assertThatThrownBy(() -> lessonValidator.validateCompatibilityCourseAndProfessor(courseId, professorId))
                 .hasMessage("Selected professor can`t teach this course");
 
-        verify(courseDao).findByProfessorId(professorId);
+        verify(courseRepository).findByProfessorId(professorId);
     }
 
     @Test
@@ -96,14 +96,14 @@ class LessonValidatorImplTest {
         groupLessons.add(lesson1);
         groupLessons.add(lesson2);
 
-        when(lessonDao.findByGroupId(groupId)).thenReturn(groupLessons);
-        when(lessonDao.findById(lessonId)).thenReturn(Optional.of(addingLesson));
+        when(lessonRepository.findAllByGroupIdOrderByTimeOfStartLesson(groupId)).thenReturn(groupLessons);
+        when(lessonRepository.findById(lessonId)).thenReturn(Optional.of(addingLesson));
 
         assertThatCode(() -> lessonValidator.checkGroupTimeTableCrossing(lessonId, groupId))
                 .doesNotThrowAnyException();
 
-        verify(lessonDao).findByGroupId(groupId);
-        verify(lessonDao).findById(lessonId);
+        verify(lessonRepository).findAllByGroupIdOrderByTimeOfStartLesson(groupId);
+        verify(lessonRepository).findById(lessonId);
     }
 
     @Test
@@ -119,14 +119,14 @@ class LessonValidatorImplTest {
         groupLessons.add(lesson1);
         groupLessons.add(lesson2);
 
-        when(lessonDao.findByGroupId(groupId)).thenReturn(groupLessons);
-        when(lessonDao.findById(lessonId)).thenReturn(Optional.of(addingLesson));
+        when(lessonRepository.findAllByGroupIdOrderByTimeOfStartLesson(groupId)).thenReturn(groupLessons);
+        when(lessonRepository.findById(lessonId)).thenReturn(Optional.of(addingLesson));
 
         assertThatCode(() -> lessonValidator.checkGroupTimeTableCrossing(lessonId, groupId))
                 .doesNotThrowAnyException();
 
-        verify(lessonDao).findByGroupId(groupId);
-        verify(lessonDao).findById(lessonId);
+        verify(lessonRepository).findAllByGroupIdOrderByTimeOfStartLesson(groupId);
+        verify(lessonRepository).findById(lessonId);
     }
 
     @Test
@@ -142,14 +142,14 @@ class LessonValidatorImplTest {
         groupLessons.add(lesson1);
         groupLessons.add(lesson2);
 
-        when(lessonDao.findByGroupId(groupId)).thenReturn(groupLessons);
-        when(lessonDao.findById(lessonId)).thenReturn(Optional.of(addingLesson));
+        when(lessonRepository.findAllByGroupIdOrderByTimeOfStartLesson(groupId)).thenReturn(groupLessons);
+        when(lessonRepository.findById(lessonId)).thenReturn(Optional.of(addingLesson));
 
         assertThatThrownBy(() -> lessonValidator.checkGroupTimeTableCrossing(lessonId, groupId))
                 .hasMessage("Lesson can`t be appointed on this time, cause time of lesson cross timetable of group");
 
-        verify(lessonDao).findByGroupId(groupId);
-        verify(lessonDao).findById(lessonId);
+        verify(lessonRepository).findAllByGroupIdOrderByTimeOfStartLesson(groupId);
+        verify(lessonRepository).findById(lessonId);
     }
 
     @Test
@@ -163,14 +163,14 @@ class LessonValidatorImplTest {
         groupLessons.add(lesson1);
         groupLessons.add(lesson2);
 
-        when(lessonDao.findByGroupId(groupId)).thenReturn(groupLessons);
-        when(lessonDao.findById(lessonId)).thenReturn(Optional.empty());
+        when(lessonRepository.findAllByGroupIdOrderByTimeOfStartLesson(groupId)).thenReturn(groupLessons);
+        when(lessonRepository.findById(lessonId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> lessonValidator.checkGroupTimeTableCrossing(lessonId, groupId))
                 .hasMessage("There are no lesson with id: 2");
 
-        verify(lessonDao).findByGroupId(groupId);
-        verify(lessonDao).findById(lessonId);
+        verify(lessonRepository).findAllByGroupIdOrderByTimeOfStartLesson(groupId);
+        verify(lessonRepository).findById(lessonId);
     }
 
     @Test
@@ -186,14 +186,14 @@ class LessonValidatorImplTest {
         professorLessons.add(lesson1);
         professorLessons.add(lesson2);
 
-        when(lessonDao.findByProfessorId(professorId)).thenReturn(professorLessons);
-        when(lessonDao.findById(lessonId)).thenReturn(Optional.of(addingLesson));
+        when(lessonRepository.findAllByTeacherIdOrderByTimeOfStartLesson(professorId)).thenReturn(professorLessons);
+        when(lessonRepository.findById(lessonId)).thenReturn(Optional.of(addingLesson));
 
         assertThatCode(() -> lessonValidator.checkProfessorTimeTableCrossing(lessonId, professorId))
                 .doesNotThrowAnyException();
 
-        verify(lessonDao).findByProfessorId(professorId);
-        verify(lessonDao).findById(lessonId);
+        verify(lessonRepository).findAllByTeacherIdOrderByTimeOfStartLesson(professorId);
+        verify(lessonRepository).findById(lessonId);
     }
 
     @Test
@@ -210,14 +210,14 @@ class LessonValidatorImplTest {
         professorLessons.add(lesson1);
         professorLessons.add(lesson2);
 
-        when(lessonDao.findByProfessorId(professorId)).thenReturn(professorLessons);
-        when(lessonDao.findById(lessonId)).thenReturn(Optional.of(addingLesson));
+        when(lessonRepository.findAllByTeacherIdOrderByTimeOfStartLesson(professorId)).thenReturn(professorLessons);
+        when(lessonRepository.findById(lessonId)).thenReturn(Optional.of(addingLesson));
 
         assertThatCode(() -> lessonValidator.checkProfessorTimeTableCrossing(lessonId, professorId))
                 .doesNotThrowAnyException();
 
-        verify(lessonDao).findByProfessorId(professorId);
-        verify(lessonDao).findById(lessonId);
+        verify(lessonRepository).findAllByTeacherIdOrderByTimeOfStartLesson(professorId);
+        verify(lessonRepository).findById(lessonId);
     }
 
     @Test
@@ -234,14 +234,14 @@ class LessonValidatorImplTest {
         professorLessons.add(lesson1);
         professorLessons.add(lesson2);
 
-        when(lessonDao.findByProfessorId(professorId)).thenReturn(professorLessons);
-        when(lessonDao.findById(lessonId)).thenReturn(Optional.of(addingLesson));
+        when(lessonRepository.findAllByTeacherIdOrderByTimeOfStartLesson(professorId)).thenReturn(professorLessons);
+        when(lessonRepository.findById(lessonId)).thenReturn(Optional.of(addingLesson));
 
         assertThatThrownBy(() -> lessonValidator.checkProfessorTimeTableCrossing(lessonId, professorId))
                 .hasMessage("Lesson can`t be appointed on this time, cause time of lesson cross timetable of professor");
 
-        verify(lessonDao).findByProfessorId(professorId);
-        verify(lessonDao).findById(lessonId);
+        verify(lessonRepository).findAllByTeacherIdOrderByTimeOfStartLesson(professorId);
+        verify(lessonRepository).findById(lessonId);
     }
 
     @Test
@@ -255,14 +255,14 @@ class LessonValidatorImplTest {
         professorLessons.add(lesson1);
         professorLessons.add(lesson2);
 
-        when(lessonDao.findByProfessorId(professorId)).thenReturn(professorLessons);
-        when(lessonDao.findById(lessonId)).thenReturn(Optional.empty());
+        when(lessonRepository.findAllByTeacherIdOrderByTimeOfStartLesson(professorId)).thenReturn(professorLessons);
+        when(lessonRepository.findById(lessonId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> lessonValidator.checkProfessorTimeTableCrossing(lessonId, professorId))
                 .hasMessage("There are no lesson with id: 2");
 
-        verify(lessonDao).findByProfessorId(professorId);
-        verify(lessonDao).findById(lessonId);
+        verify(lessonRepository).findAllByTeacherIdOrderByTimeOfStartLesson(professorId);
+        verify(lessonRepository).findById(lessonId);
     }
 
 }

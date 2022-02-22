@@ -1,4 +1,4 @@
-insert into departments (id, name) values (1, 'Department of History'), (2, 'Department of Math');
+insert into departments (id, name) values (1, 'Department of History'), (2, 'Department of Math') ,(3, 'Department for deleting');
 insert into formsOfEducation (name) values ('full-time'), ('correspondence'), ('distance'), ('evening');
 insert into groups (name, department_id, formOfEducation_id)
 values ('History Group #1', 1, 1), ('History Group #2', 1, 2), ('History Group #3', 1, 2);
@@ -8,7 +8,8 @@ insert into courses (name, department_id)
 values ('Russia History' ,1),
        ('Italic History', 1),
        ('Germany History', 1),
-       ('France History', 1);
+       ('France History', 1),
+       ('for deleting', 2);
 
 INSERT INTO users (type, first_name, last_name, email, password, group_id)
 VALUES ('student', 'Alexey', 'Chrikov', 'chrikov@gmail.com', '1234', 1),

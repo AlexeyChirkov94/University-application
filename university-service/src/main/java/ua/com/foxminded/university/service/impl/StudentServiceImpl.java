@@ -1,11 +1,12 @@
 package ua.com.foxminded.university.service.impl;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ua.com.foxminded.university.dao.GroupDao;
-import ua.com.foxminded.university.dao.RoleDao;
-import ua.com.foxminded.university.dao.StudentDao;
+import ua.com.foxminded.university.repository.GroupRepository;
+import ua.com.foxminded.university.repository.RoleRepository;
+import ua.com.foxminded.university.repository.StudentRepository;
 import ua.com.foxminded.university.dto.StudentRequest;
 import ua.com.foxminded.university.dto.StudentResponse;
 import ua.com.foxminded.university.entity.Role;
@@ -23,21 +24,21 @@ import java.util.stream.Collectors;
 @Transactional
 public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, StudentResponse> implements StudentService {
 
-    private final StudentDao studentDao;
-    private final GroupDao groupDao;
+    private final StudentRepository studentRepository;
+    private final GroupRepository groupRepository;
     private final StudentMapper studentMapper;
 
-    public StudentServiceImpl(StudentDao studentDao,GroupDao groupDao, PasswordEncoder passwordEncoder, UserValidator userValidator,
-                              StudentMapper studentMapper, RoleDao roleDao) {
-        super(passwordEncoder, studentDao, roleDao, userValidator);
-        this.studentDao = studentDao;
-        this.groupDao = groupDao;
+    public StudentServiceImpl(StudentRepository studentRepository, GroupRepository groupRepository, PasswordEncoder passwordEncoder, UserValidator userValidator,
+                              StudentMapper studentMapper, RoleRepository roleRepository) {
+        super(passwordEncoder, studentRepository, roleRepository, userValidator);
+        this.studentRepository = studentRepository;
+        this.groupRepository = groupRepository;
         this.studentMapper = studentMapper;
     }
 
     @Override
     public StudentResponse findById(long id) {
-        Student student = studentDao.findById(id)
+        Student student = studentRepository.findById(id)
                 .orElseThrow(() -> new EntityDontExistException("There no student with id: " + id));
 
         return studentMapper.mapEntityToDto(student);
@@ -45,18 +46,18 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
 
     @Override
     public List<StudentResponse> findAll(String page) {
-        final long itemsCount = studentDao.count();
+        final long itemsCount = studentRepository.count();
         int pageNumber = parsePageNumber(page, itemsCount, 1);
 
-        return studentDao.findAll(pageNumber, ITEMS_PER_PAGE).stream()
-                .map(studentMapper::mapEntityToDto)
+        return studentRepository.findAll(PageRequest.of(pageNumber - 1, ITEMS_PER_PAGE))
+                .stream().map(studentMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<StudentResponse> findAll() {
 
-        return studentDao.findAll().stream()
+        return studentRepository.findAll().stream()
                 .map(studentMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
@@ -64,7 +65,7 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
     @Override
     public List<StudentResponse> findByGroupId(long groupId) {
 
-        return studentDao.findByGroupId(groupId).stream()
+        return studentRepository.findAllByGroupId(groupId).stream()
                 .map(studentMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
@@ -74,7 +75,7 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
         userValidator.validate(studentRequest);
         studentRequest.setPassword(passwordEncoder.encode(studentRequest.getPassword()));
 
-        studentDao.update(studentMapper.mapDtoToEntity(studentRequest));
+        studentRepository.save(studentMapper.mapDtoToEntity(studentRequest));
 
         if(studentRequest.getGroupId() != 0L){
             changeGroup(studentRequest.getId(), studentRequest.getGroupId());
@@ -84,19 +85,19 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
 
     @Override
     public void deleteById(long id) {
-        if(studentDao.findById(id).isPresent()){
+        if(studentRepository.findById(id).isPresent()){
             removeAllRolesFromUser(id);
-            studentDao.deleteById(id);
+            studentRepository.deleteById(id);
         }
     }
 
     @Override
     public List<StudentResponse> findByEmail(String email) {
-        List<Student> students = studentDao.findByEmail(email);
+        List<Student> students = studentRepository.findAllByEmail(email);
 
         if(!students.isEmpty()){
             StudentResponse studentResponse = studentMapper.mapEntityToDto(students.get(0));
-            studentResponse.setRoles(roleDao.findByUserId(studentResponse.getId()));
+            studentResponse.setRoles(roleRepository.findAllByUserId(studentResponse.getId()));
             return Arrays.asList(studentResponse);
         }
 
@@ -105,8 +106,8 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
 
     @Override
     public boolean leaveGroup(long studentId) {
-        if (studentDao.findById(studentId).isPresent()){
-            studentDao.leaveGroup(studentId);
+        if (studentRepository.findById(studentId).isPresent()){
+            studentRepository.leaveGroup(studentId);
             return true;
         } else {
             return false;
@@ -115,8 +116,8 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
 
     @Override
     public boolean changeGroup(long studentId, long groupId) {
-        if (studentDao.findById(studentId).isPresent() && groupDao.findById(groupId).isPresent()){
-            studentDao.enterGroup(studentId, groupId);
+        if (studentRepository.findById(studentId).isPresent() && groupRepository.findById(groupId).isPresent()){
+            studentRepository.enterGroup(studentId, groupId);
             return true;
         } else {
             return false;
@@ -126,16 +127,16 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
     @Override
     protected StudentResponse registerCertainUser(StudentRequest studentRequest){
         Student studentBeforeSave = studentMapper.mapDtoToEntity(studentRequest);
-        Student studentAfterSave = studentDao.save(studentBeforeSave);
+        Student studentAfterSave = studentRepository.save(studentBeforeSave);
         long studentId = studentAfterSave.getId();
 
         if(studentRequest.getGroupId() != 0L){
             changeGroup(studentId, studentRequest.getGroupId());
         }
 
-        if(roleDao.findByUserId(studentId).isEmpty()) {
+        if(roleRepository.findAllByUserId(studentId).isEmpty()) {
 
-            List<Role> studentRoles = roleDao.findByName("ROLE_STUDENT");
+            List<Role> studentRoles = roleRepository.findAllByName("ROLE_STUDENT");
 
             if (studentRoles.isEmpty()){
                 throw new EntityDontExistException("ROLE_STUDENT not initialized");

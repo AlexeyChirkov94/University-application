@@ -3,7 +3,7 @@
       layout:decorate="~{templates/layout.html}"
       xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Timetable error</title>
+    <title>Error of creating</title>
 </head>
 
 <body>
@@ -14,11 +14,10 @@
 
 <section layout:fragment="page-content">
 
-    <h4 th:text="#{error.timetable.without.group}">Student can`t attend lessons without a group</h4>
+    <h3 th:text="#{error.500.title}">Something went wrong</h3>
+    <h4 th:text="#{error.500.description}">Our Engineers are on it</h4>
 
-    <p th:text="${exception.getMessage()}">VALUE</p>
-
-    <a class="btn btn-info" href="javascript:history.back()" role="button" th:text="#{try.again}">Try again</a>
+    <a class="btn btn-info" href="javascript:history.back()" role="button" th:text="#{go.back}">Go back</a>
 
 </section>
 

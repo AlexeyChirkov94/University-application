@@ -6,8 +6,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ua.com.foxminded.university.dao.FormOfEducationDao;
-import ua.com.foxminded.university.dao.GroupDao;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import ua.com.foxminded.university.repository.FormOfEducationRepository;
+import ua.com.foxminded.university.repository.GroupRepository;
 import ua.com.foxminded.university.dto.FormOfEducationRequest;
 import ua.com.foxminded.university.entity.FormOfEducation;
 import ua.com.foxminded.university.entity.Group;
@@ -28,10 +31,10 @@ import static org.mockito.Mockito.when;
 class FormOfEducationServiceImplTest {
 
     @Mock
-    FormOfEducationDao formOfEducationDao;
+    FormOfEducationRepository formOfEducationRepository;
 
     @Mock
-    GroupDao groupDao;
+    GroupRepository groupRepository;
 
     @Mock
     FormOfEducationMapper formOfEducationMapper;
@@ -45,11 +48,11 @@ class FormOfEducationServiceImplTest {
         FormOfEducationRequest formOfEducationRequest = new FormOfEducationRequest();
         formOfEducationRequest.setName(formOfEducationName);
 
-        when(formOfEducationDao.findByName(formOfEducationName)).thenReturn(Collections.emptyList());
+        when(formOfEducationRepository.findAllByName(formOfEducationName)).thenReturn(Collections.emptyList());
 
         formOfEducationService.create(formOfEducationRequest);
 
-        verify(formOfEducationDao).findByName(formOfEducationName);
+        verify(formOfEducationRepository).findAllByName(formOfEducationName);
     }
 
     @Test
@@ -58,56 +61,56 @@ class FormOfEducationServiceImplTest {
         FormOfEducationRequest formOfEducationRequest = new FormOfEducationRequest();
         formOfEducationRequest.setName(formOfEducationName);
 
-        when(formOfEducationDao.findByName(formOfEducationName)).thenReturn(Arrays.asList(FormOfEducation.builder()
+        when(formOfEducationRepository.findAllByName(formOfEducationName)).thenReturn(Arrays.asList(FormOfEducation.builder()
                 .withName(formOfEducationName).build()));
 
         assertThatThrownBy(() -> formOfEducationService.create(formOfEducationRequest)).hasMessage("Form of education with same name already exist");
 
-        verify(formOfEducationDao).findByName(formOfEducationName);
+        verify(formOfEducationRepository).findAllByName(formOfEducationName);
     }
 
     @Test
     void findByIdShouldReturnFormOfEducationResponseIfArgumentIsFormOfEducationId() {
         long formOfEducationId = 1;
 
-        when(formOfEducationDao.findById(formOfEducationId)).thenReturn(Optional.of(FormOfEducation.builder().withId(1L).build()));
+        when(formOfEducationRepository.findById(formOfEducationId)).thenReturn(Optional.of(FormOfEducation.builder().withId(1L).build()));
 
         formOfEducationService.findById(formOfEducationId);
 
-        verify(formOfEducationDao).findById(formOfEducationId);
+        verify(formOfEducationRepository).findById(formOfEducationId);
     }
 
     @Test
     void findByIdShouldThrowExceptionIfFormOfEducationNotExistIfArgumentIsFormOfEducationId() {
         long formOfEducationId = 1;
 
-        when(formOfEducationDao.findById(formOfEducationId)).thenReturn(Optional.empty());
+        when(formOfEducationRepository.findById(formOfEducationId)).thenReturn(Optional.empty());
 
         AssertionsForClassTypes.assertThatThrownBy(() -> formOfEducationService.findById(formOfEducationId)).hasMessage("There no form of education with id: 1");
 
-        verify(formOfEducationDao).findById(formOfEducationId);
+        verify(formOfEducationRepository).findById(formOfEducationId);
     }
 
     @Test
     void findAllIdShouldReturnListOfFormOfEducationResponseIfArgumentIsPageNumber() {
         String pageNumber = "2";
 
-        when(formOfEducationDao.count()).thenReturn(11L);
-        when(formOfEducationDao.findAll(2, 5)).thenReturn(Arrays.asList(FormOfEducation.builder().withId(1L).build()));
+        when(formOfEducationRepository.count()).thenReturn(11L);
+        when(formOfEducationRepository.findAll(PageRequest.of(1, 5, Sort.by("id")))).thenReturn(new PageImpl(Collections.singletonList(FormOfEducation.builder().withId(1L).build())));
 
         formOfEducationService.findAll(pageNumber);
 
-        verify(formOfEducationDao).count();
-        verify(formOfEducationDao).findAll(2, 5);
+        verify(formOfEducationRepository).count();
+        verify(formOfEducationRepository).findAll(PageRequest.of(1, 5, Sort.by("id")));
     }
 
     @Test
     void findAllIdShouldReturnListOfFormOfEducationResponseNoArguments() {
-        when(formOfEducationDao.findAll()).thenReturn(Arrays.asList(FormOfEducation.builder().withId(1L).build()));
+        when(formOfEducationRepository.findAll(Sort.by("id"))).thenReturn(Arrays.asList(FormOfEducation.builder().withId(1L).build()));
 
         formOfEducationService.findAll();
 
-        verify(formOfEducationDao).findAll();
+        verify(formOfEducationRepository).findAll(Sort.by("id"));
     }
 
     @Test
@@ -117,12 +120,12 @@ class FormOfEducationServiceImplTest {
         formOfEducationRequest.setId(1L);
 
         when(formOfEducationMapper.mapDtoToEntity(formOfEducationRequest)).thenReturn(formOfEducation);
-        doNothing().when(formOfEducationDao).update(formOfEducation);
+        when(formOfEducationRepository.save(formOfEducation)).thenReturn(formOfEducation);
 
         formOfEducationService.edit(formOfEducationRequest);
 
         verify(formOfEducationMapper).mapDtoToEntity(formOfEducationRequest);
-        verify(formOfEducationDao).update(formOfEducation);
+        verify(formOfEducationRepository).save(formOfEducation);
     }
 
     @Test
@@ -132,33 +135,33 @@ class FormOfEducationServiceImplTest {
         Group group2 = Group.builder().withId(2L).build();
         List<Group> formOfEducationGroups = Arrays.asList(group1, group2);
 
-        when(formOfEducationDao.findById(formOfEducationId)).thenReturn(Optional.of(FormOfEducation.builder().withId(formOfEducationId).build()));
-        when(groupDao.findByFormOfEducation(formOfEducationId)).thenReturn(formOfEducationGroups);
-        doNothing().when(groupDao).removeFormOfEducationFromGroup(1L);
-        doNothing().when(groupDao).removeFormOfEducationFromGroup(2L);
-        doNothing().when(formOfEducationDao).deleteById(formOfEducationId);
+        when(formOfEducationRepository.findById(formOfEducationId)).thenReturn(Optional.of(FormOfEducation.builder().withId(formOfEducationId).build()));
+        when(groupRepository.findAllByFormOfEducationIdOrderById(formOfEducationId)).thenReturn(formOfEducationGroups);
+        doNothing().when(groupRepository).removeFormOfEducationFromGroup(1L);
+        doNothing().when(groupRepository).removeFormOfEducationFromGroup(2L);
+        doNothing().when(formOfEducationRepository).deleteById(formOfEducationId);
 
 
         formOfEducationService.deleteById(formOfEducationId);
 
-        verify(formOfEducationDao).findById(formOfEducationId);
-        verify(groupDao).findByFormOfEducation(formOfEducationId);
-        verify(groupDao).removeFormOfEducationFromGroup(1L);
-        verify(groupDao).removeFormOfEducationFromGroup(2L);
-        verify(formOfEducationDao).deleteById(formOfEducationId);
-        verifyNoMoreInteractions(groupDao);
-        verifyNoMoreInteractions(formOfEducationDao);
+        verify(formOfEducationRepository).findById(formOfEducationId);
+        verify(groupRepository).findAllByFormOfEducationIdOrderById(formOfEducationId);
+        verify(groupRepository).removeFormOfEducationFromGroup(1L);
+        verify(groupRepository).removeFormOfEducationFromGroup(2L);
+        verify(formOfEducationRepository).deleteById(formOfEducationId);
+        verifyNoMoreInteractions(groupRepository);
+        verifyNoMoreInteractions(formOfEducationRepository);
     }
 
     @Test
     void deleteShouldDoNothingIfArgumentFormOfEducationDontExist() {
         long formOfEducationId = 1;
 
-        when(formOfEducationDao.findById(formOfEducationId)).thenReturn(Optional.empty());
+        when(formOfEducationRepository.findById(formOfEducationId)).thenReturn(Optional.empty());
 
         formOfEducationService.deleteById(formOfEducationId);
 
-        verify(formOfEducationDao).findById(formOfEducationId);
+        verify(formOfEducationRepository).findById(formOfEducationId);
     }
 
 }

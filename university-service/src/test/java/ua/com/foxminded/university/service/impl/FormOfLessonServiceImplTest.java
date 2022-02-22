@@ -6,8 +6,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ua.com.foxminded.university.dao.FormOfLessonDao;
-import ua.com.foxminded.university.dao.LessonDao;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import ua.com.foxminded.university.repository.FormOfLessonRepository;
+import ua.com.foxminded.university.repository.LessonRepository;
 import ua.com.foxminded.university.dto.FormOfLessonRequest;
 import ua.com.foxminded.university.entity.FormOfLesson;
 import ua.com.foxminded.university.entity.Lesson;
@@ -28,10 +31,10 @@ import static org.mockito.Mockito.when;
 class FormOfLessonServiceImplTest {
 
     @Mock
-    FormOfLessonDao formOfLessonDao;
+    FormOfLessonRepository formOfLessonRepository;
 
     @Mock
-    LessonDao lessonDao;
+    LessonRepository lessonRepository;
 
     @Mock
     FormOfLessonMapper formOfLessonMapper;
@@ -45,11 +48,11 @@ class FormOfLessonServiceImplTest {
         FormOfLessonRequest formOfLessonRequest = new FormOfLessonRequest();
         formOfLessonRequest.setName(formOfLessonName);
 
-        when(formOfLessonDao.findByName(formOfLessonName)).thenReturn(Collections.emptyList());
+        when(formOfLessonRepository.findAllByName(formOfLessonName)).thenReturn(Collections.emptyList());
 
         formOfLessonService.create(formOfLessonRequest);
 
-        verify(formOfLessonDao).findByName(formOfLessonName);
+        verify(formOfLessonRepository).findAllByName(formOfLessonName);
     }
 
     @Test
@@ -58,55 +61,55 @@ class FormOfLessonServiceImplTest {
         FormOfLessonRequest formOfLessonRequest = new FormOfLessonRequest();
         formOfLessonRequest.setName(formOfLessonName);
 
-        when(formOfLessonDao.findByName(formOfLessonName)).thenReturn(Arrays.asList(FormOfLesson.builder().withName(formOfLessonName).build()));
+        when(formOfLessonRepository.findAllByName(formOfLessonName)).thenReturn(Arrays.asList(FormOfLesson.builder().withName(formOfLessonName).build()));
 
         assertThatThrownBy(() -> formOfLessonService.create(formOfLessonRequest)).hasMessage("Form of lesson with same name already exist");
 
-        verify(formOfLessonDao).findByName(formOfLessonName);
+        verify(formOfLessonRepository).findAllByName(formOfLessonName);
     }
 
     @Test
     void findByIdShouldReturnFormOfLessonResponseIfArgumentIsFormOfLessonId() {
         long formOfLessonId = 1;
 
-        when(formOfLessonDao.findById(formOfLessonId)).thenReturn(Optional.of(FormOfLesson.builder().withId(1L).build()));
+        when(formOfLessonRepository.findById(formOfLessonId)).thenReturn(Optional.of(FormOfLesson.builder().withId(1L).build()));
 
         formOfLessonService.findById(formOfLessonId);
 
-        verify(formOfLessonDao).findById(formOfLessonId);
+        verify(formOfLessonRepository).findById(formOfLessonId);
     }
 
     @Test
     void findByIdShouldThrowExceptionIfFormOfLessonNotExistIfArgumentIsFormOfLessonId() {
         long formOfLessonId = 1;
 
-        when(formOfLessonDao.findById(formOfLessonId)).thenReturn(Optional.empty());
+        when(formOfLessonRepository.findById(formOfLessonId)).thenReturn(Optional.empty());
 
         AssertionsForClassTypes.assertThatThrownBy(() -> formOfLessonService.findById(formOfLessonId)).hasMessage("There no form of lesson with id: 1");
 
-        verify(formOfLessonDao).findById(formOfLessonId);
+        verify(formOfLessonRepository).findById(formOfLessonId);
     }
 
     @Test
     void findAllIdShouldReturnListOfFormOfLessonResponseIfArgumentIsPageNumber() {
         String pageNumber = "2";
 
-        when(formOfLessonDao.count()).thenReturn(11L);
-        when(formOfLessonDao.findAll(2, 5)).thenReturn(Arrays.asList(FormOfLesson.builder().withId(1L).build()));
+        when(formOfLessonRepository.count()).thenReturn(11L);
+        when(formOfLessonRepository.findAll(PageRequest.of(1, 5, Sort.by("id")))).thenReturn(new PageImpl(Collections.singletonList(FormOfLesson.builder().withId(1L).build())));
 
         formOfLessonService.findAll(pageNumber);
 
-        verify(formOfLessonDao).count();
-        verify(formOfLessonDao).findAll(2, 5);
+        verify(formOfLessonRepository).count();
+        verify(formOfLessonRepository).findAll(PageRequest.of(1, 5, Sort.by("id")));
     }
 
     @Test
     void findAllIdShouldReturnListOfFormOfLessonResponseNoArguments() {
-        when(formOfLessonDao.findAll()).thenReturn(Arrays.asList(FormOfLesson.builder().withId(1L).build()));
+        when(formOfLessonRepository.findAll(Sort.by("id"))).thenReturn(Arrays.asList(FormOfLesson.builder().withId(1L).build()));
 
         formOfLessonService.findAll();
 
-        verify(formOfLessonDao).findAll();
+        verify(formOfLessonRepository).findAll(Sort.by("id"));
     }
 
     @Test
@@ -116,12 +119,12 @@ class FormOfLessonServiceImplTest {
         formOfLessonRequest.setId(1L);
 
         when(formOfLessonMapper.mapDtoToEntity(formOfLessonRequest)).thenReturn(formOfLesson);
-        doNothing().when(formOfLessonDao).update(formOfLesson);
+        when(formOfLessonRepository.save(formOfLesson)).thenReturn(formOfLesson);
 
         formOfLessonService.edit(formOfLessonRequest);
 
         verify(formOfLessonMapper).mapDtoToEntity(formOfLessonRequest);
-        verify(formOfLessonDao).update(formOfLesson);
+        verify(formOfLessonRepository).save(formOfLesson);
     }
 
     @Test
@@ -131,32 +134,32 @@ class FormOfLessonServiceImplTest {
         Lesson lesson2 = Lesson.builder().withId(2L).build();
         List<Lesson> formOfLessonLessons = Arrays.asList(lesson1, lesson2);
 
-        when(formOfLessonDao.findById(formOfLessonId)).thenReturn(Optional.of(FormOfLesson.builder().withId(formOfLessonId).build()));
-        when(lessonDao.findByFormOfLessonId(1L)).thenReturn(formOfLessonLessons);
-        doNothing().when(lessonDao).removeFormOfLessonFromLesson(1L);
-        doNothing().when(lessonDao).removeFormOfLessonFromLesson(2L);
-        doNothing().when(formOfLessonDao).deleteById(formOfLessonId);
+        when(formOfLessonRepository.findById(formOfLessonId)).thenReturn(Optional.of(FormOfLesson.builder().withId(formOfLessonId).build()));
+        when(lessonRepository.findAllByFormOfLessonIdOrderByTimeOfStartLesson(1L)).thenReturn(formOfLessonLessons);
+        doNothing().when(lessonRepository).removeFormOfLessonFromLesson(1L);
+        doNothing().when(lessonRepository).removeFormOfLessonFromLesson(2L);
+        doNothing().when(formOfLessonRepository).deleteById(formOfLessonId);
 
         formOfLessonService.deleteById(formOfLessonId);
 
-        verify(formOfLessonDao).findById(formOfLessonId);
-        verify(lessonDao).findByFormOfLessonId(1L);
-        verify(lessonDao).removeFormOfLessonFromLesson(1L);
-        verify(lessonDao).removeFormOfLessonFromLesson(2L);
-        verify(formOfLessonDao).deleteById(formOfLessonId);
-        verifyNoMoreInteractions(formOfLessonDao);
-        verifyNoMoreInteractions(lessonDao);
+        verify(formOfLessonRepository).findById(formOfLessonId);
+        verify(lessonRepository).findAllByFormOfLessonIdOrderByTimeOfStartLesson(1L);
+        verify(lessonRepository).removeFormOfLessonFromLesson(1L);
+        verify(lessonRepository).removeFormOfLessonFromLesson(2L);
+        verify(formOfLessonRepository).deleteById(formOfLessonId);
+        verifyNoMoreInteractions(formOfLessonRepository);
+        verifyNoMoreInteractions(lessonRepository);
     }
 
     @Test
     void deleteShouldDoNothingIfArgumentFormOfLessonDontExist() {
         long formOfLessonId = 1;
 
-        when(formOfLessonDao.findById(formOfLessonId)).thenReturn(Optional.empty());
+        when(formOfLessonRepository.findById(formOfLessonId)).thenReturn(Optional.empty());
 
         formOfLessonService.deleteById(formOfLessonId);
 
-        verify(formOfLessonDao).findById(formOfLessonId);
+        verify(formOfLessonRepository).findById(formOfLessonId);
     }
 
 }

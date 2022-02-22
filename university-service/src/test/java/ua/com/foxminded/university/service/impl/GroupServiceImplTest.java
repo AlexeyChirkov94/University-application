@@ -6,11 +6,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ua.com.foxminded.university.dao.DepartmentDao;
-import ua.com.foxminded.university.dao.FormOfEducationDao;
-import ua.com.foxminded.university.dao.GroupDao;
-import ua.com.foxminded.university.dao.LessonDao;
-import ua.com.foxminded.university.dao.StudentDao;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import ua.com.foxminded.university.repository.DepartmentRepository;
+import ua.com.foxminded.university.repository.FormOfEducationRepository;
+import ua.com.foxminded.university.repository.GroupRepository;
+import ua.com.foxminded.university.repository.LessonRepository;
+import ua.com.foxminded.university.repository.StudentRepository;
 import ua.com.foxminded.university.dto.GroupRequest;
 import ua.com.foxminded.university.entity.Department;
 import ua.com.foxminded.university.entity.FormOfEducation;
@@ -34,22 +37,22 @@ import static org.mockito.Mockito.when;
 class GroupServiceImplTest {
 
     @Mock
-    GroupDao groupDao;
+    GroupRepository groupRepository;
 
     @Mock
-    StudentDao studentDao;
+    StudentRepository studentRepository;
 
     @Mock
-    LessonDao lessonDao;
+    LessonRepository lessonRepository;
 
     @Mock
-    DepartmentDao departmentDao;
+    DepartmentRepository departmentRepository;
 
     @Mock
     GroupMapper groupMapper;
 
     @Mock
-    FormOfEducationDao formOfEducationDao;
+    FormOfEducationRepository formOfEducationRepository;
 
     @InjectMocks
     GroupServiceImpl groupService;
@@ -60,28 +63,28 @@ class GroupServiceImplTest {
         long groupId = 1;
         long formOfEducationId = 2;
 
-        when(groupDao.findById(groupId)).thenReturn(Optional.of(Group.builder().withId(groupId).build()));
-        when(formOfEducationDao.findById(formOfEducationId)).thenReturn(Optional.of(FormOfEducation.builder().withId(formOfEducationId).build()));
-        doNothing().when(groupDao).changeFormOfEducation(groupId, formOfEducationId);
+        when(groupRepository.findById(groupId)).thenReturn(Optional.of(Group.builder().withId(groupId).build()));
+        when(formOfEducationRepository.findById(formOfEducationId)).thenReturn(Optional.of(FormOfEducation.builder().withId(formOfEducationId).build()));
+        doNothing().when(groupRepository).changeFormOfEducation(groupId, formOfEducationId);
 
         groupService.changeFormOfEducation(groupId, formOfEducationId);
 
-        verify(groupDao).findById(groupId);
-        verify(formOfEducationDao).findById(formOfEducationId);
-        verify(groupDao).changeFormOfEducation(groupId, formOfEducationId);
+        verify(groupRepository).findById(groupId);
+        verify(formOfEducationRepository).findById(formOfEducationId);
+        verify(groupRepository).changeFormOfEducation(groupId, formOfEducationId);
     }
 
     @Test
     void removeFormOfEducationFromGroupShouldRemoveFormOfEducationIfArgumentsIsGroupId() {
         long groupId = 1;
 
-        when(groupDao.findById(groupId)).thenReturn(Optional.of(Group.builder().withId(groupId).build()));
-        doNothing().when(groupDao).removeFormOfEducationFromGroup(groupId);
+        when(groupRepository.findById(groupId)).thenReturn(Optional.of(Group.builder().withId(groupId).build()));
+        doNothing().when(groupRepository).removeFormOfEducationFromGroup(groupId);
 
         groupService.removeFormOfEducationFromGroup(groupId);
 
-        verify(groupDao).findById(groupId);
-        verify(groupDao).removeFormOfEducationFromGroup(groupId);
+        verify(groupRepository).findById(groupId);
+        verify(groupRepository).removeFormOfEducationFromGroup(groupId);
     }
 
     @Test
@@ -89,11 +92,11 @@ class GroupServiceImplTest {
         long groupId = 1;
         long formOfEducationId = 2;
 
-        when(groupDao.findById(groupId)).thenReturn(Optional.empty());
+        when(groupRepository.findById(groupId)).thenReturn(Optional.empty());
 
         Assertions.assertThatThrownBy(() -> groupService.changeFormOfEducation(groupId, formOfEducationId)).hasMessage("There no group with this id:1");
 
-        verify(groupDao).findById(groupId);
+        verify(groupRepository).findById(groupId);
     }
 
     @Test
@@ -101,13 +104,13 @@ class GroupServiceImplTest {
         long groupId = 1;
         long formOfEducationId = 2;
 
-        when(groupDao.findById(groupId)).thenReturn(Optional.of(Group.builder().withId(groupId).build()));
-        when(formOfEducationDao.findById(formOfEducationId)).thenReturn(Optional.empty());
+        when(groupRepository.findById(groupId)).thenReturn(Optional.of(Group.builder().withId(groupId).build()));
+        when(formOfEducationRepository.findById(formOfEducationId)).thenReturn(Optional.empty());
 
         Assertions.assertThatThrownBy(() -> groupService.changeFormOfEducation(groupId, formOfEducationId)).hasMessage("There no formOfEducation with this id:2");
 
-        verify(groupDao).findById(groupId);
-        verify(formOfEducationDao).findById(formOfEducationId);
+        verify(groupRepository).findById(groupId);
+        verify(formOfEducationRepository).findById(formOfEducationId);
     }
 
     @Test
@@ -115,28 +118,28 @@ class GroupServiceImplTest {
         long groupId = 1;
         long departmentId = 1;
 
-        when(groupDao.findById(groupId)).thenReturn(Optional.of(Group.builder().withId(groupId).build()));
-        when(departmentDao.findById(departmentId)).thenReturn(Optional.of(Department.builder().withId(departmentId).build()));
-        doNothing().when(groupDao).changeDepartment(groupId, departmentId);
+        when(groupRepository.findById(groupId)).thenReturn(Optional.of(Group.builder().withId(groupId).build()));
+        when(departmentRepository.findById(departmentId)).thenReturn(Optional.of(Department.builder().withId(departmentId).build()));
+        doNothing().when(groupRepository).changeDepartment(groupId, departmentId);
 
         groupService.changeDepartment(groupId, departmentId);
 
-        verify(groupDao).findById(groupId);
-        verify(departmentDao).findById(departmentId);
-        verify(groupDao).changeDepartment(groupId, departmentId);
+        verify(groupRepository).findById(groupId);
+        verify(departmentRepository).findById(departmentId);
+        verify(groupRepository).changeDepartment(groupId, departmentId);
     }
 
     @Test
     void removeDepartmentFromGroupShouldRemoveDepartmentIfArgumentsIsGroupId() {
         long groupId = 1;
 
-        when(groupDao.findById(groupId)).thenReturn(Optional.of(Group.builder().withId(groupId).build()));
-        doNothing().when(groupDao).removeDepartmentFromGroup(groupId);
+        when(groupRepository.findById(groupId)).thenReturn(Optional.of(Group.builder().withId(groupId).build()));
+        doNothing().when(groupRepository).removeDepartmentFromGroup(groupId);
 
         groupService.removeDepartmentFromGroup(groupId);
 
-        verify(groupDao).findById(groupId);
-        verify(groupDao).removeDepartmentFromGroup(groupId);
+        verify(groupRepository).findById(groupId);
+        verify(groupRepository).removeDepartmentFromGroup(groupId);
     }
 
     @Test
@@ -144,11 +147,11 @@ class GroupServiceImplTest {
         long groupId = 1;
         long departmentId = 2;
 
-        when(groupDao.findById(groupId)).thenReturn(Optional.empty());
+        when(groupRepository.findById(groupId)).thenReturn(Optional.empty());
 
         Assertions.assertThatThrownBy(() -> groupService.changeDepartment(groupId, departmentId)).hasMessage("There no group with this id:1");
 
-        verify(groupDao).findById(groupId);
+        verify(groupRepository).findById(groupId);
     }
 
     @Test
@@ -156,13 +159,13 @@ class GroupServiceImplTest {
         long groupId = 1;
         long departmentId = 2;
 
-        when(groupDao.findById(groupId)).thenReturn(Optional.of(Group.builder().withId(groupId).build()));
-        when(departmentDao.findById(departmentId)).thenReturn(Optional.empty());
+        when(groupRepository.findById(groupId)).thenReturn(Optional.of(Group.builder().withId(groupId).build()));
+        when(departmentRepository.findById(departmentId)).thenReturn(Optional.empty());
 
         Assertions.assertThatThrownBy(() -> groupService.changeDepartment(groupId, departmentId)).hasMessage("There no department with this id:2");
 
-        verify(groupDao).findById(groupId);
-        verify(departmentDao).findById(departmentId);
+        verify(groupRepository).findById(groupId);
+        verify(departmentRepository).findById(departmentId);
     }
 
     @Test
@@ -176,25 +179,25 @@ class GroupServiceImplTest {
         groupRequest.setDepartmentId(1L);
         groupRequest.setFormOfEducationId(1L);
 
-        when(groupDao.findByName(groupName)).thenReturn(Collections.emptyList());
+        when(groupRepository.findAllByName(groupName)).thenReturn(Collections.emptyList());
         when(groupMapper.mapDtoToEntity(groupRequest)).thenReturn(group);
-        when(groupDao.save(group)).thenReturn(group);
-        when(groupDao.findById(1L)).thenReturn(Optional.of(group));
-        when(departmentDao.findById(1L)).thenReturn(Optional.of(department));
-        doNothing().when(groupDao).changeDepartment(1L, 1L);
-        when(formOfEducationDao.findById(1L)).thenReturn(Optional.of(formOfEducation));
-        doNothing().when(groupDao).changeFormOfEducation(1L, 1L);
+        when(groupRepository.save(group)).thenReturn(group);
+        when(groupRepository.findById(1L)).thenReturn(Optional.of(group));
+        when(departmentRepository.findById(1L)).thenReturn(Optional.of(department));
+        doNothing().when(groupRepository).changeDepartment(1L, 1L);
+        when(formOfEducationRepository.findById(1L)).thenReturn(Optional.of(formOfEducation));
+        doNothing().when(groupRepository).changeFormOfEducation(1L, 1L);
 
         groupService.create(groupRequest);
 
-        verify(groupDao).findByName(groupName);
+        verify(groupRepository).findAllByName(groupName);
         verify(groupMapper).mapDtoToEntity(groupRequest);
-        verify(groupDao).save(group);
-        verify(groupDao, times(2)).findById(1L);
-        verify(departmentDao).findById(1L);
-        verify(groupDao).changeDepartment(1L, 1L);
-        verify(formOfEducationDao).findById(1L);
-        verify(groupDao).findByName(groupName);
+        verify(groupRepository).save(group);
+        verify(groupRepository, times(2)).findById(1L);
+        verify(departmentRepository).findById(1L);
+        verify(groupRepository).changeDepartment(1L, 1L);
+        verify(formOfEducationRepository).findById(1L);
+        verify(groupRepository).findAllByName(groupName);
     }
 
     @Test
@@ -206,15 +209,15 @@ class GroupServiceImplTest {
         groupRequest.setDepartmentId(0L);
         groupRequest.setFormOfEducationId(0L);
 
-        when(groupDao.findByName(groupName)).thenReturn(Collections.emptyList());
+        when(groupRepository.findAllByName(groupName)).thenReturn(Collections.emptyList());
         when(groupMapper.mapDtoToEntity(groupRequest)).thenReturn(group);
-        when(groupDao.save(group)).thenReturn(group);
+        when(groupRepository.save(group)).thenReturn(group);
 
         groupService.create(groupRequest);
 
-        verify(groupDao).findByName(groupName);
+        verify(groupRepository).findAllByName(groupName);
         verify(groupMapper).mapDtoToEntity(groupRequest);
-        verify(groupDao).save(group);
+        verify(groupRepository).save(group);
     }
 
     @Test
@@ -223,33 +226,33 @@ class GroupServiceImplTest {
         GroupRequest groupRequest = new GroupRequest();
         groupRequest.setName(groupName);
 
-        when(groupDao.findByName(groupName)).thenReturn(Arrays.asList(Group.builder().withName(groupName).build()));
+        when(groupRepository.findAllByName(groupName)).thenReturn(Arrays.asList(Group.builder().withName(groupName).build()));
 
         assertThatThrownBy(() -> groupService.create(groupRequest)).hasMessage("Group with same name already exist");
 
-        verify(groupDao).findByName(groupName);
+        verify(groupRepository).findAllByName(groupName);
     }
 
     @Test
     void findByIdShouldReturnGroupResponseIfArgumentIsGroupId() {
         long groupId = 1;
 
-        when(groupDao.findById(groupId)).thenReturn(Optional.of(Group.builder().withId(1L).build()));
+        when(groupRepository.findById(groupId)).thenReturn(Optional.of(Group.builder().withId(1L).build()));
 
         groupService.findById(groupId);
 
-        verify(groupDao).findById(groupId);
+        verify(groupRepository).findById(groupId);
     }
 
     @Test
     void findByIdShouldThrowExceptionIfGroupNotExist() {
         long groupId = 1;
 
-        when(groupDao.findById(groupId)).thenReturn(Optional.empty());
+        when(groupRepository.findById(groupId)).thenReturn(Optional.empty());
 
         Assertions.assertThatThrownBy(() -> groupService.findById(groupId)).hasMessage("There no group with id: 1");
 
-        verify(groupDao).findById(groupId);
+        verify(groupRepository).findById(groupId);
     }
 
     @Test
@@ -259,13 +262,13 @@ class GroupServiceImplTest {
         Group group2 = Group.builder().withId(2L).build();
         List<Group> formOfEducationGroups = Arrays.asList(group1, group2);
 
-        when(formOfEducationDao.findById(formOfEducationId)).thenReturn(Optional.of(FormOfEducation.builder().withId(1L).build()));
-        when(groupDao.findByFormOfEducation(formOfEducationId)).thenReturn(formOfEducationGroups);
+        when(formOfEducationRepository.findById(formOfEducationId)).thenReturn(Optional.of(FormOfEducation.builder().withId(1L).build()));
+        when(groupRepository.findAllByFormOfEducationIdOrderById(formOfEducationId)).thenReturn(formOfEducationGroups);
 
         groupService.findByFormOfEducation(formOfEducationId);
 
-        verify(groupDao).findByFormOfEducation(formOfEducationId);
-        verify(formOfEducationDao).findById(formOfEducationId);
+        verify(groupRepository).findAllByFormOfEducationIdOrderById(formOfEducationId);
+        verify(formOfEducationRepository).findById(formOfEducationId);
     }
 
     @Test
@@ -275,35 +278,35 @@ class GroupServiceImplTest {
         Group group2 = Group.builder().withId(2L).build();
         List<Group> formOfEducationGroups = Arrays.asList(group1, group2);
 
-        when(departmentDao.findById(departmentId)).thenReturn(Optional.of(Department.builder().withId(2L).build()));
-        when(groupDao.findByDepartmentId(departmentId)).thenReturn(formOfEducationGroups);
+        when(departmentRepository.findById(departmentId)).thenReturn(Optional.of(Department.builder().withId(2L).build()));
+        when(groupRepository.findAllByDepartmentIdOrderById(departmentId)).thenReturn(formOfEducationGroups);
 
         groupService.findByDepartmentId(departmentId);
 
-        verify(departmentDao).findById(departmentId);
-        verify(groupDao).findByDepartmentId(departmentId);
+        verify(departmentRepository).findById(departmentId);
+        verify(groupRepository).findAllByDepartmentIdOrderById(departmentId);
     }
 
     @Test
     void findAllIdShouldReturnListOfGroupResponseIfArgumentIsPageNumber() {
         String pageNumber = "2";
 
-        when(groupDao.count()).thenReturn(11L);
-        when(groupDao.findAll(2, 5)).thenReturn(Arrays.asList(Group.builder().withId(1L).build()));
+        when(groupRepository.count()).thenReturn(11L);
+        when(groupRepository.findAll(PageRequest.of(1, 5, Sort.by("id")))).thenReturn(new PageImpl(Collections.singletonList(Group.builder().withId(1L).build())));
 
         groupService.findAll(pageNumber);
 
-        verify(groupDao).count();
-        verify(groupDao).findAll(2, 5);
+        verify(groupRepository).count();
+        verify(groupRepository).findAll(PageRequest.of(1, 5, Sort.by("id")));
     }
 
     @Test
     void findAllIdShouldReturnListOfGroupResponseNoArguments() {
-        when(groupDao.findAll()).thenReturn(Arrays.asList(Group.builder().withId(1L).build()));
+        when(groupRepository.findAll(Sort.by("id"))).thenReturn(Arrays.asList(Group.builder().withId(1L).build()));
 
         groupService.findAll();
 
-        verify(groupDao).findAll();
+        verify(groupRepository).findAll(Sort.by("id"));
     }
 
     @Test
@@ -319,22 +322,22 @@ class GroupServiceImplTest {
         groupRequest.setFormOfEducationId(1L);
 
         when(groupMapper.mapDtoToEntity(groupRequest)).thenReturn(group);
-        doNothing().when(groupDao).update(group);
-        when(groupDao.findById(1L)).thenReturn(Optional.of(group));
-        when(departmentDao.findById(1L)).thenReturn(Optional.of(department));
-        doNothing().when(groupDao).changeDepartment(1L, 1L);
-        when(formOfEducationDao.findById(1L)).thenReturn(Optional.of(formOfEducation));
-        doNothing().when(groupDao).changeFormOfEducation(1L, 1L);
+        when(groupRepository.save(group)).thenReturn(group);
+        when(groupRepository.findById(1L)).thenReturn(Optional.of(group));
+        when(departmentRepository.findById(1L)).thenReturn(Optional.of(department));
+        doNothing().when(groupRepository).changeDepartment(1L, 1L);
+        when(formOfEducationRepository.findById(1L)).thenReturn(Optional.of(formOfEducation));
+        doNothing().when(groupRepository).changeFormOfEducation(1L, 1L);
 
         groupService.edit(groupRequest);
 
         verify(groupMapper).mapDtoToEntity(groupRequest);
-        verify(groupDao).update(group);
-        verify(groupDao ,times(2)).findById(1L);
-        verify(departmentDao).findById(1L);
-        verify(groupDao).changeDepartment(1L, 1L);
-        verify(formOfEducationDao).findById(1L);
-        verify(groupDao).changeFormOfEducation(1L, 1L);
+        verify(groupRepository).save(group);
+        verify(groupRepository,times(2)).findById(1L);
+        verify(departmentRepository).findById(1L);
+        verify(groupRepository).changeDepartment(1L, 1L);
+        verify(formOfEducationRepository).findById(1L);
+        verify(groupRepository).changeFormOfEducation(1L, 1L);
     }
 
     @Test
@@ -346,12 +349,12 @@ class GroupServiceImplTest {
         groupRequest.setFormOfEducationId(0L);
 
         when(groupMapper.mapDtoToEntity(groupRequest)).thenReturn(group);
-        doNothing().when(groupDao).update(group);
+        when(groupRepository.save(group)).thenReturn(group);
 
         groupService.edit(groupRequest);
 
         verify(groupMapper).mapDtoToEntity(groupRequest);
-        verify(groupDao).update(group);
+        verify(groupRepository).save(group);
     }
 
     @Test
@@ -364,36 +367,36 @@ class GroupServiceImplTest {
         Lesson lesson2 = Lesson.builder().withId(2L).build();
         List<Lesson> groupLessons = Arrays.asList(lesson1, lesson2);
 
-        when(groupDao.findById(groupId)).thenReturn(Optional.of(Group.builder().withId(groupId).build()));
-        doNothing().when(groupDao).deleteById(groupId);
-        when(studentDao.findByGroupId(1L)).thenReturn(groupsStudents);
-        doNothing().when(studentDao).leaveGroup(1L);
-        doNothing().when(studentDao).leaveGroup(2L);
-        when(lessonDao.findByGroupId(1L)).thenReturn(groupLessons);
-        doNothing().when(lessonDao).removeGroupFromLesson(1L);
-        doNothing().when(lessonDao).removeGroupFromLesson(2L);
+        when(groupRepository.findById(groupId)).thenReturn(Optional.of(Group.builder().withId(groupId).build()));
+        doNothing().when(groupRepository).deleteById(groupId);
+        when(studentRepository.findAllByGroupId(1L)).thenReturn(groupsStudents);
+        doNothing().when(studentRepository).leaveGroup(1L);
+        doNothing().when(studentRepository).leaveGroup(2L);
+        when(lessonRepository.findAllByGroupIdOrderByTimeOfStartLesson(1L)).thenReturn(groupLessons);
+        doNothing().when(lessonRepository).removeGroupFromLesson(1L);
+        doNothing().when(lessonRepository).removeGroupFromLesson(2L);
 
         groupService.deleteById(groupId);
 
-        verify(groupDao).findById(groupId);
-        verify(groupDao).deleteById(groupId);
-        verify(studentDao).findByGroupId(groupId);
-        verify(studentDao).leaveGroup(1L);
-        verify(studentDao).leaveGroup(2L);
-        verify(lessonDao).findByGroupId(groupId);
-        verify(lessonDao).removeGroupFromLesson(1L);
-        verify(lessonDao).removeGroupFromLesson(2L);
+        verify(groupRepository).findById(groupId);
+        verify(groupRepository).deleteById(groupId);
+        verify(studentRepository).findAllByGroupId(groupId);
+        verify(studentRepository).leaveGroup(1L);
+        verify(studentRepository).leaveGroup(2L);
+        verify(lessonRepository).findAllByGroupIdOrderByTimeOfStartLesson(groupId);
+        verify(lessonRepository).removeGroupFromLesson(1L);
+        verify(lessonRepository).removeGroupFromLesson(2L);
     }
 
     @Test
     void deleteShouldDoNothingIfArgumentGroupDontExist() {
         long groupId = 1;
 
-        when(groupDao.findById(groupId)).thenReturn(Optional.empty());
+        when(groupRepository.findById(groupId)).thenReturn(Optional.empty());
 
         groupService.deleteById(groupId);
 
-        verify(groupDao).findById(groupId);
+        verify(groupRepository).findById(groupId);
     }
 
 }

@@ -1,13 +1,14 @@
 package ua.com.foxminded.university.service.impl;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ua.com.foxminded.university.dao.CourseDao;
-import ua.com.foxminded.university.dao.DepartmentDao;
-import ua.com.foxminded.university.dao.LessonDao;
-import ua.com.foxminded.university.dao.ProfessorDao;
-import ua.com.foxminded.university.dao.RoleDao;
+import ua.com.foxminded.university.repository.CourseRepository;
+import ua.com.foxminded.university.repository.DepartmentRepository;
+import ua.com.foxminded.university.repository.LessonRepository;
+import ua.com.foxminded.university.repository.ProfessorRepository;
+import ua.com.foxminded.university.repository.RoleRepository;
 import ua.com.foxminded.university.dto.ProfessorRequest;
 import ua.com.foxminded.university.dto.ProfessorResponse;
 import ua.com.foxminded.university.entity.Course;
@@ -31,27 +32,27 @@ import java.util.stream.Collectors;
 public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorRequest, ProfessorResponse>  implements ProfessorService {
 
     private final ScienceDegreeValidator scienceDegreeValidator;
-    private final ProfessorDao professorDao;
-    private final LessonDao lessonDao;
-    private final CourseDao courseDao;
-    private final DepartmentDao departmentDao;
+    private final ProfessorRepository professorRepository;
+    private final LessonRepository lessonRepository;
+    private final CourseRepository courseRepository;
+    private final DepartmentRepository departmentRepository;
     private final ProfessorMapper professorMapper;
 
-    public ProfessorServiceImpl(ProfessorDao professorDao, LessonDao lessonDao, CourseDao courseDao, DepartmentDao departmentDao,
+    public ProfessorServiceImpl(ProfessorRepository professorRepository, LessonRepository lessonRepository, CourseRepository courseRepository, DepartmentRepository departmentRepository,
                                 PasswordEncoder passwordEncoder, UserValidator userValidator, ScienceDegreeValidator scienceDegreeValidator,
-                                ProfessorMapper professorMapper, RoleDao roleDao) {
-        super(passwordEncoder, professorDao, roleDao, userValidator);
-        this.professorDao = professorDao;
-        this.lessonDao = lessonDao;
-        this.courseDao = courseDao;
-        this.departmentDao = departmentDao;
+                                ProfessorMapper professorMapper, RoleRepository roleRepository) {
+        super(passwordEncoder, professorRepository, roleRepository, userValidator);
+        this.professorRepository = professorRepository;
+        this.lessonRepository = lessonRepository;
+        this.courseRepository = courseRepository;
+        this.departmentRepository = departmentRepository;
         this.scienceDegreeValidator = scienceDegreeValidator;
         this.professorMapper = professorMapper;
     }
 
     @Override
     public ProfessorResponse findById(long id) {
-        Professor professor = professorDao.findById(id)
+        Professor professor = professorRepository.findById(id)
                 .orElseThrow(() -> new EntityDontExistException("There no professor with id: " + id));
 
         return professorMapper.mapEntityToDto(professor);
@@ -59,10 +60,10 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
 
     @Override
     public List<ProfessorResponse> findAll(String page) {
-        final long itemsCount = professorDao.count();
+        final long itemsCount = professorRepository.count();
         int pageNumber = parsePageNumber(page, itemsCount, 1);
 
-        return professorDao.findAll(pageNumber, ITEMS_PER_PAGE).stream()
+        return professorRepository.findAll(PageRequest.of(pageNumber - 1, ITEMS_PER_PAGE)).stream()
                 .map(professorMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
@@ -70,7 +71,7 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
     @Override
     public List<ProfessorResponse> findAll() {
 
-        return professorDao.findAll().stream()
+        return professorRepository.findAll().stream()
                 .map(professorMapper::mapEntityToDto)
                 .collect(Collectors.toList());
     }
@@ -81,7 +82,7 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
         userValidator.validate(professorRequest);
         professorRequest.setPassword(passwordEncoder.encode(professorRequest.getPassword()));
 
-        professorDao.update(professorMapper.mapDtoToEntity(professorRequest));
+        professorRepository.save(professorMapper.mapDtoToEntity(professorRequest));
 
         if(professorRequest.getDepartmentId() != 0L){
             changeDepartment(professorRequest.getId(), professorRequest.getDepartmentId());
@@ -95,30 +96,30 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
 
     @Override
     public void deleteById(long id) {
-        if(professorDao.findById(id).isPresent()){
+        if(professorRepository.findById(id).isPresent()){
             removeAllRolesFromUser(id);
 
-            List<Course> professorCourses = courseDao.findByProfessorId(id);
+            List<Course> professorCourses = courseRepository.findByProfessorId(id);
             for(Course course : professorCourses) {
-                courseDao.removeCourseFromProfessorCourseList(course.getId(), id);
+                courseRepository.removeCourseFromProfessorCourseList(course.getId(), id);
             }
 
-            List<Lesson> professorsLessons = lessonDao.findByProfessorId(id);
+            List<Lesson> professorsLessons = lessonRepository.findAllByTeacherIdOrderByTimeOfStartLesson(id);
             for(Lesson lesson : professorsLessons){
-                lessonDao.removeTeacherFromLesson(lesson.getId());
+                lessonRepository.removeTeacherFromLesson(lesson.getId());
             }
 
-            professorDao.deleteById(id);
+            professorRepository.deleteById(id);
         }
     }
 
     @Override
     public List<ProfessorResponse> findByEmail(String email) {
-        List<Professor> professors = professorDao.findByEmail(email);
+        List<Professor> professors = professorRepository.findAllByEmail(email);
 
         if(!professors.isEmpty()){
             ProfessorResponse professorResponse = professorMapper.mapEntityToDto(professors.get(0));
-            professorResponse.setRoles(roleDao.findByUserId(professorResponse.getId()));
+            professorResponse.setRoles(roleRepository.findAllByUserId(professorResponse.getId()));
             return Arrays.asList(professorResponse);
         }
 
@@ -129,12 +130,12 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
     public void changeScienceDegree(long professorId, int idNewScienceDegree) {
         checkThatUserExist(professorId);
         scienceDegreeValidator.validate(ScienceDegree.getById(idNewScienceDegree));
-        professorDao.changeScienceDegree(professorId, idNewScienceDegree);
+        professorRepository.changeScienceDegree(professorId, idNewScienceDegree);
     }
 
     @Override
     public List<ProfessorResponse> findByCourseId(long courseId) {
-        List<Professor> professors = professorDao.findByCourseId(courseId);
+        List<Professor> professors = professorRepository.findAllByCourseId(courseId);
         List<ProfessorResponse> professorResponses = new ArrayList<>();
         for(Professor professor : professors){
             professorResponses.add(professorMapper.mapEntityToDto(professor));
@@ -147,7 +148,7 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
     public List<ProfessorResponse> findByDepartmentId(long departmentId) {
         checkThatDepartmentExist(departmentId);
 
-        return professorDao.findByDepartmentId(departmentId)
+        return professorRepository.findAllByDepartmentId(departmentId)
                 .stream().map(professorMapper ::mapEntityToDto)
                 .collect(Collectors.toList());
     }
@@ -157,19 +158,19 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
         checkThatDepartmentExist(departmentId);
         checkThatUserExist(professorId);
 
-        professorDao.changeDepartment(professorId, departmentId);
+        professorRepository.changeDepartment(professorId, departmentId);
     }
 
     @Override
     public void removeDepartmentFromProfessor(long professorId) {
         checkThatUserExist(professorId);
-        professorDao.removeDepartmentFromProfessor(professorId);
+        professorRepository.removeDepartmentFromProfessor(professorId);
     }
 
     @Override
     protected ProfessorResponse registerCertainUser(ProfessorRequest professorRequest) {
         Professor professorBeforeSave = professorMapper.mapDtoToEntity(professorRequest);
-        Professor professorAfterSave = professorDao.save(professorBeforeSave);
+        Professor professorAfterSave = professorRepository.save(professorBeforeSave);
         long professorId = professorAfterSave.getId();
 
         if(professorRequest.getDepartmentId() != 0L){
@@ -180,9 +181,9 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
             changeScienceDegree(professorId, professorRequest.getScienceDegreeId());
         }
 
-        if(roleDao.findByUserId(professorId).isEmpty()) {
+        if(roleRepository.findAllByUserId(professorId).isEmpty()) {
 
-            List<Role> professorRoles = roleDao.findByName("ROLE_PROFESSOR");
+            List<Role> professorRoles = roleRepository.findAllByName("ROLE_PROFESSOR");
 
             if (professorRoles.isEmpty()){
                 throw new EntityDontExistException("ROLE_PROFESSOR not initialized");
@@ -195,7 +196,7 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
     }
 
     private void checkThatDepartmentExist(long departmentId){
-        if (!departmentDao.findById(departmentId).isPresent()) {
+        if (!departmentRepository.findById(departmentId).isPresent()) {
             throw new EntityDontExistException("There no department with id: " + departmentId);
         }
     }
