@@ -245,17 +245,7 @@
       <li class="border-top my-3"></li>
 
       <li class="mb-1">
-        <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
-                data-bs-target="#account-collapse" aria-expanded="false" th:text="#{account}">
-          Account
-        </button>
-        <div class="collapse" id="account-collapse">
-          <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-            <li><a href="#" class="link-dark rounded" th:text="#{profile}">Profile</a></li>
-            <li><a href="#" class="link-dark rounded" th:text="#{settings}">Settings</a></li>
-            <li><a href="/perform_logout" class="link-dark rounded" th:text="#{sign.out}">Sign out</a></li>
-          </ul>
-        </div>
+        <a class="btn btn-toggle align-items-center" href="/perform_logout" role="button" th:text="#{sign.out}">Sign out</a>
       </li>
     </ul>
   </div>

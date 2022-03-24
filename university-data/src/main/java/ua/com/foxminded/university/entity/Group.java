@@ -17,7 +17,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="groups")
+@Table(name="groups_of_students")
 @Data
 @Builder(setterPrefix = "with")
 @AllArgsConstructor
@@ -37,7 +37,7 @@ public class Group {
     Department department;
 
     @ManyToOne
-    @JoinColumn(name="formofeducation_id")
+    @JoinColumn(name="forms_of_education_id")
     FormOfEducation formOfEducation;
 
 }

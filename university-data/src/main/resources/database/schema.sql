@@ -1,16 +1,16 @@
 set timezone TO 'Europe/Moscow';
-drop table if exists "professor_course" CASCADE;
-drop table if exists "role_privilege" CASCADE;
-drop table if exists "user_role" CASCADE;
-drop table if exists "usersroles" CASCADE;
-drop table if exists "privileges" CASCADE;
-drop table if exists "users" CASCADE;
-drop table if exists "lessons" CASCADE;
-drop table if exists "formsoflesson" CASCADE;
-drop table if exists "courses" CASCADE;
-drop table if exists "groups" CASCADE;
-drop table if exists "departments" CASCADE;
-drop table if exists "formsofeducation" CASCADE;
+drop table if exists professor_course CASCADE;
+drop table if exists role_privilege CASCADE;
+drop table if exists user_role CASCADE;
+drop table if exists roles_of_users CASCADE;
+drop table if exists privileges CASCADE;
+drop table if exists users CASCADE;
+drop table if exists lessons CASCADE;
+drop table if exists forms_of_lesson CASCADE;
+drop table if exists courses CASCADE;
+drop table if exists groups_of_students CASCADE;
+drop table if exists departments CASCADE;
+drop table if exists forms_of_education CASCADE;
 
 create table departments
 (
@@ -25,25 +25,25 @@ create table courses
     department_id bigint references departments(id)
 );
 
-create table formsOfEducation
+create table forms_of_education
 (
     id serial primary key unique,
     name varchar(50)
 );
 
-create table formsOfLesson
+create table forms_of_lesson
 (
     id serial primary key unique,
     name varchar(50),
-    durationOfLesson int
+    duration_of_lesson int
 );
 
-create table groups
+create table groups_of_students
 (
     id serial primary key unique,
     name varchar(50),
     department_id bigint references departments(id),
-    formOfEducation_id bigint references formsOfEducation(id)
+    forms_of_education_id bigint references forms_of_education(id)
 );
 
 create table users
@@ -54,12 +54,12 @@ create table users
     last_name varchar(50),
     email varchar(50) unique,
     password varchar(60),
-    group_id bigint references groups(id),
+    group_id bigint references groups_of_students(id),
     department_id bigint references departments(id),
     scienceDegree_id int
 );
 
-create table usersroles
+create table roles_of_users
 (
     id serial primary key unique,
     name varchar(50)
@@ -75,12 +75,12 @@ create table privileges
 create table user_role
 (
     user_id bigint references users(id),
-    role_id bigint references usersroles(id)
+    role_id bigint references roles_of_users(id)
 );
 
 create table role_privilege
 (
-    role_id bigint references usersroles(id),
+    role_id bigint references roles_of_users(id),
     privilege_id bigint references privileges(id)
 
 );
@@ -90,9 +90,9 @@ create table lessons
     id serial primary key unique,
     course_id bigint references courses(id),
     timeOfStart timestamp,
-    group_id bigint references groups(id),
+    group_id bigint references groups_of_students(id),
     professor_id bigint references users(id),
-    formOfLesson_id bigint references formsOfLesson(id)
+    forms_of_lesson_id bigint references forms_of_lesson(id)
 );
 
 create table professor_course

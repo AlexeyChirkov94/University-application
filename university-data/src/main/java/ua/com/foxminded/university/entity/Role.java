@@ -16,7 +16,7 @@ import javax.persistence.Table;
 import java.util.List;
 
 @Entity
-@Table(name="usersroles")
+@Table(name="roles_of_users")
 @Builder(setterPrefix = "with")
 @AllArgsConstructor
 @NoArgsConstructor

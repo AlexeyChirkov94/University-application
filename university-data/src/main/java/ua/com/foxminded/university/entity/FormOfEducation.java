@@ -12,7 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="formsofeducation")
+@Table(name="forms_of_education")
 @Data
 @Builder(setterPrefix = "with")
 @AllArgsConstructor
