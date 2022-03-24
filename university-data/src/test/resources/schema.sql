@@ -1,67 +1,65 @@
-drop table if exists "PROFESSOR_COURSE" CASCADE;
-drop table if exists "ROLE_PRIVILEGE" CASCADE;
-drop table if exists "USER_ROLE" CASCADE;
-drop table if exists "USERSROLES" CASCADE;
-drop table if exists "PRIVILEGES" CASCADE;
-drop table if exists "USERS" CASCADE;
-drop table if exists "LESSONS" CASCADE;
-drop table if exists "FORMSOFLESSON" CASCADE;
-drop table if exists "COURSES" CASCADE;
-drop table if exists "GROUPS" CASCADE;
-drop table if exists "DEPARTMENTS" CASCADE;
-drop table if exists "SCIENCEDEFREES"CASCADE;
-drop table if exists "FORMSOFEDUCATION" CASCADE;
+drop table if exists professor_course CASCADE;
+drop table if exists role_privilege CASCADE;
+drop table if exists user_role CASCADE;
+drop table if exists roles_of_users CASCADE;
+drop table if exists privileges CASCADE;
+drop table if exists users CASCADE;
+drop table if exists lessons CASCADE;
+drop table if exists forms_of_lesson CASCADE;
+drop table if exists courses CASCADE;
+drop table if exists groups_of_students CASCADE;
+drop table if exists departments CASCADE;
+drop table if exists forms_of_education CASCADE;
 
 
 create table DEPARTMENTS
 (
     id serial primary key,
-    name varchar(30)
+    name varchar(50)
 );
 
 create table COURSES
 (
     id serial primary key,
-    name varchar(30),
-    department_id bigint references DEPARTMENTS(id)
+    name varchar(50),
+    department_id bigint references departments(id)
 );
 
-create table FORMSOFEDUCATION
+create table FORMS_OF_EDUCATION
 (
     id serial primary key,
-    name varchar(30)
+    name varchar(50)
 );
 
-create table FORMSOFLESSON
+create table FORMS_OF_LESSON
 (
     id serial primary key,
-    name varchar(30),
-    durationOfLesson int
+    name varchar(50),
+    duration_of_lesson int
 );
 
-create table GROUPS
+create table GROUPS_OF_STUDENTS
 (
     id serial primary key,
-    name varchar(30),
-    department_id bigint references DEPARTMENTS(id),
-    formOfEducation_id bigint references FORMSOFEDUCATION(id)
+    name varchar(50),
+    department_id bigint references departments(id),
+    forms_of_education_id bigint references forms_of_education(id)
 );
 
 create table USERS
 (
     id serial primary key,
     type varchar(30) not null ,
-    first_name varchar(30),
-    last_name varchar(30),
+    first_name varchar(50),
+    last_name varchar(50),
     email varchar(50),
     password varchar(60),
-    group_id bigint references GROUPS(id),
-    department_id bigint references DEPARTMENTS(id),
+    group_id bigint references GROUPS_OF_STUDENTS(id),
+    department_id bigint references departments(id),
     scienceDegree_id int
-
 );
 
-create table USERSROLES
+create table ROLES_OF_USERS
 (
     id serial primary key,
     name varchar(50)
@@ -77,29 +75,28 @@ create table PRIVILEGES
 create table USER_ROLE
 (
     user_id bigint references users(id),
-    role_id bigint references USERSROLES(id)
+    role_id bigint references roles_of_users(id)
 );
 
 create table ROLE_PRIVILEGE
 (
-    role_id bigint references USERSROLES(id),
-    privilege_id bigint references PRIVILEGES(id)
+    role_id bigint references roles_of_users(id),
+    privilege_id bigint references privileges(id)
 
 );
 
 create table LESSONS
 (
     id serial primary key,
-    course_id bigint references COURSES(id),
+    course_id bigint references courses(id),
     timeOfStart timestamp,
-    group_id bigint references GROUPS(id),
-    professor_id bigint references USERS(id),
-    formOfLesson_id bigint references FORMSOFLESSON(id)
+    group_id bigint references groups_of_students(id),
+    professor_id bigint references users(id),
+    forms_of_lesson_id bigint references forms_of_lesson(id)
 );
 
 create table PROFESSOR_COURSE
 (
-    professor_id bigint references USERS(id),
-    course_id bigint references COURSES(id)
+    professor_id bigint references users(id),
+    course_id bigint references courses(id)
 );
-

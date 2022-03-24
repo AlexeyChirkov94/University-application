@@ -7,9 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class UniversityApplication {
 
     public static void main(String[] args) {
-        try{
+        try {
             SpringApplication.run(UniversityApplication.class, args);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

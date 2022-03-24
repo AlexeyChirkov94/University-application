@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{templates/layout.html}"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Used Technologies</title>
+</head>
+
+<body>
+
+<section layout:fragment="header"> <div th:replace="templates/fragments/header.html"></div> </section>
+<section layout:fragment="footer"> <div th:replace="templates/fragments/footer.html"></div> </section>
+<section layout:fragment="sidebar"> <div th:replace="templates/fragments/sidebar.html"></div> </section>
+
+<section layout:fragment="page-content">
+
+    <h3 class="display-9 fw-bold" th:text="#{page.history.header}">Used Technologies / History of application</h3>
+
+    <div class="p-4 mb-4 bg-light rounded-3">
+
+
+        <div class="row">
+            <div class="col-9">
+                <text th:text="#{commit.one.description}">commit one description</text>
+            </div>
+            <div class="col-3">
+                <a th:text="#{this.commit}" href="https://github.com/AlexeyChrikov94/University-application/tree/0caccf4921de7e052da90d1087eeb1ef57977826" target="_blank">this commit</a>
+                <br> <br>
+                <b><text th:text="#{technologies} + ':'">Technologies:</text></b><br>
+                Java core <br>
+                Maven <br>
+                Git <br>
+                UML diagrams <br>
+                Builder pattern
+            </div>
+        </div>
+        <hr>
+
+        <div class="row">
+            <div class="col-9">
+                <text th:text="#{commit.two.description}">commit two description</text>
+            </div>
+            <div class="col-3">
+                <a th:text="#{this.commit}" href="https://github.com/AlexeyChrikov94/University-application/tree/16c66018a12a4cc86edb217e195181e6f37031ee" target="_blank">this commit</a>
+                <br> <br>
+                <b><text th:text="#{technologies} + ':'">Technologies:</text></b><br>
+                SQL <br>
+                Postgres <br>
+                H2 <br>
+                Spring JdbcTemplate <br>
+                Spring Beans (DI) <br>
+                Junit <br>
+                JaCoCo
+            </div>
+        </div>
+        <hr>
+
+        <div class="row">
+            <div class="col-9">
+                <text th:text="#{commit.three.description}">commit three description</text>
+            </div>
+            <div class="col-3">
+                <a th:text="#{this.commit}" href="https://github.com/AlexeyChrikov94/University-application/tree/18dbdd48fd9e5e120326d95d7db563917c2993cd" target="_blank">this commit</a>
+                <br> <br>
+                <b><text th:text="#{technologies} + ':'">Technologies:</text></b><br>
+                Mockito
+            </div>
+        </div>
+        <hr>
+
+        <div class="row">
+            <div class="col-9">
+                <text th:text="#{commit.four.description}">commit four description</text>
+            </div>
+            <div class="col-3">
+                <a th:text="#{this.commit}" href="https://github.com/AlexeyChrikov94/University-application/tree/d8dd44f12de33d9f79e0f96c8fa3de1fb3781366" target="_blank">this commit</a>
+                <br> <br>
+                <b><text th:text="#{technologies} + ':'">Technologies:</text></b><br>
+                Lombok
+            </div>
+        </div>
+        <hr>
+
+        <div class="row">
+            <div class="col-9">
+                <text th:text="#{commit.five.description}">commit five description</text>
+            </div>
+            <div class="col-3">
+                <a th:text="#{this.commit}" href="https://github.com/AlexeyChrikov94/University-application/tree/7b4855d49a5ee0e60df54df793c51cef4060e442" target="_blank">this commit</a>
+                <br> <br>
+                <b><text th:text="#{technologies} + ':'">Technologies:</text></b><br>
+                Docker
+            </div>
+        </div>
+        <hr>
+
+        <div class="row">
+            <div class="col-9">
+                <text th:text="#{commit.six.description}">commit six description</text>
+            </div>
+            <div class="col-3">
+                <a th:text="#{this.commit}" href="https://github.com/AlexeyChrikov94/University-application/tree/ff78c46ff65368b22fbbf66c11a7efcd70ffcf5b" target="_blank">this commit</a>
+                <br> <br>
+                <b><text th:text="#{technologies} + ':'">Technologies:</text></b><br>
+                MVC pattern<br>
+                Spring-MVC <br>
+                REST <br>
+                Thymeleaf <br>
+                Bootstrap
+            </div>
+        </div>
+        <hr>
+
+        <div class="row">
+            <div class="col-9">
+                <text th:text="#{commit.seven.description}">commit seven description</text>
+            </div>
+            <div class="col-3">
+                <a th:text="#{this.commit}" href="https://github.com/AlexeyChrikov94/University-application/tree/76bba5a6c6a52289fdf998b718d7b0d6c1cbe90d" target="_blank">this commit</a>
+                <br> <br>
+                <b><text th:text="#{technologies} + ':'">Technologies:</text></b><br>
+                I18n
+            </div>
+        </div>
+        <hr>
+
+        <div class="row">
+            <div class="col-9">
+                <text th:text="#{commit.eight.description}">commit eight description</text>
+            </div>
+            <div class="col-3">
+                <a th:text="#{this.commit}" href="https://github.com/AlexeyChrikov94/University-application/tree/c225bd22567f28beab0a3c34300672e66b19cc2c" target="_blank">this commit</a>
+                <br> <br>
+                <b><text th:text="#{technologies} + ':'">Technologies:</text></b><br>
+                MapStruct
+            </div>
+        </div>
+        <hr>
+
+        <div class="row">
+            <div class="col-9">
+                <text th:text="#{commit.nine.description}">commit nine description</text>
+            </div>
+            <div class="col-3">
+                <a th:text="#{this.commit}" href="https://github.com/AlexeyChrikov94/University-application/tree/010043e8365bd16f90740cfe6bd4cab1ae0ed923" target="_blank">this commit</a>
+                <br> <br>
+                <b><text th:text="#{technologies} + ':'">Technologies:</text></b><br>
+                Spring Security <br>
+                Roles & Privileges principle
+            </div>
+        </div>
+        <hr>
+
+        <div class="row">
+            <div class="col-9">
+                <text th:text="#{commit.ten.description}">commit ten description</text>
+            </div>
+            <div class="col-3">
+                <a th:text="#{this.commit}" href="https://github.com/AlexeyChrikov94/University-application/tree/8930bf661d12b3a06e50746f1ef7621779c69c63" target="_blank">this commit</a>
+                <br> <br>
+                <b><text th:text="#{technologies} + ':'">Technologies:</text></b><br>
+                Maven multi module structure<br>
+            </div>
+        </div>
+        <hr>
+
+        <div class="row">
+            <div class="col-9">
+                <text th:text="#{commit.eleven.description}">commit eleven description</text>
+            </div>
+            <div class="col-3">
+                <a th:text="#{this.commit}" href="https://github.com/AlexeyChrikov94/University-application/tree/0333e9649fa22c18a4427d56c7482014834d63dc" target="_blank">this commit</a>
+                <br> <br>
+                <b><text th:text="#{technologies} + ':'">Technologies:</text></b><br>
+                Docker compose <br>
+                (Multi container apps) <br>
+                JNDI
+            </div>
+        </div>
+        <hr>
+
+        <div class="row">
+            <div class="col-9">
+                <text th:text="#{commit.twelve.description}">commit twelve description</text>
+            </div>
+            <div class="col-3">
+                <a th:text="#{this.commit}" href="https://github.com/AlexeyChrikov94/University-application/tree/6f813ff2c6465b49c383c82a9c9fd1a89b527deb" target="_blank">this commit</a>
+                <br> <br>
+                <b><text th:text="#{technologies} + ':'">Technologies:</text></b><br>
+                Hibernate
+            </div>
+        </div>
+        <hr>
+
+        <div class="row">
+            <div class="col-9">
+                <text th:text="#{commit.thirteen.description}">commit thirteen description</text>
+            </div>
+            <div class="col-3">
+                <a th:text="#{this.commit}" href="https://github.com/AlexeyChrikov94/University-application/tree/14ccdd61e63da26b33e793c26152767d497a1c51" target="_blank">this commit</a>
+                <br> <br>
+                <b><text th:text="#{technologies} + ':'">Technologies:</text></b><br>
+                Spring-Boot
+            </div>
+        </div>
+        <hr>
+
+        <div class="row">
+            <div class="col-9">
+                <text th:text="#{commit.fourteen.description}">commit fourteen description</text>
+            </div>
+            <div class="col-3">
+                <a th:text="#{this.commit}" href="https://github.com/AlexeyChrikov94/University-application/tree/51f64383c9d236a25d751319ff3d431d443f855f" target="_blank">this commit</a>
+                <br> <br>
+                <b><text th:text="#{technologies} + ':'">Technologies:</text></b><br>
+                Spring Data JPA <br>
+                Use layered jar in Docker <br>
+            </div>
+        </div>
+        <hr>
+
+        <div class="row">
+            <div class="col-9">
+                <text th:text="#{commit.fifteen.description}">commit fifteen description</text>
+            </div>
+            <div class="col-3">
+                <a th:text="#{this.commit}" href="https://github.com/AlexeyChrikov94/University-application/tree/f700ce52782784bf3421fd8398ea3804c4bef1e0" target="_blank">this commit</a>
+                <br> <br>
+                <b><text th:text="#{technologies} + ':'">Technologies:</text></b><br>
+                Amazon Web Service <br>
+                Yandex Cloud <br>
+            </div>
+        </div>
+        <hr>
+
+        <div class="row">
+            <div class="col-9">
+                <text th:text="#{commit.sixteen.description}">commit sixteen description</text>
+            </div>
+            <div class="col-3">
+                <a th:text="#{this.commit}" href="/usedTechnologies" target="_blank">this commit</a>
+                <br> <br>
+                <b><text th:text="#{technologies} + ':'">Technologies:</text></b><br>
+                Hibernate validation <br>
+            </div>
+        </div>
+        <hr>
+
+    </div>
+
+</section>
+
+</body>
+</html>

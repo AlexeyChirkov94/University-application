@@ -11,7 +11,7 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
 
     List<Role> findAllByName(String name);
 
-    @Query(value = "SELECT r.id, r.name from usersroles r left join user_role ur on r.id = ur.role_id " +
+    @Query(value = "SELECT r.id, r.name from roles_of_users r left join user_role ur on r.id = ur.role_id " +
             "left join users u on ur.user_id = u.id where u.id =:usedId", nativeQuery = true)
     List<Role> findAllByUserId(long usedId);
 

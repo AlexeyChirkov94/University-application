@@ -11,15 +11,72 @@
 
 <section layout:fragment="page-content">
 
-    <h1 th:text="#{page.main.header}">Main page</h1>
-    ...                         <BR>
-    ...                         <BR>
-    ...                         <BR>
-    ...                         <BR>
-    ...                         <BR>
-    ...                         <BR>
-    ...                         <BR>
-    ...                         <BR>
+    <div class="p-4 mb-4 bg-light rounded-3">
+        <div class="container-fluid py-1">
+            <div class="row-no-gutters">
+                <div class="col-lg-8 col-md-7 fs-5">
+                    <h2 class="display-7 fw-bold" th:text="#{page.main.paragraph.one.header}" >My University</h2>
+                    <br>
+                    <text th:text="#{page.main.paragraph.one.line.one}">Hello, my name is Alexey Chirkov.</text> <br>
+                    <text th:text="#{page.main.paragraph.one.line.two}">You see my pet project.</text> <br>
+                    <text th:text="#{page.main.paragraph.one.line.three}">This is CRUD application, which allow digitalize university studying process. </text>
+                </div>
+                <div class="col-4">
+                    <img src="/resources/png/my_photo.jpg" class="img-fluid" alt="Responsive image">
+                </div>
+            </div>
+            <hr>
+            <text class="fw-bold" th:text="#{note} + ':'">Note:</text>
+            <text th:text="#{page.main.paragraph.one.line.four}">If you want to explore the app on your own, you can log in as a student using email:</text>
+            <text th:text="#{page.main.paragraph.one.line.five}">"student@gmail.com" and password: "student". Student have no rights to change or</text>
+            <text th:text="#{page.main.paragraph.one.line.six}">remove something, but can see all pages.</text>
+        </div>
+    </div>
+
+    <div class="p-4 mb-4 bg-light rounded-3">
+        <div class="container-fluid py-1">
+            <h2 class="display-7 fw-bold" th:text="#{page.main.paragraph.two.header}">The application contains of three layers:</h2>
+            <div class="fs-5">
+                <br>
+                <text th:text="#{page.main.paragraph.two.line.one}">First layer is DAO layer. It is responsible for receiving data from database. </text>
+                <text th:text="#{page.main.paragraph.two.line.two}">Now it uses Spring Data JPA. But it started with JdbcTemplate and direct SQL queries to the database. </text>
+                <text th:text="#{page.main.paragraph.two.line.three}">Full history of application creation you can find on tab </text>
+                <a th:text="#{used.technologies}" href="/usedTechnologies"> Used technologies. </a> <br>
+                <br>
+                <text th:text="#{page.main.paragraph.two.line.four}">Second layer is Service layer. It is responsible for the internal logic of the application, </text>
+                <text th:text="#{page.main.paragraph.two.line.five}">back-end validation, transaction management, and receiving data via DAO layer.</text> <br>
+                <br>
+                <text th:text="#{page.main.paragraph.two.line.six}">Third layer is UI layer. It is responsible for receiving HTTP requests from users and map them to relevant view (HTML page). </text>
+                <text th:text="#{page.main.paragraph.two.line.seven}">The UI layer logic follows the REST architecture. </text> <br>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-4 mb-4 bg-light rounded-3">
+        <div class="container-fluid py-1">
+            <h2 class="display-7 fw-bold" th:text="#{page.main.paragraph.three.header}">UML diagram of application</h2>
+            <br>
+        </div>
+
+        <div class="container-fluid py-1 text-center">
+            <button type="button" data-bs-toggle="modal" data-bs-target="#showUML">
+                <img src="/resources/png/UML.jpg"  class="img-fluid">
+            </button>
+            <div class="modal fade" id="showUML" tabindex="-1" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="myModalLabel" th:text="#{page.main.paragraph.three.header}">UML diagram of application</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <img src="/resources/png/UML.jpg"  class="img-fluid">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </section>
 

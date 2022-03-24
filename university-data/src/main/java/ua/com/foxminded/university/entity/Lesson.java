@@ -45,7 +45,7 @@ public class Lesson {
     Professor teacher;
 
     @ManyToOne
-    @JoinColumn(name="formoflesson_id")
+    @JoinColumn(name="forms_of_lesson_id")
     FormOfLesson formOfLesson;
 
 }

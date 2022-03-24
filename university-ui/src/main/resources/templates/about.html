@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{templates/layout.html}"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>About</title>
+</head>
+
+<body>
+
+<section layout:fragment="header"> <div th:replace="templates/fragments/header.html"></div> </section>
+<section layout:fragment="footer"> <div th:replace="templates/fragments/footer.html"></div> </section>
+<section layout:fragment="sidebar"> <div th:replace="templates/fragments/sidebar.html"></div> </section>
+
+<section layout:fragment="page-content">
+
+    <div class="p-4 mb-4 bg-light rounded-3">
+        <div class="container-fluid py-1">
+            <h3 class="display-9 fw-bold" th:text="#{page.about.header}">About application "My University"...</h3>
+            <div class="fs-5">
+                <br>
+                <h4 th:text="#{department.class}">Department class</h4>
+                <text th:text="#{department.class.description}">description of department class</text>
+            </div>
+            <br>
+
+            <div class="row-no-gutters">
+                <div class="col-5">
+                    <h5 th:text="#{department.class.show}">Show department</h5>
+                    <button type="button" data-bs-toggle="modal" data-bs-target="#showDepartment">
+                        <img src="/resources/png/view of department show.jpg"  class="img-fluid">
+                    </button>
+                    <div class="modal fade" id="showDepartment" tabindex="-1" aria-labelledby="showDepartmentLabel" style="display: none;" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-xl">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="showDepartmentLabel" th:text="#{department.class.show}">Show department</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <img src="/resources/png/view of department show.jpg"  class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-2"></div>
+
+                <div class="col-5">
+                    <h5 th:text="#{department.class.edit}">Edit department</h5>
+                    <button type="button" data-bs-toggle="modal" data-bs-target="#editDepartment">
+                        <img src="/resources/png/view of department edit.jpg"  class="img-fluid">
+                    </button>
+                    <div class="modal fade" id="editDepartment" tabindex="-1" aria-labelledby="editDepartmentLabel" style="display: none;" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-xl">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="editDepartmentLabel" th:text="#{department.class.edit}">Edit department</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <img src="/resources/png/view of department edit.jpg"  class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-4 mb-4 bg-light rounded-3">
+        <div class="container-fluid py-1">
+            <div class="fs-5">
+                <h4 th:text="#{course.class}">Course class</h4>
+                <text th:text="#{course.class.description}">description of course class</text>
+            </div>
+            <br>
+
+            <div class="row-no-gutters">
+                <div class="col-5">
+                    <h5 th:text="#{course.class.show}">Show course</h5>
+                    <button type="button" data-bs-toggle="modal" data-bs-target="#showCourse">
+                        <img src="/resources/png/view of course show.jpg"  class="img-fluid">
+                    </button>
+                    <div class="modal fade" id="showCourse" tabindex="-1" aria-labelledby="showCourseLabel" style="display: none;" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-xl">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="showCourseLabel" th:text="#{course.class.show}">Show course</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <img src="/resources/png/view of course show.jpg"  class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-2"> </div>
+
+                <div class="col-5">
+                    <h5 th:text="#{course.class.edit}">Edit course</h5>
+                    <button type="button" data-bs-toggle="modal" data-bs-target="#editCourse">
+                        <img src="/resources/png/view of course edit.jpg"  class="img-fluid">
+                    </button>
+                    <div class="modal fade" id="editCourse" tabindex="-1" aria-labelledby="editCourseLabel" style="display: none;" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-xl">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="editCourseLabel" th:text="#{course.class.edit}">Edit course</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <img src="/resources/png/view of course edit.jpg"  class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-4 mb-4 bg-light rounded-3">
+        <div class="container-fluid py-1">
+            <div class="fs-5">
+                <h4 th:text="#{professor.class}">Professor class</h4>
+                <text th:text="#{professor.class.description}">description of professor class</text>
+            </div>
+            <br>
+
+            <div class="row-no-gutters">
+                <div class="col-3">
+                    <h5 th:text="#{professor.class.show}">Show professor</h5>
+                    <button type="button" data-bs-toggle="modal" data-bs-target="#showProfessor">
+                        <img src="/resources/png/view of professor show.jpg"  class="img-fluid">
+                    </button>
+                    <div class="modal fade" id="showProfessor" tabindex="-1" aria-labelledby="showProfessorLabel" style="display: none;" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-xl">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="showProfessorLabel" th:text="#{professor.class.show}">Show professor</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <img src="/resources/png/view of professor show.jpg"  class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-1"> </div>
+
+                <div class="col-3">
+                    <h5 th:text="#{professor.class.edit}">Edit professor</h5>
+                    <button type="button" data-bs-toggle="modal" data-bs-target="#editProfessor">
+                        <img src="/resources/png/view of professor edit.jpg"  class="img-fluid">
+                    </button>
+                    <div class="modal fade" id="editProfessor" tabindex="-1" aria-labelledby="editProfessorLabel" style="display: none;" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-xl">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="editProfessorLabel" th:text="#{professor.class.edit}">Edit professor</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <img src="/resources/png/view of professor edit.jpg"  class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-1"> </div>
+
+                <div class="col-3">
+                    <h5 th:text="#{professor.class.timetable}">Professor timetable</h5>
+                    <button type="button" data-bs-toggle="modal" data-bs-target="#showProfessorTimetable">
+                        <img src="/resources/png/view of professor timetable.jpg"  class="img-fluid">
+                    </button>
+                    <div class="modal fade" id="showProfessorTimetable" tabindex="-1" aria-labelledby="showProfessorTimetableLabel" style="display: none;" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-xl">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="showProfessorTimetableLabel" th:text="#{professor.class.timetable}"> Show professor timetable </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <img src="/resources/png/view of professor timetable.jpg"  class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-4 mb-4 bg-light rounded-3">
+        <div class="container-fluid py-1">
+            <div class="fs-5">
+                <h4 th:text="#{student.class}">Student class</h4>
+                <text th:text="#{student.class.description}">description of student class</text>
+            </div>
+            <br>
+
+            <div class="row-no-gutters">
+                <div class="col-3">
+                    <h5 th:text="#{student.class.show}">Show student</h5>
+                    <button type="button" data-bs-toggle="modal" data-bs-target="#showStudent">
+                        <img src="/resources/png/view of student show.jpg"  class="img-fluid">
+                    </button>
+                    <div class="modal fade" id="showStudent" tabindex="-1" aria-labelledby="showStudentLabel" style="display: none;" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-xl">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="showStudentLabel" th:text="#{student.class.show}">Show student</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <img src="/resources/png/view of student show.jpg"  class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-1"> </div>
+
+                <div class="col-3">
+                    <h5 th:text="#{student.class.edit}">Edit Student</h5>
+                    <button type="button" data-bs-toggle="modal" data-bs-target="#editStudent">
+                        <img src="/resources/png/view of student edit.jpg"  class="img-fluid">
+                    </button>
+                    <div class="modal fade" id="editStudent" tabindex="-1" aria-labelledby="editStudentLabel" style="display: none;" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-xl">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="editStudentLabel" th:text="#{student.class.edit}">Edit student</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <img src="/resources/png/view of student edit.jpg"  class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-1"> </div>
+
+                <div class="col-3">
+                    <h5 th:text="#{student.class.timetable}">Student timetable</h5>
+                    <button type="button" data-bs-toggle="modal" data-bs-target="#showStudentTimetable">
+                        <img src="/resources/png/view of student timetable.jpg"  class="img-fluid">
+                    </button>
+                    <div class="modal fade" id="showStudentTimetable" tabindex="-1" aria-labelledby="showStudentTimetableLabel" style="display: none;" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-xl">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="showStudentTimetableLabel" th:text="#{student.class.timetable}"> Show student timetable </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <img src="/resources/png/view of student timetable.jpg"  class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-4 mb-4 bg-light rounded-3">
+        <div class="container-fluid py-1">
+            <div class="fs-5">
+                <h4 th:text="#{group.class}">Group class</h4>
+                <text th:text="#{group.class.description}">description of group class</text>
+            </div>
+            <br>
+
+            <div class="row-no-gutters">
+                <div class="col-3">
+                    <h5 th:text="#{group.class.show}">Show group</h5>
+                    <button type="button" data-bs-toggle="modal" data-bs-target="#showGroup">
+                        <img src="/resources/png/view of group show.jpg"  class="img-fluid">
+                    </button>
+                    <div class="modal fade" id="showGroup" tabindex="-1" aria-labelledby="showGroupLabel" style="display: none;" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-xl">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="showGroupLabel" th:text="#{group.class.show}"> Show group</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <img src="/resources/png/view of group show.jpg"  class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-1"> </div>
+
+                <div class="col-3">
+                    <h5 th:text="#{group.class.edit}">Edit group</h5>
+                    <button type="button" data-bs-toggle="modal" data-bs-target="#editGroup">
+                        <img src="/resources/png/view of group edit.jpg"  class="img-fluid">
+                    </button>
+                    <div class="modal fade" id="editGroup" tabindex="-1" aria-labelledby="editGroupLabel" style="display: none;" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-xl">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="editGroupLabel" th:text="#{group.class.edit}">Edit group</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <img src="/resources/png/view of group edit.jpg"  class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-1"> </div>
+
+                <div class="col-3">
+                    <h5 th:text="#{group.class.timetable}">Group timetable</h5>
+                    <button type="button" data-bs-toggle="modal" data-bs-target="#showGroupTimetable">
+                        <img src="/resources/png/view of group timetable.jpg"  class="img-fluid">
+                    </button>
+                    <div class="modal fade" id="showGroupTimetable" tabindex="-1" aria-labelledby="showGroupTimetableLabel" style="display: none;" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-xl">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="showGroupTimetableLabel" th:text="#{group.class.timetable}"> Show group timetable </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <img src="/resources/png/view of group timetable.jpg"  class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-4 mb-4 bg-light rounded-3">
+        <div class="container-fluid py-1">
+            <div class="fs-5">
+                <h4 th:text="#{lesson.class}">Lesson class</h4>
+                <text th:text="#{lesson.class.description}">description of group class</text>
+            </div>
+            <br>
+
+            <div class="row-no-gutters">
+                <div class="col-5">
+                    <h5 th:text="#{lesson.class.show}">Show lesson</h5>
+                    <button type="button" data-bs-toggle="modal" data-bs-target="#showLesson">
+                        <img src="/resources/png/view of lesson show.jpg"  class="img-fluid">
+                    </button>
+                    <div class="modal fade" id="showLesson" tabindex="-1" aria-labelledby="showLessonLabel" style="display: none;" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-xl">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="showLessonLabel" th:text="#{lesson.class.show}"> Show lesson</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <img src="/resources/png/view of lesson show.jpg"  class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-2"> </div>
+
+                <div class="col-5">
+                    <h5 th:text="#{lesson.class.edit}">Edit lesson</h5>
+                    <button type="button" data-bs-toggle="modal" data-bs-target="#editLesson">
+                        <img src="/resources/png/view of lesson edit.jpg"  class="img-fluid">
+                    </button>
+                    <div class="modal fade" id="editLesson" tabindex="-1" aria-labelledby="editLessonLabel" style="display: none;" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-xl">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="editLessonLabel" th:text="#{lesson.class.edit}"> Edit lesson</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <img src="/resources/png/view of lesson edit.jpg"  class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-4 mb-4 bg-light rounded-3">
+        <div class="container-fluid py-1">
+
+            <div class="fs-5">
+                <text th:text="#{forms.of.lesson.and.education.description}"> forms of lesson and education description </text>
+                <hr>
+                <text th:text="#{page.main.paragraph.one.line.four}">If you want to explore the app on your own, you can log in as a student using email:</text>
+                <text th:text="#{page.main.paragraph.one.line.five}">"student@gmail.com" and password: "student". Student have no rights to change or</text>
+                <text th:text="#{page.main.paragraph.one.line.six}">remove something, but can see all pages.</text>
+            </div>
+            <br>
+        </div>
+    </div>
+
+</section>
+
+</body>
+</html>
