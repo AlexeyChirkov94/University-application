@@ -23,12 +23,14 @@
         <div class="form-floating mb-2">
             <input type="text" th:field="*{name}" class="form-control" id="name" placeholder="Change name of form of lesson:">
             <label for="name" th:text="#{enter.new.name.of.form.of.lesson}">Change name of form of lesson:</label>
+            <div style='color:red' th:if="${#fields.hasErrors('name')}" th:text="#{error.of.size.two.fifty}">Error message</div>
         </div>
 
         <h6 th:text="#{duration.of.form.of.lesson}">Duration of form of lesson</h6>
         <div class="form-floating mb-2">
             <input type="number" th:field="*{duration}" class="form-control" id="duration" placeholder="Change duration of form of lesson:">
             <label for="duration" th:text="#{enter.new.duration.of.form.of.lesson}">Change duration of form of lesson:</label>
+            <div style='color:red' th:if="${#fields.hasErrors('duration')}" th:text="#{error.of.form.of.lesson.duration}">Error message</div>
         </div>
 
         <input class="btn btn-success" type="submit" role="button" th:value="#{update.forms.of.lesson}"/>

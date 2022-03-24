@@ -3,6 +3,7 @@ package ua.com.foxminded.university.controllers;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,11 +20,11 @@ import ua.com.foxminded.university.dto.StudentResponse;
 import ua.com.foxminded.university.service.exception.EntityAlreadyExistException;
 import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.exception.TimeTableStudentWithoutGroupException;
-import ua.com.foxminded.university.service.exception.ValidateException;
 import ua.com.foxminded.university.service.GroupService;
 import ua.com.foxminded.university.service.LessonService;
 import ua.com.foxminded.university.service.StudentService;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +55,20 @@ public class StudentsController {
     }
 
     @GetMapping("/new")
-    public String newStudent(Model model, @ModelAttribute("student") StudentRequest studentRequest) {
+    public String newStudent(Model model, @ModelAttribute("studentRequest") StudentRequest studentRequest) {
 
         model.addAttribute("groups", groupService.findAll());
         return "student/add";
     }
 
     @PostMapping()
-    public String create(@ModelAttribute("student") StudentRequest studentRequest) {
+    public String create(Model model, @ModelAttribute("studentRequest") @Valid StudentRequest studentRequest,
+                         BindingResult bindingResult) {
+
+        if(bindingResult.hasErrors()) {
+            model.addAttribute("groups", groupService.findAll());
+            return "student/add";
+        }
 
         studentService.register(studentRequest);
         return "redirect:/student";
@@ -82,7 +89,15 @@ public class StudentsController {
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute("student") StudentRequest studentRequest) {
+    public String update(Model model, @ModelAttribute("studentRequest") @Valid StudentRequest studentRequest,
+                         BindingResult bindingResult) {
+
+        if(bindingResult.hasErrors()) {
+            model.addAttribute("studentResponse", studentService.findById(studentRequest.getId()));
+            model.addAttribute("groups", groupService.findAll());
+            return "student/edit";
+        }
+
         studentService.edit(studentRequest);
         return "redirect:/student";
     }
@@ -123,15 +138,6 @@ public class StudentsController {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject("exception", ex);
         modelAndView.setViewName("errors handling/timetable show error");
-
-        return modelAndView;
-    }
-
-    @ExceptionHandler(ValidateException.class)
-    public ModelAndView validateStudentException(HttpServletRequest request, Exception ex) {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject("exception", ex);
-        modelAndView.setViewName("errors handling/common creating error");
 
         return modelAndView;
     }

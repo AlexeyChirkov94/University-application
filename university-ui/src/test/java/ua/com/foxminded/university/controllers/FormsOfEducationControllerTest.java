@@ -65,7 +65,9 @@ class FormsOfEducationControllerTest {
     void setUp() {
         Mockito.reset(formOfEducationService);
         Mockito.reset(groupService);
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(new FormsOfEducationController(formOfEducationService, groupService))
+                .build();
         formsOfEducationController = webApplicationContext.getBean(FormsOfEducationController.class);
     }
 
@@ -186,6 +188,18 @@ class FormsOfEducationControllerTest {
     }
 
     @Test
+    void createNotValidFormOfEducationShouldReturnProfessorNewView() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/education/form")
+                .accept(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("name", "s"))
+                .andExpect(model().attributeHasFieldErrorCode(
+                        "formOfEducation","name","Size")).
+                andExpect(view().name("formOfEducation/add")).
+                andExpect(status().isOk());
+    }
+
+    @Test
     void updateShouldGetFormOfEducationFromModelAndRenderIndexView() throws Exception {
         FormOfEducationRequest formOfEducationRequest = new FormOfEducationRequest();
         formOfEducationRequest.setId(1L);
@@ -206,6 +220,18 @@ class FormsOfEducationControllerTest {
 
         verify(formOfEducationService).edit(formOfEducationRequest);
         verifyNoMoreInteractions(formOfEducationService);
+    }
+
+    @Test
+    void updateNotValidFormOfEducationShouldReturnProfessorNewView() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.patch("/education/form/1")
+                .accept(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("name", "s"))
+                .andExpect(model().attributeHasFieldErrorCode(
+                        "formOfEducationRequest","name","Size")).
+                andExpect(view().name("formOfEducation/edit")).
+                andExpect(status().isOk());
     }
 
     @Test

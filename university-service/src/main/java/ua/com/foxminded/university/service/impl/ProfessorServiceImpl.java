@@ -20,7 +20,6 @@ import ua.com.foxminded.university.mapper.ProfessorMapper;
 import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.ProfessorService;
 import ua.com.foxminded.university.service.validator.ScienceDegreeValidator;
-import ua.com.foxminded.university.service.validator.UserValidator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -39,9 +38,9 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
     private final ProfessorMapper professorMapper;
 
     public ProfessorServiceImpl(ProfessorRepository professorRepository, LessonRepository lessonRepository, CourseRepository courseRepository, DepartmentRepository departmentRepository,
-                                PasswordEncoder passwordEncoder, UserValidator userValidator, ScienceDegreeValidator scienceDegreeValidator,
+                                PasswordEncoder passwordEncoder, ScienceDegreeValidator scienceDegreeValidator,
                                 ProfessorMapper professorMapper, RoleRepository roleRepository) {
-        super(passwordEncoder, professorRepository, roleRepository, userValidator);
+        super(passwordEncoder, professorRepository, roleRepository);
         this.professorRepository = professorRepository;
         this.lessonRepository = lessonRepository;
         this.courseRepository = courseRepository;
@@ -79,7 +78,6 @@ public class ProfessorServiceImpl extends AbstractUserServiceImpl<ProfessorReque
     @Override
     public void edit(ProfessorRequest professorRequest) {
 
-        userValidator.validate(professorRequest);
         professorRequest.setPassword(passwordEncoder.encode(professorRequest.getPassword()));
 
         professorRepository.save(professorMapper.mapDtoToEntity(professorRequest));

@@ -3,6 +3,7 @@ package ua.com.foxminded.university.controllers;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +23,7 @@ import ua.com.foxminded.university.service.CourseService;
 import ua.com.foxminded.university.service.DepartmentService;
 import ua.com.foxminded.university.service.ProfessorService;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.List;
 
 import static ua.com.foxminded.university.controllers.ControllersUtility.setPagesValueAndStatus;
@@ -59,7 +61,12 @@ public class CoursesController {
     }
 
     @PostMapping()
-    public String create(@ModelAttribute("course") CourseRequest courseRequest) {
+    public String create(Model model, @ModelAttribute("course") @Valid CourseRequest courseRequest, BindingResult bindingResult) {
+
+        if(bindingResult.hasErrors()) {
+            model.addAttribute("departments", departmentService.findAll());
+            return "course/add";
+        }
 
         courseService.create(courseRequest);
         return "redirect:/course";
@@ -67,25 +74,26 @@ public class CoursesController {
 
     @GetMapping("/{id}/edit")
     public String edit(Model model, @PathVariable("id") long id) {
+
+        partiallyPrepareModelToEditView(model, id);
+
         CourseResponse courseResponse = courseService.findById(id);
         CourseRequest courseRequest = new CourseRequest();
         courseRequest.setName(courseResponse.getName());
-
-        List<ProfessorResponse> notTeachersOfCourse = professorService.findAll();
-        List<ProfessorResponse> teachersOfCourse = professorService.findByCourseId(id);
-        notTeachersOfCourse.removeAll(teachersOfCourse);
-
-        model.addAttribute("teachersOfCourse", teachersOfCourse);
-        model.addAttribute("notTeachersOfCourse", notTeachersOfCourse);
         model.addAttribute("courseRequest", courseRequest);
-        model.addAttribute("departments", departmentService.findAll());
-        model.addAttribute("courseResponse", courseResponse);
 
         return "course/edit";
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute("courseRequest") CourseRequest courseRequest) {
+    public String update(Model model, @ModelAttribute("courseRequest") @Valid CourseRequest courseRequest,
+                         BindingResult bindingResult) {
+
+        if(bindingResult.hasErrors()) {
+            partiallyPrepareModelToEditView(model, courseRequest.getId());
+            return "course/edit";
+        }
+
         courseService.edit(courseRequest);
         return "redirect:/course";
     }
@@ -126,6 +134,20 @@ public class CoursesController {
         modelAndView.setViewName("errors handling/entity already exist");
 
         return modelAndView;
+    }
+
+    private void partiallyPrepareModelToEditView(Model model, long courseId) {
+
+        CourseResponse courseResponse = courseService.findById(courseId);
+
+        List<ProfessorResponse> notTeachersOfCourse = professorService.findAll();
+        List<ProfessorResponse> teachersOfCourse = professorService.findByCourseId(courseId);
+        notTeachersOfCourse.removeAll(teachersOfCourse);
+
+        model.addAttribute("teachersOfCourse", teachersOfCourse);
+        model.addAttribute("notTeachersOfCourse", notTeachersOfCourse);
+        model.addAttribute("departments", departmentService.findAll());
+        model.addAttribute("courseResponse", courseResponse);
     }
 
 }

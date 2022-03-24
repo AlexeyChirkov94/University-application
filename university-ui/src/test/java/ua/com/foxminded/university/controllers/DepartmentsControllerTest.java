@@ -26,11 +26,9 @@ import ua.com.foxminded.university.service.CourseService;
 import ua.com.foxminded.university.service.DepartmentService;
 import ua.com.foxminded.university.service.GroupService;
 import ua.com.foxminded.university.service.ProfessorService;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -78,7 +76,9 @@ class DepartmentsControllerTest {
         Mockito.reset(professorService);
         Mockito.reset(courseService);
         Mockito.reset(groupService);
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(new DepartmentsController(departmentService, professorService, courseService, groupService))
+                .build();
         departmentsController = webApplicationContext.getBean(DepartmentsController.class);
     }
 
@@ -254,6 +254,18 @@ class DepartmentsControllerTest {
     }
 
     @Test
+    void createNotValidProfessorShouldReturnProfessorNewView() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/department")
+                .accept(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("name", "s"))
+                .andExpect(model().attributeHasFieldErrorCode(
+                        "department","name","Size")).
+                andExpect(view().name("department/add")).
+                andExpect(status().isOk());
+    }
+
+    @Test
     void updateShouldGetDepartmentFromModelAndRenderIndexView() throws Exception {
         DepartmentRequest departmentRequest = new DepartmentRequest();
         departmentRequest.setId(1L);
@@ -274,6 +286,18 @@ class DepartmentsControllerTest {
 
         verify(departmentService).edit(departmentRequest);
         verifyNoMoreInteractions(departmentService);
+    }
+
+    @Test
+    void updateNotValidProfessorShouldReturnProfessorNewView() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.patch("/department/1")
+                .accept(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("name", "s"))
+                .andExpect(model().attributeHasFieldErrorCode(
+                        "departmentRequest","name","Size")).
+                andExpect(view().name("department/edit")).
+                andExpect(status().isOk());
     }
 
     @Test

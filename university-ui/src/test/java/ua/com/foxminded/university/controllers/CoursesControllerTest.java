@@ -24,15 +24,14 @@ import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.CourseService;
 import ua.com.foxminded.university.service.DepartmentService;
 import ua.com.foxminded.university.service.ProfessorService;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -72,7 +71,9 @@ class CoursesControllerTest {
         Mockito.reset(courseService);
         Mockito.reset(professorService);
         Mockito.reset(departmentService);
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(new CoursesController(courseService, professorService, departmentService))
+                .build();
         coursesController = webApplicationContext.getBean(CoursesController.class);
     }
 
@@ -158,7 +159,7 @@ class CoursesControllerTest {
                 .andExpect(model().attribute("departments", is(departments)))
                 .andExpect(model().attribute("courseResponse", is(courseResponse)));
 
-        verify(courseService).findById(1L);
+        verify(courseService, times(2)).findById(1L);
         verify(professorService).findAll();
         verify(professorService).findByCourseId(1L);
         verify(departmentService).findAll();
@@ -196,6 +197,18 @@ class CoursesControllerTest {
     }
 
     @Test
+    void createNotValidCourseShouldReturnProfessorNewView() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/course")
+                .accept(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("name", "s"))
+                .andExpect(model().attributeHasFieldErrorCode(
+                        "course","name","Size")).
+                andExpect(view().name("course/add")).
+                andExpect(status().isOk());
+    }
+
+    @Test
     void updateShouldGetCourseFromModelAndRenderIndexView() throws Exception {
         CourseRequest courseRequest = new CourseRequest();
         courseRequest.setId(1L);
@@ -219,6 +232,18 @@ class CoursesControllerTest {
 
         verify(courseService).edit(courseRequest);
         verifyNoMoreInteractions(courseService);
+    }
+
+    @Test
+    void updateNotValidCourseShouldReturnProfessorNewView() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.patch("/course/1")
+                .accept(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("name", "s"))
+                .andExpect(model().attributeHasFieldErrorCode(
+                        "courseRequest","name","Size")).
+                andExpect(view().name("course/edit")).
+                andExpect(status().isOk());
     }
 
     @Test

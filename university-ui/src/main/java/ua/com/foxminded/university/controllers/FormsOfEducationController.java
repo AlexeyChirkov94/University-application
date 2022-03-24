@@ -3,6 +3,7 @@ package ua.com.foxminded.university.controllers;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,7 @@ import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.FormOfEducationService;
 import ua.com.foxminded.university.service.GroupService;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.List;
 
 import static ua.com.foxminded.university.controllers.ControllersUtility.setPagesValueAndStatus;
@@ -55,31 +57,37 @@ public class FormsOfEducationController {
     }
 
     @PostMapping()
-    public String create(@ModelAttribute("formOfEducation") FormOfEducationRequest formOfEducationRequest) {
+    public String create(@ModelAttribute("formOfEducation") @Valid FormOfEducationRequest formOfEducationRequest, BindingResult bindingResult) {
+
+        if(bindingResult.hasErrors()) return "formOfEducation/add";
+
         formOfEducationService.create(formOfEducationRequest);
         return "redirect:/education/form";
     }
 
     @GetMapping("/{id}/edit")
     public String edit(Model model, @PathVariable("id") long id) {
+
+        partiallyPrepareModelToEditView(model, id);
+
         FormOfEducationResponse formOfEducationResponse = formOfEducationService.findById(id);
         FormOfEducationRequest formOfEducationRequest = new FormOfEducationRequest();
         formOfEducationRequest.setId(formOfEducationResponse.getId());
         formOfEducationRequest.setName(formOfEducationResponse.getName());
-        List<GroupResponse> notFormOfEducationGroups = groupService.findAll();
-        List<GroupResponse> formOfEducationGroups = groupService.findByFormOfEducation(id);
-        notFormOfEducationGroups.removeAll(formOfEducationGroups);
-
         model.addAttribute("formOfEducationRequest", formOfEducationRequest);
-
-        model.addAttribute("notFormOfEducationGroups", notFormOfEducationGroups);
-        model.addAttribute("formOfEducationGroups", formOfEducationGroups);
 
         return "formOfEducation/edit";
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute("formOfEducationRequest") FormOfEducationRequest formOfEducationRequest) {
+    public String update(Model model, @ModelAttribute("formOfEducationRequest") @Valid FormOfEducationRequest formOfEducationRequest,
+                         BindingResult bindingResult) {
+
+        if(bindingResult.hasErrors()) {
+            partiallyPrepareModelToEditView(model, formOfEducationRequest.getId());
+            return "formOfEducation/edit";
+        }
+
         formOfEducationService.edit(formOfEducationRequest);
         return "redirect:/education/form";
     }
@@ -120,6 +128,17 @@ public class FormsOfEducationController {
         modelAndView.setViewName("errors handling/entity already exist");
 
         return modelAndView;
+    }
+
+    private void partiallyPrepareModelToEditView(Model model, long id) {
+
+        List<GroupResponse> notFormOfEducationGroups = groupService.findAll();
+        List<GroupResponse> formOfEducationGroups = groupService.findByFormOfEducation(id);
+        notFormOfEducationGroups.removeAll(formOfEducationGroups);
+
+        model.addAttribute("notFormOfEducationGroups", notFormOfEducationGroups);
+        model.addAttribute("formOfEducationGroups", formOfEducationGroups);
+
     }
 
 }

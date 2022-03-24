@@ -25,8 +25,6 @@ import ua.com.foxminded.university.entity.Role;
 import ua.com.foxminded.university.entity.ScienceDegree;
 import ua.com.foxminded.university.mapper.ProfessorMapper;
 import ua.com.foxminded.university.service.validator.ScienceDegreeValidator;
-import ua.com.foxminded.university.service.validator.UserValidator;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -59,9 +57,6 @@ class ProfessorServiceImplTest {
 
     @Mock
     RoleRepository roleRepository;
-
-    @Mock
-    UserValidator userValidator;
 
     @Mock
     ScienceDegreeValidator scienceDegreeValidator;
@@ -214,7 +209,6 @@ class ProfessorServiceImplTest {
         professorRequest.setDepartmentId(0L);
         professorRequest.setScienceDegreeId(0);
 
-        doNothing().when(userValidator).validate(professorRequest);
         when(professorRepository.findAllByEmail(email)).thenReturn(Collections.emptyList());
         when(passwordEncoder.encode(password)).thenReturn(password);
         when(professorMapper.mapDtoToEntity(professorRequest)).thenReturn(professor);
@@ -223,7 +217,6 @@ class ProfessorServiceImplTest {
 
         professorService.register(professorRequest);
 
-        verify(userValidator).validate(professorRequest);
         verify(professorRepository).findAllByEmail(email);
         verify(passwordEncoder).encode(password);
         verify(professorMapper).mapDtoToEntity(professorRequest);
@@ -245,7 +238,6 @@ class ProfessorServiceImplTest {
         professorRequest.setDepartmentId(0L);
         professorRequest.setScienceDegreeId(0);
 
-        doNothing().when(userValidator).validate(professorRequest);
         when(professorRepository.findAllByEmail(email)).thenReturn(Collections.emptyList());
         when(passwordEncoder.encode(password)).thenReturn(password);
         when(professorMapper.mapDtoToEntity(professorRequest)).thenReturn(professor);
@@ -257,7 +249,6 @@ class ProfessorServiceImplTest {
 
         professorService.register(professorRequest);
 
-        verify(userValidator).validate(professorRequest);
         verify(professorRepository).findAllByEmail(email);
         verify(passwordEncoder).encode(password);
         verify(professorMapper).mapDtoToEntity(professorRequest);
@@ -282,7 +273,6 @@ class ProfessorServiceImplTest {
         professorRequest.setDepartmentId(0L);
         professorRequest.setScienceDegreeId(0);
 
-        doNothing().when(userValidator).validate(professorRequest);
         when(professorRepository.findAllByEmail(email)).thenReturn(Collections.emptyList());
         when(passwordEncoder.encode(password)).thenReturn(password);
         when(professorMapper.mapDtoToEntity(professorRequest)).thenReturn(professor);
@@ -292,7 +282,6 @@ class ProfessorServiceImplTest {
 
         Assertions.assertThatThrownBy(() -> professorService.register(professorRequest)).hasMessage("ROLE_PROFESSOR not initialized");
 
-        verify(userValidator).validate(professorRequest);
         verify(professorRepository).findAllByEmail(email);
         verify(passwordEncoder).encode(password);
         verify(professorMapper).mapDtoToEntity(professorRequest);
@@ -317,7 +306,6 @@ class ProfessorServiceImplTest {
         professorRequest.setDepartmentId(1L);
         professorRequest.setScienceDegreeId(1);
 
-        doNothing().when(userValidator).validate(professorRequest);
         when(professorRepository.findAllByEmail(email)).thenReturn(Collections.emptyList());
         when(passwordEncoder.encode(password)).thenReturn(password);
         when(professorMapper.mapDtoToEntity(professorRequest)).thenReturn(professor);
@@ -331,7 +319,6 @@ class ProfessorServiceImplTest {
 
         professorService.register(professorRequest);
 
-        verify(userValidator).validate(professorRequest);
         verify(professorRepository).findAllByEmail(email);
         verify(passwordEncoder).encode(password);
         verify(professorMapper).mapDtoToEntity(professorRequest);
@@ -352,12 +339,10 @@ class ProfessorServiceImplTest {
         professorRequest.setEmail(email);
         professorRequest.setPassword(password);
 
-        doNothing().when(userValidator).validate(professorRequest);
         when(professorRepository.findAllByEmail(email)).thenReturn(Collections.singletonList(Professor.builder().withEmail(email).build()));
 
         assertThatThrownBy(() -> professorService.register(professorRequest)).hasMessage("This email already registered");
 
-        verify(userValidator).validate(professorRequest);
         verify(professorRepository).findAllByEmail(email);
     }
 

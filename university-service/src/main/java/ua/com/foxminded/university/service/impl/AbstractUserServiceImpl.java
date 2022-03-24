@@ -10,7 +10,6 @@ import ua.com.foxminded.university.dto.UserResponse;
 import ua.com.foxminded.university.service.exception.EntityAlreadyExistException;
 import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.UserService;
-import ua.com.foxminded.university.service.validator.UserValidator;
 
 @AllArgsConstructor
 @Transactional
@@ -20,11 +19,9 @@ public abstract class AbstractUserServiceImpl<REQUEST extends UserRequest, RESPO
     protected final PasswordEncoder passwordEncoder;
     protected final UserRepository userRepository;
     protected final RoleRepository roleRepository;
-    protected final UserValidator userValidator;
 
     @Override
     public RESPONSE register(REQUEST userDto) {
-        userValidator.validate(userDto);
         if (!userRepository.findAllByEmail(userDto.getEmail()).isEmpty()) {
             throw new EntityAlreadyExistException("This email already registered");
         } else {

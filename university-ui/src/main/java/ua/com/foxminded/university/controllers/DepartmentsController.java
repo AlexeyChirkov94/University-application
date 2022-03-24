@@ -3,6 +3,7 @@ package ua.com.foxminded.university.controllers;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,8 +26,8 @@ import ua.com.foxminded.university.service.DepartmentService;
 import ua.com.foxminded.university.service.GroupService;
 import ua.com.foxminded.university.service.ProfessorService;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.List;
-
 import static ua.com.foxminded.university.controllers.ControllersUtility.setPagesValueAndStatus;
 
 @AllArgsConstructor
@@ -62,42 +63,38 @@ public class DepartmentsController {
     }
 
     @PostMapping()
-    public String create(@ModelAttribute("department") DepartmentRequest departmentRequest) {
+    public String create(@ModelAttribute("department") @Valid DepartmentRequest departmentRequest,
+            BindingResult bindingResult) {
+
+        if(bindingResult.hasErrors()) return "department/add";
+
         departmentService.create(departmentRequest);
         return "redirect:/department";
     }
 
     @GetMapping("/{id}/edit")
     public String edit(Model model, @PathVariable("id") long id) {
+
+        partiallyPrepareModelToEditView(model, id);
+
         DepartmentResponse departmentResponse = departmentService.findById(id);
         DepartmentRequest departmentRequest = new DepartmentRequest();
         departmentRequest.setId(departmentResponse.getId());
         departmentRequest.setName(departmentResponse.getName());
-
-        List<ProfessorResponse> departmentProfessors = professorService.findByDepartmentId(id);
-        List<ProfessorResponse> anotherProfessors = professorService.findAll();
-        anotherProfessors.removeAll(departmentProfessors);
-
-        List<CourseResponse> departmentCourses = courseService.findByDepartmentId(id);
-        List<CourseResponse> anotherCourses = courseService.findAll();
-        anotherCourses.removeAll(departmentCourses);
-
-        List<GroupResponse> departmentGroups = groupService.findByDepartmentId(id);
-        List<GroupResponse> anotherGroups = groupService.findAll();
-        anotherGroups.removeAll(departmentGroups);
-
         model.addAttribute("departmentRequest", departmentRequest);
-        model.addAttribute("departmentProfessors", departmentProfessors);
-        model.addAttribute("anotherProfessors", anotherProfessors);
-        model.addAttribute("departmentCourses", departmentCourses);
-        model.addAttribute("anotherCourses", anotherCourses);
-        model.addAttribute("departmentGroups", departmentGroups);
-        model.addAttribute("anotherGroups", anotherGroups);
+
         return "department/edit";
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute("departmentRequest") DepartmentRequest departmentRequest) {
+    public String update(Model model, @ModelAttribute("departmentRequest") @Valid DepartmentRequest departmentRequest,
+                         BindingResult bindingResult) {
+
+        if(bindingResult.hasErrors()) {
+            partiallyPrepareModelToEditView(model, departmentRequest.getId());
+            return "department/edit";
+        }
+
         departmentService.edit(departmentRequest);
         return "redirect:/department";
     }
@@ -166,6 +163,28 @@ public class DepartmentsController {
         modelAndView.setViewName("errors handling/entity already exist");
 
         return modelAndView;
+    }
+
+    private void partiallyPrepareModelToEditView(Model model, long id) {
+
+        List<ProfessorResponse> departmentProfessors = professorService.findByDepartmentId(id);
+        List<ProfessorResponse> anotherProfessors = professorService.findAll();
+        anotherProfessors.removeAll(departmentProfessors);
+
+        List<CourseResponse> departmentCourses = courseService.findByDepartmentId(id);
+        List<CourseResponse> anotherCourses = courseService.findAll();
+        anotherCourses.removeAll(departmentCourses);
+
+        List<GroupResponse> departmentGroups = groupService.findByDepartmentId(id);
+        List<GroupResponse> anotherGroups = groupService.findAll();
+        anotherGroups.removeAll(departmentGroups);
+
+        model.addAttribute("departmentProfessors", departmentProfessors);
+        model.addAttribute("anotherProfessors", anotherProfessors);
+        model.addAttribute("departmentCourses", departmentCourses);
+        model.addAttribute("anotherCourses", anotherCourses);
+        model.addAttribute("departmentGroups", departmentGroups);
+        model.addAttribute("anotherGroups", anotherGroups);
     }
 
 }

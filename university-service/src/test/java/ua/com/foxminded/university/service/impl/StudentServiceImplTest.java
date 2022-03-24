@@ -18,12 +18,10 @@ import ua.com.foxminded.university.entity.Group;
 import ua.com.foxminded.university.entity.Role;
 import ua.com.foxminded.university.entity.Student;
 import ua.com.foxminded.university.mapper.StudentMapper;
-import ua.com.foxminded.university.service.validator.UserValidator;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
@@ -41,9 +39,6 @@ class StudentServiceImplTest {
 
     @Mock
     RoleRepository roleRepository;
-
-    @Mock
-    UserValidator userValidator;
 
     @Mock
     PasswordEncoder passwordEncoder;
@@ -159,7 +154,6 @@ class StudentServiceImplTest {
         studentRequest.setPassword(password);
         studentRequest.setGroupId(1L);
 
-        doNothing().when(userValidator).validate(studentRequest);
         when(studentRepository.findAllByEmail(email)).thenReturn(Collections.emptyList());
         when(passwordEncoder.encode(password)).thenReturn(password);
         when(studentMapper.mapDtoToEntity(studentRequest)).thenReturn(student);
@@ -171,7 +165,6 @@ class StudentServiceImplTest {
 
         studentService.register(studentRequest);
 
-        verify(userValidator).validate(studentRequest);
         verify(studentRepository).findAllByEmail(email);
         verify(passwordEncoder).encode(password);
         verify(studentMapper).mapDtoToEntity(studentRequest);
@@ -193,7 +186,6 @@ class StudentServiceImplTest {
         studentRequest.setPassword(password);
         studentRequest.setGroupId(0L);
 
-        doNothing().when(userValidator).validate(studentRequest);
         when(studentRepository.findAllByEmail(email)).thenReturn(Collections.emptyList());
         when(passwordEncoder.encode(password)).thenReturn(password);
         when(studentMapper.mapDtoToEntity(studentRequest)).thenReturn(student);
@@ -202,7 +194,6 @@ class StudentServiceImplTest {
 
         studentService.register(studentRequest);
 
-        verify(userValidator).validate(studentRequest);
         verify(studentRepository).findAllByEmail(email);
         verify(passwordEncoder).encode(password);
         verify(studentMapper).mapDtoToEntity(studentRequest);
@@ -222,7 +213,6 @@ class StudentServiceImplTest {
         studentRequest.setPassword(password);
         studentRequest.setGroupId(0L);
 
-        doNothing().when(userValidator).validate(studentRequest);
         when(studentRepository.findAllByEmail(email)).thenReturn(Collections.emptyList());
         when(passwordEncoder.encode(password)).thenReturn(password);
         when(studentMapper.mapDtoToEntity(studentRequest)).thenReturn(student);
@@ -234,7 +224,6 @@ class StudentServiceImplTest {
 
         studentService.register(studentRequest);
 
-        verify(userValidator).validate(studentRequest);
         verify(studentRepository).findAllByEmail(email);
         verify(passwordEncoder).encode(password);
         verify(studentMapper).mapDtoToEntity(studentRequest);
@@ -256,7 +245,6 @@ class StudentServiceImplTest {
         studentRequest.setPassword(password);
         studentRequest.setGroupId(0L);
 
-        doNothing().when(userValidator).validate(studentRequest);
         when(studentRepository.findAllByEmail(email)).thenReturn(Collections.emptyList());
         when(passwordEncoder.encode(password)).thenReturn(password);
         when(studentMapper.mapDtoToEntity(studentRequest)).thenReturn(student);
@@ -266,7 +254,6 @@ class StudentServiceImplTest {
 
         assertThatThrownBy(() -> studentService.register(studentRequest)).hasMessage("ROLE_STUDENT not initialized");
 
-        verify(userValidator).validate(studentRequest);
         verify(studentRepository).findAllByEmail(email);
         verify(passwordEncoder).encode(password);
         verify(studentMapper).mapDtoToEntity(studentRequest);
@@ -283,12 +270,10 @@ class StudentServiceImplTest {
         studentRequest.setEmail(email);
         studentRequest.setPassword(password);
 
-        doNothing().when(userValidator).validate(studentRequest);
         when(studentRepository.findAllByEmail(email)).thenReturn(Collections.singletonList(Student.builder().withEmail(email).build()));
 
         assertThatThrownBy(() -> studentService.register(studentRequest)).hasMessage("This email already registered");
 
-        verify(userValidator).validate(studentRequest);
         verify(studentRepository).findAllByEmail(email);
     }
 

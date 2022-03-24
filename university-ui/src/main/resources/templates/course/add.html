@@ -23,6 +23,7 @@
         <div class="form-floating mb-3">
             <input type="text" th:field="*{name}" class="form-control" id="name of course" placeholder="Choose name of course:">
             <label for="name of course" th:text="#{enter.name.new.course}">Choose name of new course:</label>
+            <div style='color:red' th:if="${#fields.hasErrors('name')}" th:text="#{error.of.size.two.fifty}">Error message</div>
         </div>
         <select class="form-select  mb-2" th:field="*{departmentId}">
             <option selected="" value="0" th:text="#{choose.department.of.new.course}">Choose department of new course:</option>

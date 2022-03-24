@@ -24,24 +24,28 @@
         <div class="form-floating mb-2">
             <input type="text" th:field="*{firstName}" class="form-control" id="firstName1" placeholder="First name">
             <label for="firstName1" th:text="#{enter.new.student.first.name}">Change first name:</label>
+            <div style='color:red' th:if="${#fields.hasErrors('firstName')}" th:text="#{error.of.size.two.fifty}">Error message</div>
         </div>
 
         <h6 th:text="#{last.name.of.student}">Last name of student</h6>
         <div class="form-floating mb-2">
             <input type="text" th:field="*{lastName}" class="form-control" id="LastNme2" placeholder="Last name">
             <label for="LastNme2" th:text="#{enter.new.student.last.name}">Change last name:</label>
+            <div style='color:red' th:if="${#fields.hasErrors('lastName')}" th:text="#{error.of.size.two.fifty}">Error message</div>
         </div>
 
         <h6 th:text="#{email.of.student}">Email of student</h6>
         <div class="form-floating mb-2">
             <input type="text" th:field="*{email}" class="form-control" id="email1" placeholder="name@example.com">
             <label for="email1" th:text="#{enter.new.student.email}">Change email:</label>
+            <div style='color:red' th:if="${#fields.hasErrors('email')}" th:text="#{error.of.email}">Error message</div>
         </div>
 
         <h6 th:text="#{password.of.student}">Password of student</h6>
         <div class="form-floating mb-2">
             <input type="password" th:field="*{password}" class="form-control" id="floatingPassword" placeholder="Password">
             <label for="floatingPassword" th:text="#{enter.new.student.password}">Change password:</label>
+            <div style='color:red' th:if="${#fields.hasErrors('password')}" th:text="#{error.of.size.password}">Error message</div>
         </div>
 
         <h6 th:text="#{group.of.student}">Group of student</h6>

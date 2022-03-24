@@ -3,6 +3,7 @@ package ua.com.foxminded.university.controllers;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,15 +21,14 @@ import ua.com.foxminded.university.dto.ProfessorResponse;
 import ua.com.foxminded.university.dto.ScienceDegreeResponse;
 import ua.com.foxminded.university.service.exception.EntityAlreadyExistException;
 import ua.com.foxminded.university.service.exception.EntityDontExistException;
-import ua.com.foxminded.university.service.exception.ValidateException;
 import ua.com.foxminded.university.service.CourseService;
 import ua.com.foxminded.university.service.DepartmentService;
 import ua.com.foxminded.university.service.LessonService;
 import ua.com.foxminded.university.service.ProfessorService;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
-
 import static ua.com.foxminded.university.controllers.ControllersUtility.getStringDateTimes;
 import static ua.com.foxminded.university.controllers.ControllersUtility.setPagesValueAndStatus;
 
@@ -58,7 +58,7 @@ public class ProfessorsController {
     }
 
     @GetMapping("/new")
-    public String newProfessor(Model model, @ModelAttribute("professor") ProfessorRequest professorRequest) {
+    public String newProfessor(Model model, @ModelAttribute("professorRequest") ProfessorRequest professorRequest) {
 
         model.addAttribute("scienceDegrees", ScienceDegreeResponse.values());
         model.addAttribute("departments", departmentService.findAll());
@@ -66,7 +66,15 @@ public class ProfessorsController {
     }
 
     @PostMapping()
-    public String create(@ModelAttribute("professor") ProfessorRequest professorRequest) {
+    public String create(Model model, @ModelAttribute("professorRequest") @Valid ProfessorRequest professorRequest,
+                         BindingResult bindingResult) {
+
+        if(bindingResult.hasErrors()) {
+            model.addAttribute("scienceDegrees", ScienceDegreeResponse.values());
+            model.addAttribute("departments", departmentService.findAll());
+            return "professor/add";
+        }
+
         professorService.register(professorRequest);
         return "redirect:/professor";
     }
@@ -93,7 +101,22 @@ public class ProfessorsController {
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute("professor") ProfessorRequest professorRequest) {
+    public String update(Model model, @ModelAttribute("professorRequest") @Valid ProfessorRequest professorRequest, BindingResult bindingResult) {
+
+        if(bindingResult.hasErrors()) {
+            ProfessorResponse professorResponse = professorService.findById(professorRequest.getId());
+            List<CourseResponse> professorsCourses = courseService.findByProfessorId(professorRequest.getId());
+            List<CourseResponse> anotherCourses = courseService.findAll();
+            anotherCourses.removeAll(professorsCourses);
+
+            model.addAttribute("professorResponse", professorResponse);
+            model.addAttribute("ScienceDegrees", ScienceDegreeResponse.values());
+            model.addAttribute("departments", departmentService.findAll());
+            model.addAttribute("professorsCourses", professorsCourses);
+            model.addAttribute("anotherCourses", anotherCourses);
+            return "professor/edit";
+        }
+
         professorService.edit(professorRequest);
         return "redirect:/professor";
     }
@@ -127,15 +150,6 @@ public class ProfessorsController {
     public String delete(@PathVariable("id") long id) {
         professorService.deleteById(id);
         return "redirect:/professor";
-    }
-
-    @ExceptionHandler(ValidateException.class)
-    public ModelAndView validateProfessorException(HttpServletRequest request, Exception ex) {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject("exception", ex);
-        modelAndView.setViewName("errors handling/common creating error");
-
-        return modelAndView;
     }
 
     @ExceptionHandler(EntityDontExistException.class)
