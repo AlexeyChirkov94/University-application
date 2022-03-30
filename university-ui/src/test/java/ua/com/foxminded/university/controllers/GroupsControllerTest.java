@@ -38,6 +38,7 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -86,7 +87,9 @@ public class GroupsControllerTest {
         Mockito.reset(departmentService);
         Mockito.reset(studentService);
         Mockito.reset(lessonService);
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(new GroupsController(groupService, formOfEducationService, departmentService, studentService, lessonService))
+                .build();
         groupsController = webApplicationContext.getBean(GroupsController.class);
     }
 
@@ -202,7 +205,7 @@ public class GroupsControllerTest {
                 .andExpect(model().attribute("studentsAnotherGroups", is(studentsAnotherGroups)))
                 .andExpect(model().attribute("studentsCurrentGroup", is(studentsCurrentGroup)));
 
-        verify(groupService).findById(1L);
+        verify(groupService, times(2)).findById(1L);
         verify(departmentService).findAll();
         verify(formOfEducationService).findAll();
         verify(studentService).findAll();
@@ -240,6 +243,18 @@ public class GroupsControllerTest {
     }
 
     @Test
+    void createNotValidGroupShouldReturnProfessorNewView() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/group")
+                .accept(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("name", "s"))
+                .andExpect(model().attributeHasFieldErrorCode(
+                        "group","name","Size")).
+                andExpect(view().name("group/add")).
+                andExpect(status().isOk());
+    }
+
+    @Test
     void updateShouldGetGroupFromModelAndRenderIndexView() throws Exception {
         GroupRequest groupRequest = new GroupRequest();
         groupRequest.setId(1L);
@@ -254,11 +269,23 @@ public class GroupsControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/group"))
                 .andExpect(redirectedUrl("/group"))
-                .andExpect(model().attribute("group", hasProperty("id", is(groupRequest.getId()))))
-                .andExpect(model().attribute("group", hasProperty("name",is(groupRequest.getName()))));
+                .andExpect(model().attribute("groupRequest", hasProperty("id", is(groupRequest.getId()))))
+                .andExpect(model().attribute("groupRequest", hasProperty("name",is(groupRequest.getName()))));
 
         verify(groupService).edit(groupRequest);
         verifyNoMoreInteractions(groupService);
+    }
+
+    @Test
+    void updateNotValidGroupShouldReturnProfessorNewView() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.patch("/group/1")
+                .accept(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("name", "s"))
+                .andExpect(model().attributeHasFieldErrorCode(
+                        "groupRequest","name","Size")).
+                andExpect(view().name("group/edit")).
+                andExpect(status().isOk());
     }
 
     @Test

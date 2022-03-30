@@ -3,6 +3,7 @@ package ua.com.foxminded.university.controllers;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +28,7 @@ import ua.com.foxminded.university.service.GroupService;
 import ua.com.foxminded.university.service.LessonService;
 import ua.com.foxminded.university.service.StudentService;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
@@ -68,36 +70,40 @@ public class GroupsController {
     }
 
     @PostMapping()
-    public String create(@ModelAttribute("group") GroupRequest groupRequest) {
+    public String create(Model model, @ModelAttribute("group") @Valid GroupRequest groupRequest, BindingResult bindingResult) {
+
+        if(bindingResult.hasErrors()) {
+            model.addAttribute("formsOfEducation", formOfEducationService.findAll());
+            model.addAttribute("departments", departmentService.findAll());
+            return "group/add";
+        }
+
         groupService.create(groupRequest);
         return "redirect:/group";
     }
 
     @GetMapping("/{id}/edit")
     public String edit(Model model, @PathVariable("id") long id) {
+
+        partiallyPrepareModelToEditView(model, id);
+
         GroupResponse groupResponse = groupService.findById(id);
         GroupRequest groupRequest = new GroupRequest();
         groupRequest.setName(groupResponse.getName());
-
-        List<DepartmentResponse> departments = departmentService.findAll();
-        List<FormOfEducationResponse> formsOfEducation = formOfEducationService.findAll();
-
-        List<StudentResponse> studentsAnotherGroups = studentService.findAll();
-        List<StudentResponse> studentsCurrentGroup = studentService.findByGroupId(id);
-        studentsAnotherGroups.removeAll(studentsCurrentGroup);
-
-        model.addAttribute("studentsAnotherGroups", studentsAnotherGroups);
-        model.addAttribute("studentsCurrentGroup", studentsCurrentGroup);
-        model.addAttribute("formsOfEducation", formsOfEducation);
-        model.addAttribute("departments", departments);
-        model.addAttribute("groupResponse", groupResponse);
         model.addAttribute("groupRequest", groupRequest);
 
         return "group/edit";
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute("group") GroupRequest groupRequest) {
+    public String update(Model model, @ModelAttribute("groupRequest") @Valid GroupRequest groupRequest, BindingResult bindingResult) {
+
+        if(bindingResult.hasErrors()) {
+            System.out.println("dot1");
+            partiallyPrepareModelToEditView(model, groupRequest.getId());
+            return "group/edit";
+        }
+
         groupService.edit(groupRequest);
         return "redirect:/group";
     }
@@ -149,6 +155,22 @@ public class GroupsController {
         modelAndView.setViewName("errors handling/entity already exist");
 
         return modelAndView;
+    }
+
+    private void partiallyPrepareModelToEditView(Model model, long id) {
+
+        GroupResponse groupResponse = groupService.findById(id);
+        List<DepartmentResponse> departments = departmentService.findAll();
+        List<FormOfEducationResponse> formsOfEducation = formOfEducationService.findAll();
+        List<StudentResponse> studentsAnotherGroups = studentService.findAll();
+        List<StudentResponse> studentsCurrentGroup = studentService.findByGroupId(id);
+        studentsAnotherGroups.removeAll(studentsCurrentGroup);
+
+        model.addAttribute("studentsAnotherGroups", studentsAnotherGroups);
+        model.addAttribute("studentsCurrentGroup", studentsCurrentGroup);
+        model.addAttribute("formsOfEducation", formsOfEducation);
+        model.addAttribute("departments", departments);
+        model.addAttribute("groupResponse", groupResponse);
     }
 
 }

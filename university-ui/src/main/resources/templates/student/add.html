@@ -19,26 +19,30 @@
 
     <br>
 
-    <form th:method="POST" th:action="@{/student}" th:object="${student}">
+    <form th:method="POST" th:action="@{/student}" th:object="${studentRequest}">
 
         <div class="form-floating mb-2">
             <input type="text" th:field="*{firstName}" class="form-control" id="firstName" placeholder="First name">
             <label for="firstName" th:text="#{enter.first.name}">Enter first name:</label>
+            <div style='color:red' th:if="${#fields.hasErrors('firstName')}" th:text="#{error.of.size.two.fifty}">Error message</div>
         </div>
 
         <div class="form-floating mb-2">
             <input type="text" th:field="*{lastName}" class="form-control" id="lastName" placeholder="Last name">
             <label for="lastName" th:text="#{enter.last.name}">Enter last name:</label>
+            <div style='color:red' th:if="${#fields.hasErrors('lastName')}" th:text="#{error.of.size.two.fifty}">Error message</div>
         </div>
 
         <div class="form-floating mb-2">
             <input type="text" th:field="*{email}" class="form-control" id="email" placeholder="name@example.com">
             <label for="email" th:text="#{enter.email}">Enter email:</label>
+            <div style='color:red' th:if="${#fields.hasErrors('email')}" th:text="#{error.of.email}">Error message</div>
         </div>
 
         <div class="form-floating mb-2">
             <input type="password" th:field="*{password}" class="form-control" id="floatingPassword" placeholder="Password">
             <label for="floatingPassword" th:text="#{enter.password}">Enter password:</label>
+            <div style='color:red' th:if="${#fields.hasErrors('password')}" th:text="#{error.of.size.password}">Error message</div>
         </div>
 
         <select class="form-select  mb-2" th:field="*{groupId}">

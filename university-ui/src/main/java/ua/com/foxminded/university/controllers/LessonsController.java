@@ -3,6 +3,7 @@ package ua.com.foxminded.university.controllers;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +31,7 @@ import ua.com.foxminded.university.service.GroupService;
 import ua.com.foxminded.university.service.LessonService;
 import ua.com.foxminded.university.service.ProfessorService;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
@@ -99,7 +101,7 @@ public class LessonsController {
         List<ProfessorResponse> availableTeachers;
         List<CourseResponse> availableCourses;
         availableTeachers = !course.getName().isEmpty() ? professorService.findByCourseId(course.getId()) : professorService.findAll();
-        availableCourses = !teacher.getLastName().isEmpty() ? courseService.findByProfessorId(teacher.getId()) : courseService.findAll();
+        availableCourses = !(teacher.getLastName() == null) ? courseService.findByProfessorId(teacher.getId()) : courseService.findAll();
 
         model.addAttribute("lessonResponse", lessonResponse);
         model.addAttribute("lessonRequest", lessonRequest);
@@ -162,7 +164,11 @@ public class LessonsController {
     }
 
     @PostMapping("/type")
-    public String createFromOFLesson(@ModelAttribute("formOfLesson") FormOfLessonRequest formOfLessonRequest) {
+    public String createFromOFLesson(@ModelAttribute("formOfLesson") @Valid FormOfLessonRequest formOfLessonRequest,
+                                     BindingResult bindingResult) {
+
+        if(bindingResult.hasErrors()) return "formOfLesson/add";
+
         formOfLessonService.create(formOfLessonRequest);
         return "redirect:/lesson/type";
     }
@@ -180,7 +186,11 @@ public class LessonsController {
     }
 
     @PatchMapping("type/{id}")
-    public String updateFromOFLesson(@ModelAttribute("formOfLessonRequest") FormOfLessonRequest formOfLessonRequest) {
+    public String updateFromOFLesson(@ModelAttribute("formOfLessonRequest") @Valid FormOfLessonRequest formOfLessonRequest,
+                                     BindingResult bindingResult) {
+
+        if(bindingResult.hasErrors()) return "formOfLesson/edit";
+
         formOfLessonService.edit(formOfLessonRequest);
         return "redirect:/lesson/type";
     }

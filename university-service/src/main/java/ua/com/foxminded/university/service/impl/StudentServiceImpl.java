@@ -14,7 +14,6 @@ import ua.com.foxminded.university.entity.Student;
 import ua.com.foxminded.university.mapper.StudentMapper;
 import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.StudentService;
-import ua.com.foxminded.university.service.validator.UserValidator;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -28,9 +27,9 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
     private final GroupRepository groupRepository;
     private final StudentMapper studentMapper;
 
-    public StudentServiceImpl(StudentRepository studentRepository, GroupRepository groupRepository, PasswordEncoder passwordEncoder, UserValidator userValidator,
+    public StudentServiceImpl(StudentRepository studentRepository, GroupRepository groupRepository, PasswordEncoder passwordEncoder,
                               StudentMapper studentMapper, RoleRepository roleRepository) {
-        super(passwordEncoder, studentRepository, roleRepository, userValidator);
+        super(passwordEncoder, studentRepository, roleRepository);
         this.studentRepository = studentRepository;
         this.groupRepository = groupRepository;
         this.studentMapper = studentMapper;
@@ -72,7 +71,6 @@ public class StudentServiceImpl extends AbstractUserServiceImpl<StudentRequest, 
 
     @Override
     public void edit(StudentRequest studentRequest) {
-        userValidator.validate(studentRequest);
         studentRequest.setPassword(passwordEncoder.encode(studentRequest.getPassword()));
 
         studentRepository.save(studentMapper.mapDtoToEntity(studentRequest));

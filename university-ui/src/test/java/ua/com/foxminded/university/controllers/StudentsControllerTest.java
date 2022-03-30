@@ -22,11 +22,9 @@ import ua.com.foxminded.university.dto.StudentResponse;
 import ua.com.foxminded.university.service.exception.EntityAlreadyExistException;
 import ua.com.foxminded.university.service.exception.EntityDontExistException;
 import ua.com.foxminded.university.service.exception.TimeTableStudentWithoutGroupException;
-import ua.com.foxminded.university.service.exception.ValidateException;
 import ua.com.foxminded.university.service.GroupService;
 import ua.com.foxminded.university.service.LessonService;
 import ua.com.foxminded.university.service.StudentService;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -78,7 +76,9 @@ class StudentsControllerTest {
         Mockito.reset(studentService);
         Mockito.reset(groupService);
         Mockito.reset(lessonService);
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(new StudentsController(studentService, groupService, lessonService))
+                .build();
         studentsController = webApplicationContext.getBean(StudentsController.class);
     }
 
@@ -196,10 +196,14 @@ class StudentsControllerTest {
         studentRequest.setId(1L);
         studentRequest.setFirstName("Alex");
         studentRequest.setLastName("Chirkov");
+        studentRequest.setEmail("chirkov@gmail.com");
+        studentRequest.setPassword("1231234");
         StudentResponse studentResponse = new StudentResponse();
         studentResponse.setId(1L);
         studentResponse.setFirstName("Alex");
         studentResponse.setLastName("Chirkov");
+        studentResponse.setEmail("chirkov@gmail.com");
+        studentResponse.setPassword("1231234");
 
         when(studentService.register(studentRequest)).thenReturn(studentResponse);
 
@@ -208,16 +212,32 @@ class StudentsControllerTest {
                 .param("id", studentResponse.getId().toString())
                 .param("firstName", studentResponse.getFirstName())
                 .param("lastName", studentResponse.getLastName())
+                .param("email", studentResponse.getEmail())
+                .param("password", studentResponse.getPassword())
         )
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/student"))
                 .andExpect(redirectedUrl("/student"))
-                .andExpect(model().attribute("student", hasProperty("id", is(studentResponse.getId()))))
-                .andExpect(model().attribute("student", hasProperty("firstName",is(studentResponse.getFirstName()))))
-                .andExpect(model().attribute("student", hasProperty("lastName",is(studentResponse.getLastName()))));
+                .andExpect(model().attribute("studentRequest", hasProperty("id", is(studentResponse.getId()))))
+                .andExpect(model().attribute("studentRequest", hasProperty("firstName",is(studentResponse.getFirstName()))))
+                .andExpect(model().attribute("studentRequest", hasProperty("lastName",is(studentResponse.getLastName()))))
+                .andExpect(model().attribute("studentRequest", hasProperty("email",is(studentResponse.getEmail()))))
+                .andExpect(model().attribute("studentRequest", hasProperty("password",is(studentResponse.getPassword()))));
 
         verify(studentService).register(studentRequest);
         verifyNoMoreInteractions(studentService);
+    }
+
+    @Test
+    void createNotValidProfessorShouldReturnProfessorNewView() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/student")
+                .accept(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("firstName", "s"))
+                .andExpect(model().attributeHasFieldErrorCode(
+                        "studentRequest","firstName","Size")).
+                andExpect(view().name("student/add")).
+                andExpect(status().isOk());
     }
 
     @Test
@@ -226,6 +246,8 @@ class StudentsControllerTest {
         studentRequest.setId(1L);
         studentRequest.setFirstName("Alex");
         studentRequest.setLastName("Chirkov");
+        studentRequest.setEmail("chirkov@gmail.com");
+        studentRequest.setPassword("1231234");
 
         doNothing().when(studentService).edit(studentRequest);
 
@@ -234,16 +256,32 @@ class StudentsControllerTest {
                 .param("id", studentRequest.getId().toString())
                 .param("firstName", studentRequest.getFirstName())
                 .param("lastName", studentRequest.getLastName())
+                .param("email", studentRequest.getEmail())
+                .param("password", studentRequest.getPassword())
         )
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/student"))
                 .andExpect(redirectedUrl("/student"))
-                .andExpect(model().attribute("student", hasProperty("id", is(studentRequest.getId()))))
-                .andExpect(model().attribute("student", hasProperty("firstName",is(studentRequest.getFirstName()))))
-                .andExpect(model().attribute("student", hasProperty("lastName",is(studentRequest.getLastName()))));
+                .andExpect(model().attribute("studentRequest", hasProperty("id", is(studentRequest.getId()))))
+                .andExpect(model().attribute("studentRequest", hasProperty("firstName",is(studentRequest.getFirstName()))))
+                .andExpect(model().attribute("studentRequest", hasProperty("lastName",is(studentRequest.getLastName()))))
+                .andExpect(model().attribute("studentRequest", hasProperty("email",is(studentRequest.getEmail()))))
+                .andExpect(model().attribute("studentRequest", hasProperty("password",is(studentRequest.getPassword()))));
 
         verify(studentService).edit(studentRequest);
         verifyNoMoreInteractions(studentService);
+    }
+
+    @Test
+    void updateNotValidProfessorShouldReturnProfessorNewView() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.patch("/student/1")
+                .accept(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("firstName", "s"))
+                .andExpect(model().attributeHasFieldErrorCode(
+                        "studentRequest","firstName","Size")).
+                andExpect(view().name("student/edit")).
+                andExpect(status().isOk());
     }
 
     @Test
@@ -328,29 +366,12 @@ class StudentsControllerTest {
     }
 
     @Test
-    void validateStudentShouldGetExceptionFromModelAndRenderErrorView() throws Exception {
-        StudentRequest notValidStudent = new StudentRequest();
-        notValidStudent.setFirstName("Alex");
-        Exception exception = new ValidateException("password don`t match the pattern");
-
-        when(studentService.register(notValidStudent)).thenThrow(exception);
-
-        mockMvc.perform(post("/student")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .param("firstName", notValidStudent.getFirstName())
-        )
-                .andExpect(status().isOk())
-                .andExpect(view().name("errors handling/common creating error"))
-                .andExpect(model().attribute("exception", is(exception)));
-
-        verify(studentService).register(notValidStudent);
-        verifyNoMoreInteractions(studentService);
-    }
-
-    @Test
     void entityAlreadyExistShouldGetExceptionFromModelAndRenderErrorView() throws Exception {
         StudentRequest repeatableStudent = new StudentRequest();
         repeatableStudent.setFirstName("Alex");
+        repeatableStudent.setLastName("Chirkov");
+        repeatableStudent.setPassword("1231234");
+        repeatableStudent.setEmail("chirkov@gamil.com");
         Exception exception = new EntityAlreadyExistException("Student with same email already exist");
 
         when(studentService.register(repeatableStudent)).thenThrow(exception);
@@ -358,6 +379,9 @@ class StudentsControllerTest {
         mockMvc.perform(post("/student")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("firstName", repeatableStudent.getFirstName())
+                .param("lastName", repeatableStudent.getLastName())
+                .param("password", repeatableStudent.getPassword())
+                .param("email", repeatableStudent.getEmail())
         )
                 .andExpect(status().isOk())
                 .andExpect(view().name("errors handling/entity already exist"))
@@ -398,6 +422,5 @@ class StudentsControllerTest {
         verify(lessonService).formTimeTableForStudent(2L);
         verifyNoMoreInteractions(lessonService);
     }
-
 
 }

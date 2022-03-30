@@ -85,7 +85,9 @@ class LessonsControllerTest {
         Mockito.reset(groupService);
         Mockito.reset(formOfLessonService);
         Mockito.reset(courseService);
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(new LessonsController(lessonService, professorService, groupService, formOfLessonService, courseService))
+                .build();
         lessonsController = webApplicationContext.getBean(LessonsController.class);
     }
 
@@ -142,7 +144,6 @@ class LessonsControllerTest {
         courseResponse.setName("");
         List<CourseResponse> availableCourses = Arrays.asList(courseResponse);
         ProfessorResponse professorResponse = new ProfessorResponse();
-        professorResponse.setLastName("");
         List<ProfessorResponse> availableProfessors = Arrays.asList(professorResponse);
         GroupResponse groupResponse = new GroupResponse();
         List<GroupResponse> allGroups = Arrays.asList(groupResponse);
@@ -456,6 +457,18 @@ class LessonsControllerTest {
     }
 
     @Test
+    void createNotValidFormOfLessonShouldReturnProfessorNewView() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/lesson/type")
+                .accept(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("duration", "1"))
+                .andExpect(model().attributeHasFieldErrorCode(
+                        "formOfLesson","duration","Range")).
+                andExpect(view().name("formOfLesson/add")).
+                andExpect(status().isOk());
+    }
+
+    @Test
     void updateShouldGetFormOfLessonFromModelAndRenderIndexView() throws Exception {
         FormOfLessonRequest formOfLessonRequest = new FormOfLessonRequest();
         formOfLessonRequest.setId(1L);
@@ -479,6 +492,18 @@ class LessonsControllerTest {
 
         verify(formOfLessonService).edit(formOfLessonRequest);
         verifyNoMoreInteractions(formOfLessonService);
+    }
+
+    @Test
+    void updateNotValidFormOfLessonShouldReturnProfessorNewView() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.patch("/lesson/type/1")
+                .accept(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("duration", "1"))
+                .andExpect(model().attributeHasFieldErrorCode(
+                        "formOfLessonRequest","duration","Range")).
+                andExpect(view().name("formOfLesson/edit")).
+                andExpect(status().isOk());
     }
 
     @Test
@@ -517,6 +542,7 @@ class LessonsControllerTest {
     void entityAlreadyExistShouldGetExceptionFromModelAndRenderErrorView() throws Exception {
         FormOfLessonRequest formOfLessonRequest = new FormOfLessonRequest();
         formOfLessonRequest.setName("lecture");
+        formOfLessonRequest.setDuration(30);
 
         Exception exception = new EntityAlreadyExistException("Form of lesson with same name already exist");
 
@@ -525,6 +551,7 @@ class LessonsControllerTest {
         mockMvc.perform(post("/lesson/type")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("name", formOfLessonRequest.getName())
+                .param("duration", formOfLessonRequest.getDuration().toString())
         )
                 .andExpect(status().isOk())
                 .andExpect(view().name("errors handling/entity already exist"))

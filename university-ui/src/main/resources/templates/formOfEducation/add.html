@@ -23,6 +23,7 @@
         <div class="form-floating mb-3">
             <input type="text" th:field="*{name}" class="form-control" id="name of formOfEducation" placeholder="Choose name of new form of education:">
             <label for="name of formOfEducation" th:text="#{enter.name.of.new.form.of.education}">Choose name of new form of education:</label>
+            <div style='color:red' th:if="${#fields.hasErrors('name')}" th:text="#{error.of.size.two.fifty}">Error message</div>
         </div>
 
         <input class="btn btn-success" type="submit" role="button" th:value="#{add.new.form.of.education}"/>
